@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VLAN 02 — Network Attached Storage (NAS) | Server+ Study Switchboard</title>
+  <style>
+:root {
+  --bg-primary: #0b0f17;
+  --bg-secondary: #131a26;
+  --bg-card: #182132;
+  --bg-card-hover: #1e293e;
+  --border-color: #2a3750;
+  --accent-cyan: #38bdf8;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  --accent-purple: #a855f7;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  padding-bottom: 4rem;
+}
+
+.topbar {
+  background: rgba(19, 26, 38, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0.85rem 1.5rem;
+}
+
+.topbar-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+}
+
+.brand-badge {
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  transition: all 0.15s ease;
+}
+
+.nav-btn:hover:not(.disabled) {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.nav-btn.disabled {
+  opacity: 0.38;
+  pointer-events: none;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1.75rem 1.5rem 0;
+}
+
+.vlan-banner {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(16, 185, 129, 0.08));
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-left: 4px solid var(--accent-cyan);
+  border-radius: 10px;
+  padding: 1.4rem 1.6rem;
+  margin-bottom: 1.75rem;
+}
+
+.vlan-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.vlan-pill {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-cyan);
+  background: rgba(56, 189, 248, 0.14);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+.isolation-pill {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--accent-emerald);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+h1 {
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  margin-bottom: 0.4rem;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 0.96rem;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 1.15rem;
+  margin-bottom: 1.5rem;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1.25rem 1.35rem;
+}
+
+.card h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.card h3 {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0.85rem 0 0.35rem;
+}
+
+.card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.6rem;
+}
+
+ul.clean-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+ul.clean-list li {
+  position: relative;
+  padding-left: 1.15rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+ul.clean-list li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--accent-cyan);
+  font-weight: bold;
+}
+
+ul.clean-list li strong {
+  color: var(--text-primary);
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.83rem;
+  background: rgba(15, 23, 42, 0.85);
+  color: var(--accent-amber);
+  padding: 0.12rem 0.38rem;
+  border-radius: 4px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-card);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+th {
+  background: #101724;
+  color: var(--accent-cyan);
+  font-weight: 700;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(42, 55, 80, 0.6);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+td strong {
+  color: var(--text-primary);
+}
+
+.callout {
+  background: rgba(245, 158, 11, 0.09);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-left: 4px solid var(--accent-amber);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.callout strong {
+  color: var(--accent-amber);
+}
+
+.footer-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-color);
+}
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-badge">SK1-006</span>
+        <span>SERVER+ VLAN SWITCHBOARD</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-btn">⌂ Trunk Index</a>
+        <a href="vlan-01.html" class="nav-btn">← VLAN 01</a>
+        <a href="vlan-03.html" class="nav-btn">VLAN 03 →</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="vlan-banner">
+      <div class="vlan-tag-row">
+        <span class="vlan-pill">VLAN 02 // ISOLATED DOMAIN</span>
+        <span class="isolation-pill">STRICT DOMAIN BOUNDARY — ZERO CROSS-VLAN LEAKAGE</span>
+      </div>
+      <h1>Network Attached Storage (NAS)</h1>
+      <p class="subtitle">File-level network storage appliances, SMB/CIFS, NFS, AFP, internal CoW file systems, and ACL permissions.</p>
+    </section>
+
+    
+<div class="callout">
+  <strong>DOMAIN SCOPE (VLAN 02):</strong> Everything inside this room belongs strictly to <strong>File-Level Network Attached Storage (NAS)</strong>. A NAS is a self-contained network appliance with its own OS, CPU, and internal file system that serves shared folders over standard IP networks.
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>File Protocol</th>
+        <th>Primary OS Ecosystem</th>
+        <th>Transport &amp; Ports</th>
+        <th>Path / Mount Syntax</th>
+        <th>Security &amp; Session Features</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>SMB / CIFS</strong><br><small>(Server Message Block)</small></td>
+        <td>Windows Server / Cross-platform (Samba)</td>
+        <td>Direct TCP Port <code>445</code><br><small>(Legacy NetBIOS: 137–139)</small></td>
+        <td>UNC Path:<br><code>\\nas-srv\share</code></td>
+        <td>SMB 3.x AES-128/256 encryption, SMB Signing, Kerberos/NTLM, SMB Multichannel</td>
+      </tr>
+      <tr>
+        <td><strong>NFS</strong><br><small>(Network File System)</small></td>
+        <td>Linux / UNIX / VMware ESXi</td>
+        <td>TCP/UDP Port <code>2049</code><br><small>(NFSv3 uses rpcbind 111)</small></td>
+        <td>Export Mount:<br><code>nas-srv:/exports/data</code></td>
+        <td>NFSv4 stateful sessions, firewall-friendly single port 2049, Kerberos (<code>krb5p</code>)</td>
+      </tr>
+      <tr>
+        <td><strong>AFP</strong><br><small>(Apple Filing Protocol)</small></td>
+        <td>Legacy macOS environments</td>
+        <td>TCP Port <code>548</code></td>
+        <td><code>afp://nas-srv/share</code></td>
+        <td>Deprecated by Apple in favor of SMB 3.x</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h2>NAS Architecture &amp; Internal File Systems</h2>
+    <ul class="clean-list">
+      <li><strong>Appliance Architecture:</strong> Dedicated storage head (CPU + RAM + NICs) running an embedded storage OS (TrueNAS, Synology DSM, QNAP QTS, NetApp ONTAP).</li>
+      <li><strong>File-Level Abstraction:</strong> Clients request files by directory path and filename; the NAS appliance manages underlying disk blocks, metadata, and file locking.</li>
+      <li><strong>ZFS (Zettabyte File System):</strong> Copy-on-Write (CoW) file system combining volume management, end-to-end data checksums (prevents silent bit rot), snapshots, and RAID-Z.</li>
+      <li><strong>Btrfs / XFS / ext4 / NTFS:</strong> Common internal NAS file systems supporting ACLs, quotas, and journaling.</li>
+      <li><strong>Write Caching (SLOG / ZIL):</strong> Dedicated fast NVMe/SSD cache used by NAS appliances to accelerate synchronous file writes.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Authentication, Permissions &amp; Quotas</h2>
+    <ul class="clean-list">
+      <li><strong>Directory Integration:</strong> Joins Active Directory (AD) or LDAP domains so users authenticate with centralized domain credentials.</li>
+      <li><strong>Share Permissions vs. NTFS/ACL Permissions:</strong> Access is governed by the <strong>most restrictive combination</strong> of network share-level permissions and underlying file-system ACLs.</li>
+      <li><strong>NFS Export Controls (<code>/etc/exports</code>):</strong> Restricts access by client IP/subnet, read-only (<code>ro</code>) vs. read-write (<code>rw</code>), and <code>root_squash</code> (maps remote root to unprivileged <code>nobody</code>).</li>
+      <li><strong>User &amp; Directory Quotas:</strong> Hard and soft storage limits enforced per user or per shared folder to prevent one department from filling the NAS.</li>
+      <li><strong>File Locking (Oplocks / Leases):</strong> Prevents two users from overwriting the same document simultaneously over SMB/NFS.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h2>NAS Networking &amp; Throughput</h2>
+    <ul class="clean-list">
+      <li><strong>Standard Ethernet Connectivity:</strong> Connects directly to standard Layer 2/Layer 3 Ethernet access/distribution switches via RJ45 (1GbE/10GbE) or SFP+/SFP28 NICs.</li>
+      <li><strong>Routable Layer 3 Traffic:</strong> Because SMB and NFS run over TCP/IP, clients can reach a NAS across subnets, VLANs, and site-to-site VPNs.</li>
+      <li><strong>LACP Link Aggregation (802.3ad):</strong> Bonds multiple physical Ethernet ports on the NAS to increase aggregate multi-client bandwidth and survive NIC/port failure.</li>
+      <li><strong>SMB Multichannel:</strong> Automatically detects multiple NIC paths between Windows clients and a NAS to aggregate throughput without requiring switch-side LACP.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Primary NAS Workloads &amp; Features</h2>
+    <ul class="clean-list">
+      <li><strong>User Home Directories &amp; Departmental Shares:</strong> Centralized document repositories, roaming profiles, and collaborative file servers.</li>
+      <li><strong>Media &amp; Archive Repositories:</strong> Video editing assets, ISO libraries, software installation repositories, and unstructured log archives.</li>
+      <li><strong>Backup Target Destination:</strong> Receives backup jobs over SMB/NFS from backup servers and agents.</li>
+      <li><strong>Copy-on-Write Snapshots:</strong> Instantaneous, space-efficient point-in-time file snapshots allowing self-service "Previous Versions" file recovery.</li>
+    </ul>
+  </div>
+</div>
+
+
+    <div class="footer-nav">
+      <a href="vlan-01.html" class="nav-btn">← VLAN 01</a>
+      <a href="index.html" class="nav-btn">⌂ Return to Switchboard</a>
+      <a href="vlan-03.html" class="nav-btn">VLAN 03 →</a>
+    </div>
+  </main>
+</body>
+</html>

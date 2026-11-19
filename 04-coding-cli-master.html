@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Server+ V6 — Linux/Windows CLI, Scripting &amp; Automation Master</title>
+<style>
+  :root {
+    --bg-main: #0a0f1c;
+    --bg-card: #111827;
+    --bg-panel: #0d1526;
+    --border-subtle: #1e293b;
+    --accent-cyan: #38bdf8;
+    --accent-teal: #2dd4bf;
+    --accent-amber: #fbbf24;
+    --accent-red: #f87171;
+    --accent-purple: #c084fc;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    line-height: 1.6;
+    padding: 16px 12px 64px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 20px 18px;
+    margin-bottom: 18px;
+  }
+  header h1 { font-size: 1.35rem; color: var(--accent-cyan); margin-bottom: 6px; }
+  header p { font-size: 0.9rem; color: var(--text-secondary); }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 18px 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+  }
+  .card h2 {
+    font-size: 1.08rem;
+    color: var(--accent-teal);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .badge {
+    font-size: 0.72rem;
+    background: rgba(56, 189, 248, 0.14);
+    color: var(--accent-cyan);
+    padding: 3px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  p { margin-bottom: 10px; color: var(--text-secondary); font-size: 0.92rem; }
+  strong { color: var(--text-primary); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 0.85rem;
+  }
+  th, td {
+    border: 1px solid #1e293b;
+    padding: 9px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #0f172a;
+    color: var(--accent-cyan);
+    font-weight: 700;
+  }
+  tr:nth-child(even) td { background: rgba(15, 23, 42, 0.5); }
+  .callout {
+    background: var(--bg-panel);
+    border-left: 3px solid var(--accent-amber);
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin: 10px 0;
+    font-size: 0.87rem;
+    color: #fef3c7;
+  }
+  .callout.teal {
+    border-left-color: var(--accent-teal);
+    color: #ccfbf1;
+  }
+  .callout.red {
+    border-left-color: var(--accent-red);
+    color: #fee2e2;
+  }
+  pre {
+    background: #070b14;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 12px;
+    overflow-x: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.82rem;
+    color: #7dd3fc;
+    margin: 10px 0;
+  }
+  code {
+    background: #1e293b;
+    color: #7dd3fc;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.84rem;
+  }
+  ul { padding-left: 18px; margin-bottom: 10px; color: var(--text-secondary); font-size: 0.9rem; }
+  li { margin-bottom: 6px; }
+  .sim-box {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 10px;
+  }
+  .sim-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 10px; }
+  select, input[type=number] {
+    background: #1e293b;
+    color: var(--text-primary);
+    border: 1px solid #475569;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.88rem;
+  }
+  button.btn {
+    background: var(--accent-cyan);
+    color: #090d16;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+  button.btn.danger { background: var(--accent-red); color: #fff; }
+  button.btn.reset { background: #334155; color: var(--text-primary); }
+  .locker-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 12px 0;
+  }
+  .locker {
+    background: #1e293b;
+    border: 2px solid var(--accent-teal);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    transition: 0.15s;
+  }
+  .locker.dead {
+    background: rgba(248, 113, 113, 0.18);
+    border-color: var(--accent-red);
+    color: #fca5a5;
+    text-decoration: line-through;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Server CLI, Scripting &amp; Automation Master Vault</h1>
+  <p>CompTIA Server+ V6 (SK1-006) • Essential Linux &amp; PowerShell Troubleshooting Commands, Socket Flags, Storage/LVM Workflows, Crontab, Systemd &amp; Ansible IaC.</p>
+</header>
+
+<section class="card">
+  <h2>1. Network &amp; Socket Diagnostics (Linux vs. Windows) <span class="badge">Must-Know CLI</span></h2>
+  <table>
+    <tr><th>Task</th><th>Linux Modern Command</th><th>Windows / PowerShell</th><th>Key Flags &amp; Exam Triggers</th></tr>
+    <tr><td><strong>Listening TCP/UDP + PIDs</strong></td><td><code>ss -ltnp</code> or <code>ss -tulpn</code></td><td><code>netstat -ano | findstr :443</code></td><td><code>-l</code> listening, <code>-t</code> TCP, <code>-u</code> UDP, <code>-n</code> numeric, <code>-p</code> process</td></tr>
+    <tr><td><strong>IP &amp; Link State</strong></td><td><code>ip addr show</code> / <code>ip link</code></td><td><code>ipconfig /all</code></td><td><code>169.254.x.x</code> = APIPA (DHCP unreachable)</td></tr>
+    <tr><td><strong>Routing Table</strong></td><td><code>ip route show</code></td><td><code>route print</code></td><td>Missing <code>default via</code> = local LAN works, WAN fails</td></tr>
+    <tr><td><strong>TCP Port Reachability</strong></td><td><code>nc -zv host 443</code></td><td><code>Test-NetConnection host -Port 443</code></td><td>Ping tests ICMP only; <code>tnc -Port</code> tests real TCP handshake</td></tr>
+    <tr><td><strong>MTU / Jumbo Frame Test</strong></td><td><code>ping -M do -s 8972 &lt;ip&gt;</code></td><td><code>ping -f -l 8972 &lt;ip&gt;</code></td><td>8972 payload + 28 header = 9000 bytes (Don't Fragment)</td></tr>
+    <tr><td><strong>NIC Speed &amp; Duplex</strong></td><td><code>ethtool eth0</code></td><td><code>Get-NetAdapter</code></td><td>Hardcoded Full + Auto peer = Half Duplex late collisions</td></tr>
+    <tr><td><strong>Flush DNS Cache</strong></td><td><code>resolvectl flush-caches</code></td><td><code>ipconfig /flushdns</code></td><td><code>127.0.0.53</code> failing = restart <code>systemd-resolved</code></td></tr>
+  </table>
+</section>
+
+<section class="card">
+  <h2>2. Linux Storage, LVM &amp; Filesystem Commands <span class="badge">Storage CLI</span></h2>
+  <pre># 1. Inspect block devices, partitions, and UUIDs (blank raw disks have NO UUID!)
+lsblk -f
+blkid
+
+# 2. Check human-readable disk space vs. INODE exhaustion
+df -h          # Shows GB/TB usage (e.g., 42% full)
+df -i          # Shows inode usage (100% IUse% = millions of tiny files!)
+
+# 3. Extend an LVM Logical Volume AND grow the filesystem inside it
+lvextend -r -L +4T /dev/vg_data/lv_files
+# (Without -r, you must manually run resize2fs for ext4 or xfs_growfs for XFS!)
+
+# 4. Safe /etc/fstab entry for iSCSI / NFS network storage (prevents boot hang!)
+UUID=a1b2-c3d4  /mnt/san  xfs  _netdev,nofail  0 0</pre>
+  <div class="callout"><strong>Exam Trigger:</strong> If <code>df -h</code> shows 120 GB free yet writes fail with <em>"No space left on device"</em>, check <code>df -i</code> (inode exhaustion). If <code>df -h</code> or <code>ls</code> hangs forever and ignores <code>kill -9</code>, you have a stale unreachable <strong>hard NFS mount</strong>.</div>
+</section>
+
+<section class="card">
+  <h2>3. Process, Memory, OOM Killer &amp; Systemd Supervision <span class="badge">OS Internals</span></h2>
+  <pre># Check CPU I/O wait (%wa) and load average
+top            # High %wa (>50%) = slow disk/SAN bottleneck, NOT CPU shortage!
+vmstat 1       # High si/so (swap-in/swap-out) = physical RAM thrashing
+
+# Catch the Linux OOM (Out-of-Memory) Killer red-handed
+dmesg -T | grep -i -E "kill|oom"
+
+# Systemd unit auto-recovery after crash (inside [Service] section)
+[Service]
+ExecStart=/usr/local/bin/payment-api
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65535   # Fixes "Too many open files (EMFILE)" socket exhaustion!</pre>
+</section>
+
+<section class="card">
+  <h2>4. Crontab Scheduling &amp; Safe Sudo Delegation <span class="badge">Automation</span></h2>
+  <pre># Crontab field order: Minute(0-59)  Hour(0-23)  Day(1-31)  Month(1-12)  Weekday(0-7, 0/7=Sun)
+30 3 * * 0   /usr/local/bin/backup.sh      # Runs every Sunday at 03:30 AM
+0 */6 * * *  /usr/local/bin/healthcheck.sh # Runs every 6 hours at minute 0
+
+# Least-privilege sudo delegation (ALWAYS edit via visudo to prevent syntax lockouts!)
+visudo
+operator_user ALL=(ALL) NOPASSWD: /bin/systemctl restart httpd</pre>
+</section>
+
+<section class="card">
+  <h2>5. Infrastructure-as-Code (IaC), GitOps &amp; AI CLI Tools <span class="badge">V6 Modern Stack</span></h2>
+  <table>
+    <tr><th>Tool / File</th><th>Category</th><th>How It Works &amp; Exam Distinction</th></tr>
+    <tr><td><strong>Ansible (YAML)</strong></td><td>Configuration Management</td><td><strong>Agentless</strong> push over SSH; enforces idempotent desired state and fixes configuration drift.</td></tr>
+    <tr><td><strong>Terraform / OpenTofu</strong></td><td>Infrastructure Provisioning</td><td>Declarative HCL builds cloud/VM infrastructure state; tracks resources in state files.</td></tr>
+    <tr><td><strong>Kickstart / Preseed / Cloud-Init</strong></td><td>Zero-Touch OS Install</td><td>Unattended answer files paired with <strong>PXE network boot</strong> for bare-metal server fleets.</td></tr>
+    <tr><td><strong><code>nvidia-smi</code> / <code>dcgm-exporter</code></strong></td><td>AI GPU Telemetry</td><td>Monitors HBM VRAM usage, ECC Xid errors, power draw, and memory junction hotspot temps.</td></tr>
+  </table>
+</section>
+</body>
+</html>

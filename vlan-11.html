@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VLAN 11 — Virtualization, Hypervisors & Containers | Server+ Study Switchboard</title>
+  <style>
+:root {
+  --bg-primary: #0b0f17;
+  --bg-secondary: #131a26;
+  --bg-card: #182132;
+  --bg-card-hover: #1e293e;
+  --border-color: #2a3750;
+  --accent-cyan: #38bdf8;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  --accent-purple: #a855f7;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  padding-bottom: 4rem;
+}
+
+.topbar {
+  background: rgba(19, 26, 38, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0.85rem 1.5rem;
+}
+
+.topbar-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+}
+
+.brand-badge {
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  transition: all 0.15s ease;
+}
+
+.nav-btn:hover:not(.disabled) {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.nav-btn.disabled {
+  opacity: 0.38;
+  pointer-events: none;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1.75rem 1.5rem 0;
+}
+
+.vlan-banner {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(16, 185, 129, 0.08));
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-left: 4px solid var(--accent-cyan);
+  border-radius: 10px;
+  padding: 1.4rem 1.6rem;
+  margin-bottom: 1.75rem;
+}
+
+.vlan-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.vlan-pill {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-cyan);
+  background: rgba(56, 189, 248, 0.14);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+.isolation-pill {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--accent-emerald);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+h1 {
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  margin-bottom: 0.4rem;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 0.96rem;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 1.15rem;
+  margin-bottom: 1.5rem;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1.25rem 1.35rem;
+}
+
+.card h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.card h3 {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0.85rem 0 0.35rem;
+}
+
+.card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.6rem;
+}
+
+ul.clean-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+ul.clean-list li {
+  position: relative;
+  padding-left: 1.15rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+ul.clean-list li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--accent-cyan);
+  font-weight: bold;
+}
+
+ul.clean-list li strong {
+  color: var(--text-primary);
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.83rem;
+  background: rgba(15, 23, 42, 0.85);
+  color: var(--accent-amber);
+  padding: 0.12rem 0.38rem;
+  border-radius: 4px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-card);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+th {
+  background: #101724;
+  color: var(--accent-cyan);
+  font-weight: 700;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(42, 55, 80, 0.6);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+td strong {
+  color: var(--text-primary);
+}
+
+.callout {
+  background: rgba(245, 158, 11, 0.09);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-left: 4px solid var(--accent-amber);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.callout strong {
+  color: var(--accent-amber);
+}
+
+.footer-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-color);
+}
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-badge">SK1-006</span>
+        <span>SERVER+ VLAN SWITCHBOARD</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-btn">⌂ Trunk Index</a>
+        <a href="vlan-10.html" class="nav-btn">← VLAN 10</a>
+        <a href="vlan-12.html" class="nav-btn">VLAN 12 →</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="vlan-banner">
+      <div class="vlan-tag-row">
+        <span class="vlan-pill">VLAN 11 // ISOLATED DOMAIN</span>
+        <span class="isolation-pill">STRICT DOMAIN BOUNDARY — ZERO CROSS-VLAN LEAKAGE</span>
+      </div>
+      <h1>Virtualization, Hypervisors & Containers</h1>
+      <p class="subtitle">Type 1 vs. Type 2 hypervisors, vSwitches, Thin vs. Thick provisioning, VM snapshots, Ballooning, Live Migration, and Containers/K8s.</p>
+    </section>
+
+    
+<div class="callout">
+  <strong>DOMAIN SCOPE (VLAN 11):</strong> Everything inside this room belongs strictly to <strong>Type 1 &amp; Type 2 Hypervisors, Virtual Networking (vSwitches), VM Storage &amp; Snapshots, Resource Overcommitment, Live Migration, and Containers/Kubernetes</strong>.
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Architecture</th>
+        <th>Execution Layer</th>
+        <th>Examples</th>
+        <th>Isolation &amp; Footprint</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Type 1 Hypervisor</strong><br><small>(Bare-Metal)</small></td>
+        <td>Installs directly onto physical server hardware with no underlying host OS</td>
+        <td>VMware ESXi, Microsoft Hyper-V, KVM, Citrix Hypervisor (XenServer)</td>
+        <td>Hardware-level isolation; lowest overhead; enterprise production standard.</td>
+      </tr>
+      <tr>
+        <td><strong>Type 2 Hypervisor</strong><br><small>(Hosted)</small></td>
+        <td>Runs as a software application on top of a conventional host OS</td>
+        <td>VMware Workstation, Oracle VirtualBox, Parallels Desktop</td>
+        <td>Higher latency due to host OS scheduling; used for dev/test labs only.</td>
+      </tr>
+      <tr>
+        <td><strong>Containers</strong><br><small>(OS-Level Virtualization)</small></td>
+        <td>Shares the <strong>host OS kernel</strong>; isolates user-space processes via <code>namespaces</code> &amp; <code>cgroups</code></td>
+        <td>Docker, containerd, Podman, orchestrated by Kubernetes (K8s)</td>
+        <td>Megabytes in size, millisecond startup; ephemeral by default unless mapped to Persistent Volumes.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h2>VM Storage Provisioning &amp; Snapshots</h2>
+    <ul class="clean-list">
+      <li><strong>Thick Provisioning (Lazy vs. Eager Zeroed):</strong> Allocates 100% of virtual disk capacity upfront (e.g., 500 GB VMDK/VHDX consumes 500 GB immediately); Eager Zeroed wipes blocks upfront for highest initial write speed.</li>
+      <li><strong>Thin Provisioning:</strong> Allocates physical blocks dynamically only as data is written; saves storage space but requires capacity alerts to prevent datastore exhaustion.</li>
+      <li><strong>VM Snapshots (Delta Disks):</strong> Captures a point-in-time state by freezing the base virtual disk as read-only and writing all new changes to a child delta file (<code>-delta.vmdk</code> / <code>.avhdx</code>).</li>
+      <li><strong>Snapshot Warning:</strong> Snapshots are <strong>NOT backups</strong>; leaving long snapshot chains active degrades I/O performance and risks filling the datastore until consolidated/deleted.</li>
+      <li><strong>Golden Templates &amp; Cloning:</strong> Pre-hardened, patched master VM images used to rapidly stamp out identical VMs (requires <code>Sysprep</code> on Windows or <code>cloud-init</code> on Linux to reset SIDs/machine-IDs).</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Resource Overcommitment, vSwitch &amp; Migrations</h2>
+    <ul class="clean-list">
+      <li><strong>CPU &amp; Memory Overcommitment:</strong> Assigning more total vCPUs or vRAM across VMs than physically installed on the host.</li>
+      <li><strong>Memory Ballooning &amp; TPS:</strong> Balloon driver inside the guest OS reclaims idle RAM from low-priority VMs to give to busy VMs; Transparent Page Sharing (TPS) deduplicates identical memory pages.</li>
+      <li><strong>Virtual Switch (vSwitch):</strong> Software Layer 2 switch inside the hypervisor connecting VM vNICs (Port Groups) to physical uplinks (<code>vmnic</code>) and dedicated VMkernel ports (Management, vMotion, Storage).</li>
+      <li><strong>Live Migration (vMotion / Hyper-V Live Migration):</strong> Transfers active memory state of a running VM between physical hosts over a dedicated high-speed network with zero user downtime.</li>
+      <li><strong>Storage Migration (Storage vMotion):</strong> Moves a running VM's virtual disk files between datastores without powering off the VM.</li>
+    </ul>
+  </div>
+</div>
+
+
+    <div class="footer-nav">
+      <a href="vlan-10.html" class="nav-btn">← VLAN 10</a>
+      <a href="index.html" class="nav-btn">⌂ Return to Switchboard</a>
+      <a href="vlan-12.html" class="nav-btn">VLAN 12 →</a>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SK0-006 // Chapter 3: Maintenance &amp; Licensing Tactical Reference</title>
+  <style>
+    /* ==========================================================================
+       DESIGN TOKENS & RESET (Tactical Dark-Navy Theme, Zero External Dependencies)
+       ========================================================================== */
+    :root {
+      --bg-base: #0b1120;
+      --bg-surface: #131c31;
+      --bg-surface-hover: #18233d;
+      --bg-inset: #080d19;
+      --border-subtle: #1e2d4a;
+      --border-strong: #2d426b;
+      --accent-cyan: #38bdf8;
+      --accent-cyan-dim: rgba(56, 189, 248, 0.14);
+      --accent-emerald: #34d399;
+      --accent-emerald-dim: rgba(52, 211, 153, 0.14);
+      --accent-amber: #fbbf24;
+      --accent-amber-dim: rgba(251, 191, 36, 0.14);
+      --accent-rose: #fb7185;
+      --accent-rose-dim: rgba(251, 113, 133, 0.14);
+      --text-primary: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+      --shadow-card: 0 8px 24px -6px rgba(0, 0, 0, 0.45);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ==========================================================================
+       LAYOUT & HEADER
+       ========================================================================== */
+    .app-shell {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 3.5rem;
+    }
+
+    .tactical-header {
+      background: linear-gradient(145deg, #131c31 0%, #0e1628 100%);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.35rem 1.5rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tactical-header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-emerald));
+    }
+
+    .header-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+    }
+
+    .badge-cyan {
+      color: var(--accent-cyan);
+      background: var(--accent-cyan-dim);
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+
+    .badge-emerald {
+      color: var(--accent-emerald);
+      background: var(--accent-emerald-dim);
+      border-color: rgba(52, 211, 153, 0.3);
+    }
+
+    .badge-amber {
+      color: var(--accent-amber);
+      background: var(--accent-amber-dim);
+      border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    .tactical-header h1 {
+      margin: 0 0 0.35rem;
+      font-size: clamp(1.3rem, 3.5vw, 1.75rem);
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      color: #f8fafc;
+    }
+
+    .tactical-header p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+    }
+
+    /* ==========================================================================
+       PRIMARY VIEW SWITCHER TABS
+       ========================================================================== */
+    .nav-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.65rem;
+      background: var(--bg-inset);
+      padding: 0.45rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 1.35rem;
+    }
+
+    .tab-btn {
+      appearance: none;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 0.8rem 0.9rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      min-height: 48px;
+      text-align: center;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .tab-btn.active {
+      background: var(--bg-surface);
+      color: var(--accent-cyan);
+      border-color: var(--border-strong);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .tab-btn.active .tab-pill {
+      background: var(--accent-cyan);
+      color: #06101f;
+    }
+
+    .tab-pill {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.12rem 0.45rem;
+      border-radius: 999px;
+      background: var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .view-panel {
+      display: none;
+      animation: fadeSlide 0.2s ease-out;
+    }
+
+    .view-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================================================
+       SECTION 1: LICENSING & MAINTENANCE DECODER (SWITCHBOARD)
+       ========================================================================== */
+    .filter-toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.2rem;
+    }
+
+    @media (min-width: 680px) {
+      .filter-toolbar {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+
+    .filter-chip {
+      appearance: none;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 0.55rem 0.8rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      min-height: 40px;
+    }
+
+    .filter-chip:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+    }
+
+    .filter-chip.active {
+      background: var(--accent-cyan-dim);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 100%;
+    }
+
+    @media (min-width: 680px) {
+      .search-box {
+        max-width: 280px;
+      }
+    }
+
+    .search-box input {
+      width: 100%;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.88rem;
+      padding: 0.6rem 0.85rem;
+      border-radius: var(--radius-md);
+      outline: none;
+      min-height: 40px;
+      transition: border-color 0.15s ease;
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent-cyan);
+    }
+
+    .search-box input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .decoder-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .ghost-btn {
+      appearance: none;
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      padding: 0.4rem 0.7rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      min-height: 36px;
+    }
+
+    .ghost-btn:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    .decoder-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+    }
+
+    .decoder-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .decoder-card:hover {
+      border-color: var(--border-strong);
+    }
+
+    .decoder-card.open {
+      border-color: rgba(56, 189, 248, 0.45);
+      box-shadow: var(--shadow-card);
+    }
+
+    .card-header-btn {
+      width: 100%;
+      appearance: none;
+      background: transparent;
+      border: none;
+      color: inherit;
+      text-align: left;
+      padding: 1.05rem 1.15rem;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.9rem;
+      min-height: 60px;
+    }
+
+    .card-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .card-title {
+      font-size: 1.04rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin: 0;
+    }
+
+    .card-hook {
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .chevron {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-cyan);
+      transition: transform 0.2s ease, background 0.2s ease;
+      margin-top: 0.15rem;
+    }
+
+    .decoder-card.open .chevron {
+      transform: rotate(180deg);
+      background: var(--accent-cyan-dim);
+    }
+
+    .card-body {
+      display: none;
+      padding: 0 1.15rem 1.2rem;
+      border-top: 1px solid var(--border-subtle);
+      background: rgba(8, 13, 25, 0.35);
+    }
+
+    .decoder-card.open .card-body {
+      display: block;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      margin-top: 0.95rem;
+    }
+
+    @media (min-width: 680px) {
+      .comparison-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+    }
+
+    .sub-pane {
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 0.95rem;
+    }
+
+    .sub-pane h4 {
+      margin: 0 0 0.4rem;
+      font-size: 0.86rem;
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .sub-pane.emerald h4 {
+      color: var(--accent-emerald);
+    }
+
+    .sub-pane p, .sub-pane ul {
+      margin: 0;
+      font-size: 0.88rem;
+      color: var(--text-primary);
+    }
+
+    .sub-pane ul {
+      padding-left: 1.15rem;
+    }
+
+    .sub-pane li {
+      margin-bottom: 0.3rem;
+    }
+
+    .exam-trap-callout {
+      margin-top: 0.85rem;
+      background: var(--accent-emerald-dim);
+      border-left: 3px solid var(--accent-emerald);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 0.75rem 0.95rem;
+      font-size: 0.87rem;
+    }
+
+    .exam-trap-callout strong {
+      color: var(--accent-emerald);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    .rpm-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.9rem;
+      font-size: 0.85rem;
+      background: var(--bg-inset);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .rpm-table th, .rpm-table td {
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .rpm-table th {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--accent-cyan);
+      background: rgba(19, 28, 49, 0.8);
+    }
+
+    .rpm-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius-lg);
+      color: var(--text-secondary);
+      display: none;
+    }
+
+    /* ==========================================================================
+       SECTION 2: CHAPTER 3 SCENARIO DRILL (5 EXAM-TRAP QUESTIONS)
+       ========================================================================== */
+    .quiz-hud {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.15rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.85rem;
+    }
+
+    .hud-stats {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .stat-block {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+
+    .stat-value.emerald {
+      color: var(--accent-emerald);
+    }
+
+    .reset-btn {
+      appearance: none;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.65rem 1rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      min-height: 44px;
+    }
+
+    .reset-btn:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      background: var(--accent-cyan-dim);
+    }
+
+    .quiz-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+    }
+
+    .question-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .q-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .q-prompt {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: #f8fafc;
+      margin: 0 0 1rem;
+      line-height: 1.55;
+    }
+
+    .options-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .option-btn {
+      width: 100%;
+      appearance: none;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1rem;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.91rem;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      transition: all 0.15s ease;
+      min-height: 48px;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--accent-cyan);
+      background: var(--bg-surface-hover);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-letter {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-cyan);
+      margin-top: 0.05rem;
+    }
+
+    .option-btn.correct {
+      background: var(--accent-emerald-dim);
+      border-color: var(--accent-emerald);
+      color: #f8fafc;
+    }
+
+    .option-btn.correct .option-letter {
+      background: var(--accent-emerald);
+      border-color: var(--accent-emerald);
+      color: #051b11;
+    }
+
+    .option-btn.incorrect {
+      background: var(--accent-rose-dim);
+      border-color: var(--accent-rose);
+      color: #fecdd3;
+    }
+
+    .option-btn.incorrect .option-letter {
+      background: var(--accent-rose);
+      border-color: var(--accent-rose);
+      color: #1f050a;
+    }
+
+    .option-btn.dimmed {
+      opacity: 0.55;
+    }
+
+    .rationale-box {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.95rem 1.05rem;
+      border-radius: var(--radius-md);
+      background: var(--bg-inset);
+      border: 1px solid var(--border-strong);
+      font-size: 0.88rem;
+    }
+
+    .rationale-box.visible {
+      display: block;
+      animation: fadeSlide 0.2s ease-out;
+    }
+
+    .rationale-status {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+
+    .rationale-status.pass {
+      color: var(--accent-emerald);
+    }
+
+    .rationale-status.fail {
+      color: var(--accent-rose);
+    }
+
+    .rationale-box p {
+      margin: 0 0 0.55rem;
+      color: var(--text-primary);
+    }
+
+    .rationale-box p:last-child {
+      margin-bottom: 0;
+      color: var(--text-secondary);
+    }
+
+    .summary-banner {
+      display: none;
+      margin-top: 1.25rem;
+      padding: 1.25rem;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(145deg, rgba(52, 211, 153, 0.14), rgba(56, 189, 248, 0.12));
+      border: 1px solid var(--accent-emerald);
+      text-align: center;
+    }
+
+    .summary-banner.visible {
+      display: block;
+    }
+
+    .summary-banner h3 {
+      margin: 0 0 0.35rem;
+      color: #f8fafc;
+      font-size: 1.15rem;
+    }
+
+    .summary-banner p {
+      margin: 0 0 0.9rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .footer-note {
+      margin-top: 2.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- TACTICAL HEADER -->
+    <header class="tactical-header">
+      <div class="header-meta">
+        <span class="badge badge-cyan">CompTIA Server+ // SK0-006</span>
+        <span class="badge badge-emerald">Chapter 3 // Maintenance &amp; Licensing</span>
+      </div>
+      <h1>Server Maintenance &amp; Licensing Tactical Decoder</h1>
+      <p>High-yield exam-trap switchboard and 5-question scenario drill covering enterprise licensing math, open-source obligations, drive latency tiers, and firmware non-volatile memory.</p>
+    </header>
+
+    <!-- PRIMARY VIEW SWITCHER -->
+    <nav class="nav-tabs" role="tablist" aria-label="Study Modes">
+      <button class="tab-btn active" id="tab-decoder" role="tab" aria-selected="true" aria-controls="panel-decoder" type="button">
+        <span>1. Licensing &amp; Maintenance Decoder</span>
+        <span class="tab-pill">8 Cards</span>
+      </button>
+      <button class="tab-btn" id="tab-drill" role="tab" aria-selected="false" aria-controls="panel-drill" type="button">
+        <span>2. Chapter 3 Scenario Drill</span>
+        <span class="tab-pill">5 Qs</span>
+      </button>
+    </nav>
+
+    <!-- ======================================================================
+         PANEL 1: LICENSING & MAINTENANCE DECODER
+         ====================================================================== -->
+    <main id="panel-decoder" class="view-panel active" role="tabpanel" aria-labelledby="tab-decoder">
+      <div class="filter-toolbar">
+        <div class="filter-pills" role="group" aria-label="Filter topics">
+          <button class="filter-chip active" data-filter="all" type="button">All Topics (8)</button>
+          <button class="filter-chip" data-filter="licensing" type="button">Licensing (5)</button>
+          <button class="filter-chip" data-filter="maintenance" type="button">Hardware &amp; Firmware (3)</button>
+        </div>
+        <div class="search-box">
+          <input type="search" id="decoder-search" placeholder="Filter by keyword (e.g., True-Up, GPL, NVRAM)..." aria-label="Filter reference cards" />
+        </div>
+      </div>
+
+      <div class="decoder-actions">
+        <button class="ghost-btn" id="expand-all-btn" type="button">+ Expand All</button>
+        <button class="ghost-btn" id="collapse-all-btn" type="button">- Collapse All</button>
+      </div>
+
+      <div class="decoder-grid" id="decoder-grid">
+        <!-- CARD 1: TRUE-UP AGREEMENTS -->
+        <article class="decoder-card open" data-category="licensing" data-keywords="true-up true up enterprise agreement audit compliance annual reconciliation">
+          <button class="card-header-btn" type="button" aria-expanded="true">
+            <div class="card-title-group">
+              <div class="card-tags">
+                <span class="badge badge-cyan">Licensing // Enterprise</span>
+                <span class="badge badge-amber">High Exam Frequency</span>
+              </div>
+              <h2 class="card-title">True-Up Agreements &amp; Compliance Reconciliation</h2>
+              <p class="card-hook">Annual enterprise accounting that prevents mid-year compliance violations during rapid growth.</p>
+            </div>
+            <span class="chevron" aria-hidden="true">&#9662;</span>
+          </button>
+          <div class="card-body">
+            <div class="comparison-grid">
+              <div class="sub-pane">
+                <h4>How True-Up Works</h4>
+                <p>Under an Enterprise Agreement (EA), an organization is authorized to deploy additional software instances, VMs, or seats throughout the year without stopping to issue purchase orders first. Once per year (anniversary date), IT performs an internal count and pays the vendor for the net-new licenses added.</p>
+              </div>
+              <div class="sub-pane emerald">
+                <h4>True-Up vs. Vendor Audit</h4>
+                <p>A <strong>True-Up</strong> is a planned, contractual reconciliation built into an EA. A <strong>Vendor Audit</strong> is an external compliance inspection where you must produce written or digital proof of entitlement for every active installation or face penalty fees.</p>
+              </div>
+            </div>
+            <div class="exam-trap-callout">
+              <strong>SK0-006 Exam Trigger</strong>
+              If a scenario describes a fast-growing company spinning up extra servers mid-year and asks which mechanism keeps them compliant by reconciling and paying for the overage at the end of the annual cycle, select <strong>True-Up</strong>.
+            </div>
+          </div>
+        </article>
+
+        <!-- CARD 2: COPYLEFT VS PERMISSIVE -->
+        <article class="decoder-card" data-category="licensing" data-keywords="copyleft gpl permissive mit apache bsd open source proprietary derivative">
+          <button class="card-header-btn" type="button" aria-expanded="false">
+            <div class="card-title-group">
+              <div class="card-tags">
+                <span class="badge badge-cyan">Licensing // Open Source</span>
+              </div>
+              <h2 class="card-title">Copyleft (GPL) vs. Permissive (MIT / Apache / BSD)</h2>
+              <p class="card-hook">The legal rules governing whether modified open-source code can be closed up and sold.</p>
+            </div>
+            <span class="chevron" aria-hidden="true">&#9662;</span>
+          </button>
+          <div class="card-body">
+            <div class="comparison-grid">
+              <div class="sub-pane">
+                <h4>Copyleft (e.g., GNU GPL)</h4>
+                <ul>
+                  <li><strong>"Share and share alike"</strong> viral obligation.</li>
+                  <li>If you modify GPL code and distribute the resulting binary/application, you <strong>must</strong> release your modified source code under the exact same GPL license.</li>
+                  <li>Cannot be wrapped into a closed-source proprietary product.</li>
+                </ul>
+              </div>
+              <div class="sub-pane emerald">
+                <h4>Permissive (e.g., MIT, Apache 2.0, BSD)</h4>
+                <ul>
+                  <li>Minimal restrictions on reuse and redistribution.</li>
+                  <li>You may modify the code, integrate it into a commercial product, and distribute it as <strong>closed-source proprietary</strong> software.</li>
+                  <li>Typically only requires preserving the original copyright notice and license text.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="exam-trap-callout">
+              <strong>SK0-006 Exam Trigger</strong>
+              A software team wants to fork an open-source utility, add proprietary features, and sell it commercially without publishing their source code. They must avoid <strong>Copyleft (GPL)</strong> and choose a <strong>Permissive</strong> license.
+            </div>
+          </div>
+        </article>
+
+        <!-- CARD 3: PER-SOCKET, PER-CORE & VIRTUAL OSE STACKING -->
+        <article class="decoder-card" data-category="licensing" data-keywords="per-socket per-core physical virtual ose windows server standard datacenter vm stacking">
+          <button class="card-header-btn" type="button" aria-expanded="false">
+            <div class="card-title-group">
+              <div class="card-tags">
+                <span class="badge badge-cyan">Licensing // Compute &amp; VMs</span>
+                <span class="badge badge-amber">Math Trap</span>
+              </div>
+              <h2 class="card-title">Per-Socket vs. Per-Core &amp; Physical/Virtual OSE Stacking</h2>
+              <p class="card-hook">Counting physical CPU chips vs. individual cores, and the 2-VM ceiling on Windows Server Standard.</p>
+            </div>
+            <span class="chevron" aria-hidden="true">&#9662;</span>
+          </button>
+          <div class="card-body">
+            <div class="comparison-grid">
+              <div class="sub-pane">
+                <h4>Per-Socket vs. Per-Core</h4>
+                <ul>
+                  <li><strong>Per-Socket:</strong> Counts physical CPU packages plugged into motherboard sockets (e.g., a dual-socket 2U host needs 2 socket licenses regardless of core count).</li>
+                  <li><strong>Per-Core:</strong> Counts every physical core across all sockets (modern Windows Server requires licensing all physical cores, with a 16-core server minimum).</li>
+                </ul>
+              </div>
+              <div class="sub-pane emerald">
+                <h4>Physical vs. Virtual OSEs</h4>
+                <ul>
+                  <li><strong>Windows Server Standard:</strong> Licensing all physical cores entitles you to <strong>2 Virtual OSEs</strong> (VMs) + 1 physical host (for Hyper-V management only). Need 4 VMs? You must <strong>stack</strong> (buy a second full set of core licenses).</li>
+                  <li><strong>Windows Server Datacenter:</strong> Licensing all physical cores once grants <strong>unlimited</strong> virtual OSEs on that host.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="exam-trap-callout">
+              <strong>SK0-006 Exam Trigger</strong>
+              Running 4 Windows Server Standard VMs on a single dual-socket physical host requires licensing the physical host's cores <strong>twice</strong> (2 OSEs per license set). Above ~10–12 VMs, Datacenter becomes cheaper than stacking Standard.
+            </div>
+          </div>
+        </article>
+
+        <!-- CARD 4: PER-CONCURRENT USER VS PER-SEAT VS NODE-LOCKED -->
+        <article class="decoder-card" data-category="licensing" data-keywords="per-concurrent user per-seat per-server node-locked mac address simultaneous">
+          <button class="card-header-btn" type="button" aria-expanded="false">
+            <div class="card-title-group">
+              <div class="card-tags">
+                <span class="badge badge-cyan">Licensing // Access &amp; Binding</span>
+              </div>
+              <h2 class="card-title">Per-Concurrent User vs. Per-Seat / Per-Server vs. Node-Locked</h2>
+              <p class="card-hook">Distinguishing simultaneous session pools from named users and hardware-bound keys.</p>
+            </div>
+            <span class="chevron" aria-hidden="true">&#9662;</span>
+          </button>
+          <div class="card-body">
+            <div class="comparison-grid">
+              <div class="sub-pane">
+                <h4>User &amp; Server Models</h4>
+                <ul>
+                  <li><strong>Per-Concurrent User:</strong> Caps <em>simultaneous</em> active sessions. You can install the app on 200 workstations with 100 licenses; user #101 trying to connect at the same moment is denied.</li>
+                  <li><strong>Per-Seat (Named User):</strong> Every individual user or client device that can access the server requires its own dedicated Client Access License (CAL).</li>
+                  <li><strong>Per-Server:</strong> Licenses are assigned to the server itself to cover a fixed max number of simultaneous client connections.</li>
+                </ul>
+              </div>
+              <div class="sub-pane emerald">
+                <h4>Node-Locked &amp; Per-Instance</h4>
+                <ul>
+                  <li><strong>Node-Locked:</strong> Strictly tied to a single physical machine's unique hardware identifier (MAC address, CPU ID, or motherboard serial). Replacing the NIC/motherboard breaks activation until re-hosted.</li>
+                  <li><strong>Per-Instance:</strong> Counts every running OS or container instance, even if multiple instances run on the same physical or virtual host.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="exam-trap-callout">
+              <strong>SK0-006 Exam Trigger</strong>
+              A call center has 300 staff working across three 8-hour shifts (100 staff per shift). Which model minimizes cost legally? <strong>Per-Concurrent User</strong> (100 licenses).
+            </div>
+          </div>
+        </article>
+
+        <!-- CARD 5: FORWARD-COMPATIBLE VS VOLUME / SITE-BASED -->
+        <article class="decoder-card" data-category="licensing" data-keywords="forward compatible volume site-based vlk mak kms downgrade">
+          <button class="card-header-btn" type="button" aria-expanded="false">
+            <div class="card-title-group">
+              <div class="card-tags">
+                <span class="badge badge-cyan">Licensing // Deployment Keys</span>
+              </div>
+              <h2 class="card-title">Forward-Compatible vs. Site-Based &amp; Volume Licensing</h2>
+              <p class="card-hook">Minor-version upgrade rights vs. single-key mass deployment across an organization.</p>
+            </div>
+            <span class="chevron" aria-hidden="true">&#9662;</span>
+          </button>
+          <div class="card-body">
+            <div class="comparison-grid">
+              <div class="sub-pane">
+                <h4>Forward-Compatible License</h4>
+                <p>Purchased for an older release (e.g., Windows Server 2012) but legally valid to demonstrate compliance for a <strong>minor</strong> newer release (e.g., Windows Server 2012 R2). Does <em>not</em> cover major version jumps (e.g., 2019 to 2022) unless covered by active Software Assurance.</p>
+              </div>
+              <div class="sub-pane emerald">
+                <h4>Site-Based &amp; Volume Licensing</h4>
+                <p>Allows installing software across many systems using a single <strong>Volume License Key (VLK)</strong> up to a contracted installation ceiling (or unlimited within a specific campus/site boundary), eliminating individual retail product keys.</p>
+              </div>
+            </div>
+            <div class="exam-trap-callout">
+              <strong>SK0-006 Exam Trigger</strong>
+              Watch the wording: <strong>Forward-compatible</strong> applies to minor point/R2 releases without buying new keys; mass-deploying 80 identical servers with one key is <strong>Volume / Site-Based</strong> licensing.
+            </div>
+          </div>
+        </article>
+
+        <!-- CARD 6: HDD RPM & LATENCY TIERS -->
+        <article class="decoder-card" data-category="maintenance" data-keywords="hdd rpm 5400 7200 10000 15000 latency ms rotational speed ssd hybrid">
+          <button class="card-header-btn" type="button" aria-expanded="false">
+            <div class="card-title-group">
+              <div class="card-tags">
+                <span class="badge badge-emerald">Hardware // Storage Performance</span>
+              </div>
+              <h2 class="card-title">Magnetic HDD RPM Tiers, Rotational Latency &amp; Hybrid Drives</h2>
+              <p class="card-hook">Exact rotational latency figures (ms) from 5,400 RPM up to 15,000 RPM enterprise SAS drives.</p>
+            </div>
+            <span class="chevron" aria-hidden="true">&#9662;</span>
+          </button>
+          <div class="card-body">
+            <table class="rpm-table">
+              <thead>
+                <tr>
+                  <th>Spindle Speed</th>
+                  <th>Avg. Rotational Latency</th>
+                  <th>Typical Role &amp; Thermal Profile</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>5,400 RPM</strong></td>
+                  <td>~5.5 ms</td>
+                  <td>Low-power archival / cold bulk storage; lowest heat and throughput.</td>
+                </tr>
+                <tr>
+                  <td><strong>7,200 RPM</strong></td>
+                  <td>~4.2 ms</td>
+                  <td>Standard nearline enterprise SATA/SAS capacity drives (~1030 Mbps sustained).</td>
+                </tr>
+                <tr>
+                  <td><strong>10,000 RPM</strong></td>
+                  <td>~3.0 ms</td>
+                  <td>Performance enterprise SAS (~1.5 Gb/s); higher heat &amp; airflow demand.</td>
+                </tr>
+                <tr>
+                  <td><strong>15,000 RPM</strong></td>
+                  <td>~2.0 ms</td>
+                  <td>Legacy high-IOPS transactional SAS (~2 Gb/s); highest heat, power &amp; noise.</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="exam-trap-callout">
+              <strong>SK0-006 Exam Trigger</strong>
+              Faster RPM reduces <strong>rotational latency</strong> (the time waiting for the platter sector to spin under the read/write head) and boosts transfer rate, but increases heat output—requiring verification of chassis cooling capacity.
+            </div>
+          </div>
+        </article>
+
+        <!-- CARD 7: HOT-SWAPPABLE ADMINISTRATIVE PREREQUISITES -->
+        <article class="decoder-card" data-category="maintenance" data-keywords="hot-swappable hot swap raid unmount quiesce os boot drive">
+          <button class="card-header-btn" type="button" aria-expanded="false">
+            <div class="card-title-group">
+              <div class="card-tags">
+                <span class="badge badge-emerald">Hardware // Maintenance</span>
+                <span class="badge badge-amber">Procedural Trap</span>
+              </div>
+              <h2 class="card-title">Hot-Swappable Hardware: Administrative Prerequisites</h2>
+              <p class="card-hook">Why physical hot-swap support still requires logical isolation before pulling a drive.</p>
+            </div>
+            <span class="chevron" aria-hidden="true">&#9662;</span>
+          </button>
+          <div class="card-body">
+            <div class="comparison-grid">
+              <div class="sub-pane">
+                <h4>Common Hot-Swappable Components</h4>
+                <ul>
+                  <li>RAID-backed SAS/SATA/NVMe drive sleds</li>
+                  <li>Redundant power supply units (PSUs)</li>
+                  <li>Redundant chassis cooling fans</li>
+                  <li>High-end PCIe expansion cards &amp; hot-add CPU/RAM modules (enterprise mainframes/blades)</li>
+                </ul>
+              </div>
+              <div class="sub-pane emerald">
+                <h4>Mandatory Pre-Removal Rules</h4>
+                <ul>
+                  <li>Stop active application I/O to the target volume and remove logical software links/mounts first.</li>
+                  <li>Verify RAID array redundancy (e.g., RAID 1, 5, 6, 10) before pulling a failed member disk.</li>
+                  <li><strong>Never</strong> hot-pull a single, unmirrored drive hosting the active OS boot partition.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="exam-trap-callout">
+              <strong>SK0-006 Exam Trigger</strong>
+              "Hot-swappable" means you don't have to power down the server—it does <strong>not</strong> mean you can yank a drive without first quiescing I/O or unmounting logical links in the OS/RAID controller.
+            </div>
+          </div>
+        </article>
+
+        <!-- CARD 8: NVRAM VS EEPROM -->
+        <article class="decoder-card" data-category="maintenance" data-keywords="nvram eeprom cmos bios uefi battery firmware settings">
+          <button class="card-header-btn" type="button" aria-expanded="false">
+            <div class="card-title-group">
+              <div class="card-tags">
+                <span class="badge badge-emerald">Firmware // Motherboard</span>
+              </div>
+              <h2 class="card-title">NVRAM (CMOS) vs. EEPROM (BIOS / UEFI Firmware)</h2>
+              <p class="card-hook">Where immutable boot code lives vs. where your custom boot order and clock settings are saved.</p>
+            </div>
+            <span class="chevron" aria-hidden="true">&#9662;</span>
+          </button>
+          <div class="card-body">
+            <div class="comparison-grid">
+              <div class="sub-pane">
+                <h4>EEPROM (Flash ROM)</h4>
+                <p>Stores the core <strong>BIOS or UEFI firmware instructions</strong> themselves. Non-volatile without a battery; only rewritten during an intentional firmware flash/update.</p>
+              </div>
+              <div class="sub-pane emerald">
+                <h4>NVRAM (CMOS Memory)</h4>
+                <p>Stores <strong>variable user/admin configuration settings</strong>: boot sequence, system date/time, virtualization flags (VT-x/AMD-V), and port toggles. Sustained by the coin-cell CMOS battery.</p>
+              </div>
+            </div>
+            <div class="exam-trap-callout">
+              <strong>SK0-006 Exam Trigger</strong>
+              If a server loses its custom boot order and resets its system clock to 1970/2000 on every cold boot, the <strong>CMOS battery</strong> backing <strong>NVRAM</strong> has failed—not the EEPROM chip.
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="empty-state" id="decoder-empty">
+        No matching Chapter 3 reference cards found. Clear your search filter to view all 8 cards.
+      </div>
+    </main>
+
+    <!-- ======================================================================
+         PANEL 2: CHAPTER 3 SCENARIO DRILL (5 EXAM-TRAP QUESTIONS)
+         ====================================================================== -->
+    <section id="panel-drill" class="view-panel" role="tabpanel" aria-labelledby="tab-drill">
+      <div class="quiz-hud">
+        <div class="hud-stats">
+          <div class="stat-block">
+            <span class="stat-label">Answered</span>
+            <span class="stat-value" id="hud-answered">0 / 5</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-label">Score</span>
+            <span class="stat-value emerald" id="hud-score">0%</span>
+          </div>
+        </div>
+        <button class="reset-btn" id="reset-quiz-btn" type="button">&#8635; Reset Drill</button>
+      </div>
+
+      <div class="quiz-list" id="quiz-list"></div>
+
+      <div class="summary-banner" id="quiz-summary">
+        <h3 id="summary-title">Drill Complete</h3>
+        <p id="summary-text"></p>
+        <button class="reset-btn" id="summary-reset-btn" type="button">&#8635; Retake 5-Question Drill</button>
+      </div>
+    </section>
+
+    <footer class="footer-note">
+      <span>SK0-006 // CHAPTER 3 STUDY MODULE</span>
+      <span>OFFLINE-READY SINGLE-FILE ARTIFACT // GITHUB PAGES COMPATIBLE</span>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      /* ========================================================================
+         1. VIEW TAB NAVIGATION
+         ======================================================================== */
+      const tabDecoder = document.getElementById("tab-decoder");
+      const tabDrill = document.getElementById("tab-drill");
+      const panelDecoder = document.getElementById("panel-decoder");
+      const panelDrill = document.getElementById("panel-drill");
+
+      function switchTab(target) {
+        const isDecoder = target === "decoder";
+        tabDecoder.classList.toggle("active", isDecoder);
+        tabDecoder.setAttribute("aria-selected", String(isDecoder));
+        panelDecoder.classList.toggle("active", isDecoder);
+
+        tabDrill.classList.toggle("active", !isDecoder);
+        tabDrill.setAttribute("aria-selected", String(!isDecoder));
+        panelDrill.classList.toggle("active", !isDecoder);
+      }
+
+      tabDecoder.addEventListener("click", function () { switchTab("decoder"); });
+      tabDrill.addEventListener("click", function () { switchTab("drill"); });
+
+      /* ========================================================================
+         2. DECODER ACCORDION, CATEGORY FILTERING & KEYWORD SEARCH
+         ======================================================================== */
+      const decoderGrid = document.getElementById("decoder-grid");
+      const cards = Array.from(decoderGrid.querySelectorAll(".decoder-card"));
+      const filterChips = Array.from(document.querySelectorAll(".filter-chip"));
+      const searchInput = document.getElementById("decoder-search");
+      const emptyState = document.getElementById("decoder-empty");
+      const expandAllBtn = document.getElementById("expand-all-btn");
+      const collapseAllBtn = document.getElementById("collapse-all-btn");
+
+      let activeCategory = "all";
+
+      // Toggle individual accordion cards
+      cards.forEach(function (card) {
+        const headerBtn = card.querySelector(".card-header-btn");
+        headerBtn.addEventListener("click", function () {
+          const willOpen = !card.classList.contains("open");
+          card.classList.toggle("open", willOpen);
+          headerBtn.setAttribute("aria-expanded", String(willOpen));
+        });
+      });
+
+      expandAllBtn.addEventListener("click", function () {
+        cards.forEach(function (card) {
+          if (card.style.display !== "none") {
+            card.classList.add("open");
+            card.querySelector(".card-header-btn").setAttribute("aria-expanded", "true");
+          }
+        });
+      });
+
+      collapseAllBtn.addEventListener("click", function () {
+        cards.forEach(function (card) {
+          card.classList.remove("open");
+          card.querySelector(".card-header-btn").setAttribute("aria-expanded", "false");
+        });
+      });
+
+      function applyDecoderFilters() {
+        const query = searchInput.value.trim().toLowerCase();
+        let visibleCount = 0;
+
+        cards.forEach(function (card) {
+          const category = card.getAttribute("data-category");
+          const keywords = (card.getAttribute("data-keywords") || "").toLowerCase();
+          const textContent = card.textContent.toLowerCase();
+
+          const matchesCategory = activeCategory === "all" || category === activeCategory;
+          const matchesSearch = !query || keywords.includes(query) || textContent.includes(query);
+
+          if (matchesCategory && matchesSearch) {
+            card.style.display = "";
+            visibleCount++;
+          } else {
+            card.style.display = "none";
+          }
+        });
+
+        emptyState.style.display = visibleCount === 0 ? "block" : "none";
+      }
+
+      filterChips.forEach(function (chip) {
+        chip.addEventListener("click", function () {
+          filterChips.forEach(function (c) { c.classList.remove("active"); });
+          chip.classList.add("active");
+          activeCategory = chip.getAttribute("data-filter");
+          applyDecoderFilters();
+        });
+      });
+
+      searchInput.addEventListener("input", applyDecoderFilters);
+
+      /* ========================================================================
+         3. CHAPTER 3 SCENARIO DRILL DATA & RENDER ENGINE
+         ======================================================================== */
+      const quizQuestions = [
+        {
+          id: 1,
+          tag: "Licensing // Enterprise Agreements",
+          prompt: "An enterprise operates under a multi-year volume licensing agreement that permits IT administrators to deploy new server instances immediately during peak seasonal demand without pausing for procurement. At the end of each 12-month cycle, IT submits an internal deployment tally and pays the vendor for the net-new licenses consumed. Which licensing mechanism does this describe?",
+          options: [
+            "Per-Concurrent User licensing",
+            "True-Up reconciliation",
+            "Node-locked entitlement",
+            "Forward-compatible licensing"
+          ],
+          correctIndex: 1,
+          explanation: "A True-Up agreement is an annual contractual reconciliation built into Enterprise Agreements that lets organizations deploy freely during the year and pay for the overage at the anniversary date without violating compliance.",
+          distractors: "Per-Concurrent User caps simultaneous active logins; Node-locked binds a key to a single hardware MAC/serial; Forward-compatible covers minor version upgrades (e.g., 2012 to 2012 R2) on older keys."
+        },
+        {
+          id: 2,
+          tag: "Licensing // Virtualization Math",
+          prompt: "A systems administrator is provisioning a new dual-socket rack server (16 physical cores total) to host four virtual machines running Windows Server Standard edition. Assuming each full Windows Server Standard host license covers 16 physical cores and entitles the host to two virtual Operating System Environments (OSEs), what must the administrator do to remain compliant?",
+          options: [
+            "Purchase one additional Windows Server Standard license set (stacking licenses) to cover all four VMs",
+            "Switch all four VMs to Per-Server CALs, which automatically include virtual OSE rights",
+            "Purchase a single Node-Locked license tied to the Hyper-V management NIC",
+            "No additional licensing is needed because physical core licenses grant unlimited virtual OSEs"
+          ],
+          correctIndex: 0,
+          explanation: "Windows Server Standard licenses all physical cores and grants rights to two virtual OSEs. To run four virtual OSEs on that same physical host, you must license the physical cores twice (license stacking).",
+          distractors: "Unlimited virtual OSEs is a feature of Windows Server Datacenter edition, not Standard. Per-Server CALs govern client connections rather than host OSE entitlements."
+        },
+        {
+          id: 3,
+          tag: "Licensing // Open Source Obligations",
+          prompt: "An internal engineering team modifies an open-source network monitoring daemon to add proprietary telemetry algorithms and plans to distribute the compiled software commercially to external clients without releasing their custom source code. Which license type on the original open-source daemon would legally prohibit this distribution model?",
+          options: [
+            "MIT License",
+            "Apache License 2.0",
+            "GNU General Public License (Copyleft)",
+            "BSD 3-Clause License"
+          ],
+          correctIndex: 2,
+          explanation: "Copyleft licenses such as the GNU GPL enforce 'share and share alike' terms: if you modify GPL-licensed code and distribute the resulting software, you must release your modified source code under the same GPL license.",
+          distractors: "MIT, Apache 2.0, and BSD are all permissive open-source licenses that allow modification and redistribution inside closed-source commercial products."
+        },
+        {
+          id: 4,
+          tag: "Hardware // Hot-Swappable Maintenance",
+          prompt: "A degraded 10,000 RPM SAS drive in a RAID 5 array inside a 2U rack server has an amber fault LED lit. The server chassis supports hot-swappable drive bays. Before physically unlatching and removing the faulty drive caddy, which administrative action should the technician verify first?",
+          options: [
+            "Power down the server completely and unplug both redundant PSUs to prevent backplane arcing",
+            "Ensure applications are not actively accessing the isolated logical link and unmount/offline the drive in software if required",
+            "Clear the CMOS jumper on the motherboard so NVRAM re-enumerates the SAS backplane",
+            "Flash the UEFI EEPROM firmware to reset the RAID controller's stripe parity map"
+          ],
+          correctIndex: 1,
+          explanation: "Even when hardware is physically hot-swappable, administrators must ensure active application I/O is quiesced and logical software links are cleanly removed/offlined before pulling the drive.",
+          distractors: "Powering down defeats the purpose of hot-swappable RAID hardware, while clearing CMOS/NVRAM or flashing EEPROM risks wiping boot configurations and RAID metadata."
+        },
+        {
+          id: 5,
+          tag: "Firmware // Non-Volatile Memory",
+          prompt: "Following a scheduled power outage in a remote branch closet, a tower server fails to boot automatically because its custom boot sequence reverted to defaults and its hardware clock reset to the factory baseline date. The UEFI firmware interface itself still loads normally. Which component most likely failed?",
+          options: [
+            "The motherboard EEPROM chip storing the UEFI firmware image",
+            "The CMOS coin-cell battery maintaining power to NVRAM",
+            "The PCIe riser card connecting the hardware RAID controller",
+            "The 15,000 RPM SAS boot drive's spindle motor"
+          ],
+          correctIndex: 1,
+          explanation: "Variable user-configured settings such as boot order, date/time, and port toggles are stored in NVRAM (CMOS memory), which relies on the coin-cell CMOS battery when AC power is removed.",
+          distractors: "The core UEFI/BIOS firmware code resides in non-volatile EEPROM flash memory, which does not require battery power to retain the firmware image itself."
+        }
+      ];
+
+      const quizListEl = document.getElementById("quiz-list");
+      const hudAnsweredEl = document.getElementById("hud-answered");
+      const hudScoreEl = document.getElementById("hud-score");
+      const resetQuizBtn = document.getElementById("reset-quiz-btn");
+      const summaryBanner = document.getElementById("quiz-summary");
+      const summaryTitle = document.getElementById("summary-title");
+      const summaryText = document.getElementById("summary-text");
+      const summaryResetBtn = document.getElementById("summary-reset-btn");
+
+      let userAnswers = {};
+
+      function updateHud() {
+        const total = quizQuestions.length;
+        const answeredCount = Object.keys(userAnswers).length;
+        let correctCount = 0;
+
+        quizQuestions.forEach(function (q) {
+          if (userAnswers[q.id] === q.correctIndex) {
+            correctCount++;
+          }
+        });
+
+        hudAnsweredEl.textContent = answeredCount + " / " + total;
+        const pct = answeredCount === 0 ? 0 : Math.round((correctCount / total) * 100);
+        hudScoreEl.textContent = pct + "%";
+
+        if (answeredCount === total) {
+          summaryBanner.classList.add("visible");
+          summaryTitle.textContent = "Chapter 3 Drill Complete: " + correctCount + " / " + total + " (" + pct + "%)";
+          if (correctCount === total) {
+            summaryText.textContent = "Clean sweep. You nailed every enterprise licensing calculation and maintenance trap—ready for Chapter 4.";
+          } else if (correctCount >= 4) {
+            summaryText.textContent = "Strong run. Review the single distractor note above, then move straight into Chapter 4.";
+          } else {
+            summaryText.textContent = "Good diagnostic pass. Flip back to the Decoder tab to review the highlighted exam triggers, then retake the drill.";
+          }
+        } else {
+          summaryBanner.classList.remove("visible");
+        }
+      }
+
+      function renderQuiz() {
+        quizListEl.innerHTML = "";
+        const letters = ["A", "B", "C", "D"];
+
+        quizQuestions.forEach(function (q, index) {
+          const card = document.createElement("article");
+          card.className = "question-card";
+
+          const header = document.createElement("div");
+          header.className = "q-header";
+          header.innerHTML =
+            '<span class="badge badge-cyan">Question ' + (index + 1) + ' of ' + quizQuestions.length + '</span>' +
+            '<span class="badge badge-emerald">' + q.tag + '</span>';
+
+          const prompt = document.createElement("p");
+          prompt.className = "q-prompt";
+          prompt.textContent = q.prompt;
+
+          const optionsStack = document.createElement("div");
+          optionsStack.className = "options-stack";
+
+          const rationaleBox = document.createElement("div");
+          rationaleBox.className = "rationale-box";
+
+          q.options.forEach(function (optText, optIdx) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "option-btn";
+            btn.innerHTML =
+              '<span class="option-letter">' + letters[optIdx] + '</span>' +
+              '<span>' + optText + '</span>';
+
+            btn.addEventListener("click", function () {
+              if (Object.prototype.hasOwnProperty.call(userAnswers, q.id)) {
+                return;
+              }
+              userAnswers[q.id] = optIdx;
+
+              const allBtns = Array.from(optionsStack.querySelectorAll(".option-btn"));
+              allBtns.forEach(function (b, bIdx) {
+                b.disabled = true;
+                if (bIdx === q.correctIndex) {
+                  b.classList.add("correct");
+                } else if (bIdx === optIdx) {
+                  b.classList.add("incorrect");
+                } else {
+                  b.classList.add("dimmed");
+                }
+              });
+
+              const isRight = optIdx === q.correctIndex;
+              rationaleBox.innerHTML =
+                '<span class="rationale-status ' + (isRight ? 'pass' : 'fail') + '">' +
+                (isRight ? '&#10003; Correct // Exam Logic Verified' : '&#10007; Trap Triggered // Correct Answer: ' + letters[q.correctIndex]) +
+                '</span>' +
+                '<p><strong>Why it works:</strong> ' + q.explanation + '</p>' +
+                '<p><strong>Why distractors fail:</strong> ' + q.distractors + '</p>';
+              rationaleBox.classList.add("visible");
+
+              updateHud();
+            });
+
+            optionsStack.appendChild(btn);
+          });
+
+          card.appendChild(header);
+          card.appendChild(prompt);
+          card.appendChild(optionsStack);
+          card.appendChild(rationaleBox);
+          quizListEl.appendChild(card);
+        });
+
+        updateHud();
+      }
+
+      function resetQuiz() {
+        userAnswers = {};
+        renderQuiz();
+      }
+
+      resetQuizBtn.addEventListener("click", resetQuiz);
+      summaryResetBtn.addEventListener("click", resetQuiz);
+
+      // Initial render
+      renderQuiz();
+    })();
+  </script>
+</body>
+</html>

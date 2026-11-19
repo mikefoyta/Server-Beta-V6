@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VLAN 05 — Server Hardware, Expansion Buses & Storage Interfaces | Server+ Study Switchboard</title>
+  <style>
+:root {
+  --bg-primary: #0b0f17;
+  --bg-secondary: #131a26;
+  --bg-card: #182132;
+  --bg-card-hover: #1e293e;
+  --border-color: #2a3750;
+  --accent-cyan: #38bdf8;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  --accent-purple: #a855f7;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  padding-bottom: 4rem;
+}
+
+.topbar {
+  background: rgba(19, 26, 38, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0.85rem 1.5rem;
+}
+
+.topbar-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+}
+
+.brand-badge {
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  transition: all 0.15s ease;
+}
+
+.nav-btn:hover:not(.disabled) {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.nav-btn.disabled {
+  opacity: 0.38;
+  pointer-events: none;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1.75rem 1.5rem 0;
+}
+
+.vlan-banner {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(16, 185, 129, 0.08));
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-left: 4px solid var(--accent-cyan);
+  border-radius: 10px;
+  padding: 1.4rem 1.6rem;
+  margin-bottom: 1.75rem;
+}
+
+.vlan-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.vlan-pill {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-cyan);
+  background: rgba(56, 189, 248, 0.14);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+.isolation-pill {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--accent-emerald);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+h1 {
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  margin-bottom: 0.4rem;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 0.96rem;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 1.15rem;
+  margin-bottom: 1.5rem;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1.25rem 1.35rem;
+}
+
+.card h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.card h3 {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0.85rem 0 0.35rem;
+}
+
+.card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.6rem;
+}
+
+ul.clean-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+ul.clean-list li {
+  position: relative;
+  padding-left: 1.15rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+ul.clean-list li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--accent-cyan);
+  font-weight: bold;
+}
+
+ul.clean-list li strong {
+  color: var(--text-primary);
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.83rem;
+  background: rgba(15, 23, 42, 0.85);
+  color: var(--accent-amber);
+  padding: 0.12rem 0.38rem;
+  border-radius: 4px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-card);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+th {
+  background: #101724;
+  color: var(--accent-cyan);
+  font-weight: 700;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(42, 55, 80, 0.6);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+td strong {
+  color: var(--text-primary);
+}
+
+.callout {
+  background: rgba(245, 158, 11, 0.09);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-left: 4px solid var(--accent-amber);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.callout strong {
+  color: var(--accent-amber);
+}
+
+.footer-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-color);
+}
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-badge">SK1-006</span>
+        <span>SERVER+ VLAN SWITCHBOARD</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-btn">⌂ Trunk Index</a>
+        <a href="vlan-04.html" class="nav-btn">← VLAN 04</a>
+        <a href="vlan-06.html" class="nav-btn">VLAN 06 →</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="vlan-banner">
+      <div class="vlan-tag-row">
+        <span class="vlan-pill">VLAN 05 // ISOLATED DOMAIN</span>
+        <span class="isolation-pill">STRICT DOMAIN BOUNDARY — ZERO CROSS-VLAN LEAKAGE</span>
+      </div>
+      <h1>Server Hardware, Expansion Buses & Storage Interfaces</h1>
+      <p class="subtitle">SAS vs. SATA vs. NVMe, PCIe lanes and generations, ECC/RDIMM/LRDIMM/NUMA memory, and Rack/Blade chassis.</p>
+    </section>
+
+    
+<div class="callout">
+  <strong>DOMAIN SCOPE (VLAN 05):</strong> Everything inside this room belongs strictly to <strong>Internal Server Hardware, Expansion Buses (PCIe), Drive Interfaces (SAS/SATA/NVMe), Server Memory (ECC/NUMA), and Chassis Form Factors</strong>.
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Drive Interface</th>
+        <th>Protocol &amp; Bus</th>
+        <th>Duplex &amp; Porting</th>
+        <th>Max Link Speed</th>
+        <th>Key Compatibility &amp; Exam Rules</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>SATA</strong></td>
+        <td>AHCI over SATA cable</td>
+        <td>Half-duplex, single-port</td>
+        <td><code>6 Gbps</code> (SATA 3.0)</td>
+        <td>Cost-effective bulk storage; lower queue depth (32 commands); cannot plug into native SAS-only backplane unless controller supports both.</td>
+      </tr>
+      <tr>
+        <td><strong>SAS</strong><br><small>(Serial Attached SCSI)</small></td>
+        <td>SCSI command set over serial point-to-point</td>
+        <td><strong>Full-duplex, dual-ported</strong> (multipath)</td>
+        <td><code>12 Gbps</code> (SAS-3)<br><code>24 Gbps</code> (SAS-4)</td>
+        <td><strong>Backward-compatible controller:</strong> A SAS controller CAN run SATA drives, but a SATA controller CANNOT run SAS drives.</td>
+      </tr>
+      <tr>
+        <td><strong>NVMe</strong><br><small>(U.2 / U.3 / M.2 / EDSFF)</small></td>
+        <td>NVMe protocol directly over <strong>PCIe lanes</strong></td>
+        <td>Full-duplex, multi-queue (64K queues)</td>
+        <td><code>~32–128 Gbps</code> (PCIe Gen 4/5 x4)</td>
+        <td>Bypasses legacy SATA/SAS controllers; ultra-low latency; U.2/U.3 and EDSFF support front-bay hot-swapping.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h2>PCIe Expansion Bus &amp; Riser Architecture</h2>
+    <ul class="clean-list">
+      <li><strong>Point-to-Point Serial Lanes:</strong> Unlike legacy shared-bus PCI, each PCIe slot gets dedicated bidirectional serial lanes (<code>x1</code>, <code>x4</code>, <code>x8</code>, <code>x16</code>) wired directly to the CPU or PCH chipset.</li>
+      <li><strong>Physical vs. Electrical Lanes:</strong> A slot can be physically <code>x16</code> long while wired electrically as <code>x8</code> (written as <code>x16 @ x8</code>); always check electrical lane count for high-bandwidth NICs/HBAs.</li>
+      <li><strong>Generation Throughput (per lane):</strong> PCIe 3.0 = ~1 GB/s per lane; PCIe 4.0 = ~2 GB/s per lane; PCIe 5.0 = ~4 GB/s per lane (doubles every generation).</li>
+      <li><strong>PCIe Riser Cards:</strong> Right-angle adapter boards used in low-profile 1U/2U rack servers so full-height expansion cards mount horizontally parallel to the motherboard.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Server Memory (ECC, RDIMM, LRDIMM) &amp; NUMA</h2>
+    <ul class="clean-list">
+      <li><strong>ECC (Error-Correcting Code) RAM:</strong> Uses extra parity bits (72-bit bus vs. 64-bit non-ECC) to detect and automatically correct single-bit memory errors on the fly and halt on uncorrectable multi-bit errors.</li>
+      <li><strong>UDIMM vs. RDIMM vs. LRDIMM:</strong> Unbuffered (UDIMM) has no register; Registered (RDIMM) adds a register buffer between CPU and DRAM for stability at high capacities; Load-Reduced (LRDIMM) buffers both address and data lines for maximum RAM density. <em>Never mix DIMM types in the same server.</em></li>
+      <li><strong>NUMA (Non-Uniform Memory Access):</strong> In multi-socket servers, each CPU socket has direct local memory banks; accessing RAM attached to Socket 2 from Socket 1 crosses the interconnect bus (UPI/Infinity Fabric) with higher latency.</li>
+      <li><strong>Memory Mirroring &amp; Sparing:</strong> BIOS hardware redundancy modes that mirror RAM channels or reserve spare ranks to survive full DIMM failure.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Server Chassis Form Factors &amp; Internal Cooling Hardware</h2>
+  <div class="grid-3" style="margin-bottom:0;">
+    <div>
+      <h3>Rackmount (1U, 2U, 4U)</h3>
+      <ul class="clean-list">
+        <li>Standardized <code>19-inch</code> width; height measured in Rack Units (<code>1U = 1.75 inches</code> / 44.45 mm).</li>
+        <li>1U uses small high-RPM fans (loud); 2U/4U allow larger, quieter fans and more PCIe slots/drive bays.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Blade Servers &amp; Chassis</h3>
+      <ul class="clean-list">
+        <li>Ultra-dense modular compute blades (CPU + RAM + local boot) slotting into a shared Blade Chassis.</li>
+        <li>Chassis provides shared power supplies, cooling fans, backplane networking, and management modules.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Airflow Shrouds &amp; Hot-Swap Fans</h3>
+      <ul class="clean-list">
+        <li><strong>Air Baffles / Shrouds:</strong> Plastic ducts directing front-to-rear cold air directly over CPU heatsinks and DIMMs.</li>
+        <li><strong>N+1 Hot-Swap Fan Modules:</strong> Tool-less fan cartridges replaceable while running; failure of 1 fan triggers remaining fans to spin up to 100% RPM.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+    <div class="footer-nav">
+      <a href="vlan-04.html" class="nav-btn">← VLAN 04</a>
+      <a href="index.html" class="nav-btn">⌂ Return to Switchboard</a>
+      <a href="vlan-06.html" class="nav-btn">VLAN 06 →</a>
+    </div>
+  </main>
+</body>
+</html>

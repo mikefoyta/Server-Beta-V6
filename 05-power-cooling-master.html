@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Server+ V6 — Rack Power, Redundancy &amp; Cooling Master</title>
+<style>
+  :root {
+    --bg-main: #0a0f1c;
+    --bg-card: #111827;
+    --bg-panel: #0d1526;
+    --border-subtle: #1e293b;
+    --accent-cyan: #38bdf8;
+    --accent-teal: #2dd4bf;
+    --accent-amber: #fbbf24;
+    --accent-red: #f87171;
+    --accent-purple: #c084fc;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    line-height: 1.6;
+    padding: 16px 12px 64px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 20px 18px;
+    margin-bottom: 18px;
+  }
+  header h1 { font-size: 1.35rem; color: var(--accent-cyan); margin-bottom: 6px; }
+  header p { font-size: 0.9rem; color: var(--text-secondary); }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 18px 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+  }
+  .card h2 {
+    font-size: 1.08rem;
+    color: var(--accent-teal);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .badge {
+    font-size: 0.72rem;
+    background: rgba(56, 189, 248, 0.14);
+    color: var(--accent-cyan);
+    padding: 3px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  p { margin-bottom: 10px; color: var(--text-secondary); font-size: 0.92rem; }
+  strong { color: var(--text-primary); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 0.85rem;
+  }
+  th, td {
+    border: 1px solid #1e293b;
+    padding: 9px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #0f172a;
+    color: var(--accent-cyan);
+    font-weight: 700;
+  }
+  tr:nth-child(even) td { background: rgba(15, 23, 42, 0.5); }
+  .callout {
+    background: var(--bg-panel);
+    border-left: 3px solid var(--accent-amber);
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin: 10px 0;
+    font-size: 0.87rem;
+    color: #fef3c7;
+  }
+  .callout.teal {
+    border-left-color: var(--accent-teal);
+    color: #ccfbf1;
+  }
+  .callout.red {
+    border-left-color: var(--accent-red);
+    color: #fee2e2;
+  }
+  pre {
+    background: #070b14;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 12px;
+    overflow-x: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.82rem;
+    color: #7dd3fc;
+    margin: 10px 0;
+  }
+  code {
+    background: #1e293b;
+    color: #7dd3fc;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.84rem;
+  }
+  ul { padding-left: 18px; margin-bottom: 10px; color: var(--text-secondary); font-size: 0.9rem; }
+  li { margin-bottom: 6px; }
+  .sim-box {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 10px;
+  }
+  .sim-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 10px; }
+  select, input[type=number] {
+    background: #1e293b;
+    color: var(--text-primary);
+    border: 1px solid #475569;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.88rem;
+  }
+  button.btn {
+    background: var(--accent-cyan);
+    color: #090d16;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+  button.btn.danger { background: var(--accent-red); color: #fff; }
+  button.btn.reset { background: #334155; color: var(--text-primary); }
+  .locker-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 12px 0;
+  }
+  .locker {
+    background: #1e293b;
+    border: 2px solid var(--accent-teal);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    transition: 0.15s;
+  }
+  .locker.dead {
+    background: rgba(248, 113, 113, 0.18);
+    border-color: var(--accent-red);
+    color: #fca5a5;
+    text-decoration: line-through;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Data Center Power, Redundancy &amp; Thermal Master Vault</h1>
+  <p>CompTIA Server+ V6 (SK1-006) • Interactive A/B Feed &amp; 80% NEC Circuit Calculator, PSU Redundancy Modes, UPS Topologies, PUE Math &amp; Direct-to-Chip Liquid Cooling.</p>
+</header>
+
+<section class="card">
+  <h2>1. Interactive A/B Dual-Feed Rack Power &amp; 80% NEC Calculator <span class="badge">Failover Math</span></h2>
+  <p>Every single power circuit must safely carry <strong>100% of the rack's steady-state load</strong> within the <strong>80% continuous load rule</strong> in case the redundant feed trips!</p>
+  <div class="sim-box">
+    <div class="sim-row">
+      <label>Circuit Voltage (V):
+        <select id="pVolt" onchange="calcPower()">
+          <option value="120" selected>120V (Single-Phase US)</option>
+          <option value="208">208V (Single-Phase High-Line)</option>
+          <option value="230">230V (Single-Phase UK/EU)</option>
+          <option value="360">208V 3-Phase (208 × √3 ≈ 360V eff.)</option>
+        </select>
+      </label>
+      <label>Breaker Amps (A): <input type="number" id="pAmp" value="20" min="10" max="100" onchange="calcPower()"></label>
+      <label>Total Rack Load (W): <input type="number" id="pLoad" value="1800" min="100" max="50000" step="100" onchange="calcPower()"></label>
+    </div>
+    <div id="pOut" class="callout teal"></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>2. Power Supply Redundancy &amp; High-Line Rules <span class="badge">Hardware Power</span></h2>
+  <table>
+    <tr><th>Mode / Term</th><th>How It Works</th><th>Exam Trigger</th></tr>
+    <tr><td><strong>N+1 Redundancy</strong></td><td>One extra PSU beyond minimum required to run the server (e.g., 2 PSUs where 1 can carry 100% load).</td><td>Survives 1 PSU failure or 1 PDU feed loss with zero downtime.</td></tr>
+    <tr><td><strong>N+N (2N) Redundancy</strong></td><td>Completely mirrored independent power paths (Dual PDUs, Dual UPS, Dual Utility Feeds).</td><td>Full fault tolerance across entire power distribution chain.</td></tr>
+    <tr><td><strong>Cold Redundancy</strong></td><td>Parks extra PSUs in microsecond-wake standby during low loads so active PSUs run near ~50% peak efficiency.</td><td>Saves electricity &amp; heat without sacrificing failover.</td></tr>
+    <tr><td><strong>PSU "Input Lost"</strong></td><td>BMC reports PSU 2 healthy internally, but zero AC voltage arriving at inlet.</td><td>Check upstream PDU outlet, whip, or tripped breaker—NOT the PSU!</td></tr>
+    <tr><td><strong>High-Line 200V–240V</strong></td><td>Enterprise PSUs &gt;1600W–2400W require 200V–240V AC and C19/C20 cords; won't boot on 120V.</td><td>Amber blinking PSU LEDs after moving rack to 120V circuit.</td></tr>
+  </table>
+</section>
+
+<section class="card">
+  <h2>3. UPS Topologies &amp; Generator Failover <span class="badge">Continuity</span></h2>
+  <ul>
+    <li><strong>Online Double-Conversion UPS:</strong> Continuously converts incoming AC → DC → clean pure sine-wave AC with <strong>0 ms transfer time</strong>. Mandatory for enterprise server racks.</li>
+    <li><strong>UPS Battery Trap:</strong> Degraded VRLA batteries still read <strong>"100% Charge"</strong> at idle (float voltage), then collapse within seconds under real load due to high internal resistance. Load-test and replace every 3–5 years.</li>
+    <li><strong>Generator Slew Rate vs. UPS:</strong> Unloaded diesel generators can drift in frequency (e.g., 57–63 Hz), causing double-conversion UPS units to reject generator input and drain batteries unless generator governors or UPS input windows are tuned.</li>
+  </ul>
+</section>
+
+<section class="card">
+  <h2>4. Airflow, Containment, ASHRAE &amp; AI Liquid Cooling <span class="badge">Thermal Engineering</span></h2>
+  <table>
+    <tr><th>Cooling Concept</th><th>Rule / Threshold</th><th>Failure Mode if Violated</th></tr>
+    <tr><td><strong>Internal Air Baffle</strong></td><td>Plastic shroud channeling front-to-back air directly across passive CPU heatsinks and DIMMs.</td><td>Forgetting shroud = fans hit 100% RPM and CPUs throttle within minutes.</td></tr>
+    <tr><td><strong>Blanking Panels &amp; Drive Fillers</strong></td><td>Seal every empty rack U-space and empty hot-swap drive bay.</td><td>Open gaps cause hot rear exhaust recirculation and drop static air pressure.</td></tr>
+    <tr><td><strong>ASHRAE Environmental</strong></td><td>Measure at <strong>FRONT cold-aisle intake</strong>: 18°C–27°C recommended; 40%–60% RH (20%–80% allowable).</td><td>&lt;20% RH = severe ESD static risk; &gt;80% RH = condensation/corrosion.</td></tr>
+    <tr><td><strong>Direct-to-Chip (D2C) Liquid</strong></td><td>Required for high-density AI racks (&gt;20–30 kW/rack). Uses warm water (32°C) + CDUs.</td><td>Warm water stays above dew point (no condensation) &amp; avoids chillers; rope leak sensors auto-close manifold valves.</td></tr>
+    <tr><td><strong>PUE Formula</strong></td><td><code>PUE = Total Facility Power ÷ IT Equipment Power</code> (Ideal = 1.0; Efficient = 1.1–1.3).</td><td>1.25 MW total ÷ 1.00 MW IT = <strong>1.25 PUE</strong>.</td></tr>
+  </table>
+</section>
+
+<script>
+function calcPower() {
+  const v = parseFloat(document.getElementById("pVolt").value);
+  const a = parseFloat(document.getElementById("pAmp").value) || 20;
+  const load = parseFloat(document.getElementById("pLoad").value) || 1800;
+  const peak = Math.round(v * a);
+  const safe80 = Math.round(peak * 0.8);
+  const normalPerFeed = Math.round(load / 2);
+  const out = document.getElementById("pOut");
+  if (load <= safe80) {
+    out.className = "callout teal";
+    out.innerHTML = `<strong>SAFE FAILOVER:</strong> Each feed provides ${peak}W peak / <strong>${safe80}W continuous (80% limit)</strong>.<br>Normal load: ${normalPerFeed}W per feed. If Feed A fails, Feed B absorbs all <strong>${load}W</strong> safely (${Math.round(load/peak*100)}% load).`;
+  } else {
+    out.className = "callout red";
+    out.innerHTML = `<strong>BREAKER TRIP RISK ON FAILOVER!</strong> Each feed's 80% continuous ceiling is <strong>${safe80}W</strong>. Normal dual-feed load (${normalPerFeed}W/feed) looks fine, but if Feed A fails, Feed B jumps to <strong>${load}W</strong> and trips!`;
+  }
+}
+calcPower();
+</script>
+</body>
+</html>

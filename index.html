@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA Server+ V6 (SK1-006) — Master Study Hub</title>
+<style>
+  :root {
+    --bg-main: #0a0f1c;
+    --bg-card: #111827;
+    --bg-panel: #0d1526;
+    --border-subtle: #1e293b;
+    --accent-cyan: #38bdf8;
+    --accent-teal: #2dd4bf;
+    --accent-amber: #fbbf24;
+    --accent-red: #f87171;
+    --accent-purple: #c084fc;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    line-height: 1.6;
+    padding: 16px 12px 64px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 20px 18px;
+    margin-bottom: 18px;
+  }
+  header h1 { font-size: 1.35rem; color: var(--accent-cyan); margin-bottom: 6px; }
+  header p { font-size: 0.9rem; color: var(--text-secondary); }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 18px 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+  }
+  .card h2 {
+    font-size: 1.08rem;
+    color: var(--accent-teal);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .badge {
+    font-size: 0.72rem;
+    background: rgba(56, 189, 248, 0.14);
+    color: var(--accent-cyan);
+    padding: 3px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  p { margin-bottom: 10px; color: var(--text-secondary); font-size: 0.92rem; }
+  strong { color: var(--text-primary); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 0.85rem;
+  }
+  th, td {
+    border: 1px solid #1e293b;
+    padding: 9px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #0f172a;
+    color: var(--accent-cyan);
+    font-weight: 700;
+  }
+  tr:nth-child(even) td { background: rgba(15, 23, 42, 0.5); }
+  .callout {
+    background: var(--bg-panel);
+    border-left: 3px solid var(--accent-amber);
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin: 10px 0;
+    font-size: 0.87rem;
+    color: #fef3c7;
+  }
+  .callout.teal {
+    border-left-color: var(--accent-teal);
+    color: #ccfbf1;
+  }
+  .callout.red {
+    border-left-color: var(--accent-red);
+    color: #fee2e2;
+  }
+  pre {
+    background: #070b14;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 12px;
+    overflow-x: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.82rem;
+    color: #7dd3fc;
+    margin: 10px 0;
+  }
+  code {
+    background: #1e293b;
+    color: #7dd3fc;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.84rem;
+  }
+  ul { padding-left: 18px; margin-bottom: 10px; color: var(--text-secondary); font-size: 0.9rem; }
+  li { margin-bottom: 6px; }
+  .sim-box {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 10px;
+  }
+  .sim-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 10px; }
+  select, input[type=number] {
+    background: #1e293b;
+    color: var(--text-primary);
+    border: 1px solid #475569;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.88rem;
+  }
+  button.btn {
+    background: var(--accent-cyan);
+    color: #090d16;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+  button.btn.danger { background: var(--accent-red); color: #fff; }
+  button.btn.reset { background: #334155; color: var(--text-primary); }
+  .locker-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 12px 0;
+  }
+  .locker {
+    background: #1e293b;
+    border: 2px solid var(--accent-teal);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    transition: 0.15s;
+  }
+  .locker.dead {
+    background: rgba(248, 113, 113, 0.18);
+    border-color: var(--accent-red);
+    color: #fca5a5;
+    text-decoration: line-through;
+  }
+
+  .hub-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 14px; }
+  a.hub-link {
+    display: block;
+    background: #111827;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 16px;
+    text-decoration: none;
+    color: #f1f5f9;
+    transition: 0.15s;
+  }
+  a.hub-link:hover { border-color: #38bdf8; background: #162033; }
+  a.hub-link h3 { color: #38bdf8; font-size: 1.05rem; margin-bottom: 4px; }
+  a.hub-link span { color: #94a3b8; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>CompTIA Server+ V6 (SK1-006) — Complete Mobile Study Hub</h1>
+  <p>7 Self-Contained Dark-Navy Interactive Modules • 200 V6 Scenarios (All 5 Domains + AI) &amp; 5 Interactive Technical Master Vaults.</p>
+</header>
+<div class="hub-grid">
+  <a class="hub-link" href="01-scenarios-set1.html"><h3>01. 100 Scenarios Vault — Set 1 (#001–#100)</h3><span>All 5 V6 Domains (Hardware, Admin/Storage, Security/DR, Troubleshooting, AI Compute) with root-cause drawers.</span></a>
+  <a class="hub-link" href="02-scenarios-set2.html"><h3>02. 100 Scenarios Vault — Set 2 (#101–#200)</h3><span>100 brand-new scenarios: Blade chassis, ZFS, WSFC quorum, PAWs, LoRA, KV cache &amp; liquid cooling.</span></a>
+  <a class="hub-link" href="03-raid-storage-master.html"><h3>03. RAID &amp; Enterprise Storage Master</h3><span>Interactive RAID 10 Vertical Locker Simulator, Usable Capacity Calculator, Write Penalties &amp; BBU mechanics.</span></a>
+  <a class="hub-link" href="04-coding-cli-master.html"><h3>04. Linux/Windows CLI, Scripting &amp; Automation Master</h3><span>Socket diagnostics (ss/netstat), LVM/inode commands, OOM Killer, systemd auto-restart, crontab &amp; Ansible.</span></a>
+  <a class="hub-link" href="05-power-cooling-master.html"><h3>05. Rack Power, Redundancy &amp; Cooling Master</h3><span>Interactive A/B Feed &amp; 80% NEC Circuit Calculator, Cold Redundancy, UPS/Generator slew, PUE &amp; D2C liquid cooling.</span></a>
+  <a class="hub-link" href="06-hardware-architecture-master.html"><h3>06. Server Hardware Architecture Master</h3><span>CPU Cache L1/L2/L3, NUMA node affinity, 8-channel DIMM interleaving, 2DPC physics, PCIe bifurcation &amp; BMC.</span></a>
+  <a class="hub-link" href="07-components-diagnostics-master.html"><h3>07. Components, Interfaces &amp; Diagnostics Master</h3><span>UDIMM/RDIMM/LRDIMM, SAS/U.3/EDSFF, OCP 3.0, UPC vs. APC fiber ends, TPM 2.0 &amp; WHEA/SEL log triggers.</span></a>
+</div>
+</body>
+</html>

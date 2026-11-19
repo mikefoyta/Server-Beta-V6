@@ -1,0 +1,2051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CompTIA Server+ (SK1-006) Scenario Vault — Batch 4 (#301–#400)</title>
+  <style>
+    /* ==========================================================================
+       EMERGENCY GOOSE TACTICAL DESIGN TOKENS (Zero External Dependencies)
+       ========================================================================== */
+    :root {
+      --bg-base: #080f1e;
+      --bg-surface: #0f1b33;
+      --bg-elevated: #162442;
+      --bg-inset: #050a14;
+      --border-subtle: #1e293b;
+      --border-strong: #2d426b;
+      --accent-sky: #38bdf8;
+      --accent-sky-dim: rgba(56, 189, 248, 0.14);
+      --accent-cyan: #22d3ee;
+      --accent-cyan-dim: rgba(34, 211, 238, 0.14);
+      --accent-emerald: #34d399;
+      --accent-emerald-dim: rgba(52, 211, 153, 0.15);
+      --accent-amber: #f59e0b;
+      --accent-amber-dim: rgba(245, 158, 11, 0.15);
+      --accent-rose: #f87171;
+      --accent-rose-dim: rgba(248, 113, 113, 0.15);
+      --text-primary: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+      --shadow-card: 0 10px 26px -6px rgba(0, 0, 0, 0.55);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.56;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ==========================================================================
+       APP SHELL & TACTICAL HEADER
+       ========================================================================== */
+    .app-shell {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 1.15rem 1rem 4rem;
+    }
+
+    .tactical-header {
+      background: linear-gradient(145deg, var(--bg-surface) 0%, #0a1428 100%);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.35rem 1.5rem;
+      margin-bottom: 1.15rem;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tactical-header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-sky), var(--accent-cyan), var(--accent-amber));
+    }
+
+    .header-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.71rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.24rem 0.6rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+    }
+
+    .badge-sky { color: var(--accent-sky); background: var(--accent-sky-dim); border-color: rgba(56, 189, 248, 0.3); }
+    .badge-cyan { color: var(--accent-cyan); background: var(--accent-cyan-dim); border-color: rgba(34, 211, 238, 0.3); }
+    .badge-emerald { color: var(--accent-emerald); background: var(--accent-emerald-dim); border-color: rgba(52, 211, 153, 0.3); }
+    .badge-amber { color: var(--accent-amber); background: var(--accent-amber-dim); border-color: rgba(245, 158, 11, 0.35); }
+    .badge-rose { color: var(--accent-rose); background: var(--accent-rose-dim); border-color: rgba(248, 113, 113, 0.3); }
+
+    .tactical-header h1 {
+      margin: 0 0 0.35rem;
+      font-size: clamp(1.22rem, 3.4vw, 1.74rem);
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      color: #f8fafc;
+    }
+
+    .tactical-header p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.91rem;
+    }
+
+    /* ==========================================================================
+       STICKY TACTICAL COMMAND HUD
+       ========================================================================== */
+    .command-hud {
+      position: sticky;
+      top: 0.5rem;
+      z-index: 40;
+      background: rgba(15, 27, 51, 0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
+    }
+
+    .hud-row-primary {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .hud-stats {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1.15rem;
+    }
+
+    .stat-cell {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.67rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .stat-val {
+      font-family: var(--font-mono);
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: var(--accent-sky);
+    }
+
+    .stat-val.emerald { color: var(--accent-emerald); }
+    .stat-val.amber { color: var(--accent-amber); }
+
+    .hud-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .ctrl-btn {
+      appearance: none;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.52rem 0.78rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .ctrl-btn:hover {
+      border-color: var(--accent-sky);
+      color: var(--accent-sky);
+    }
+
+    .ctrl-btn.active-mode {
+      background: var(--accent-cyan-dim);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    .ctrl-btn.active-study {
+      background: var(--accent-emerald-dim);
+      border-color: var(--accent-emerald);
+      color: var(--accent-emerald);
+    }
+
+    .ctrl-btn.danger:hover {
+      border-color: var(--accent-rose);
+      color: var(--accent-rose);
+    }
+
+    .hud-row-filters {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    @media (min-width: 880px) {
+      .hud-row-filters {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    .domain-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.38rem;
+    }
+
+    .filter-pill {
+      appearance: none;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.42rem 0.68rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      min-height: 36px;
+    }
+
+    .filter-pill:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+    }
+
+    .filter-pill.active {
+      background: var(--accent-sky-dim);
+      border-color: var(--accent-sky);
+      color: var(--accent-sky);
+    }
+
+    .filter-pill.bookmarked-pill.active {
+      background: var(--accent-amber-dim);
+      border-color: var(--accent-amber);
+      color: var(--accent-amber);
+    }
+
+    .search-wrap {
+      flex: 1;
+      max-width: 100%;
+    }
+
+    @media (min-width: 880px) {
+      .search-wrap {
+        max-width: 265px;
+      }
+    }
+
+    .search-wrap input {
+      width: 100%;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      padding: 0.46rem 0.78rem;
+      border-radius: var(--radius-sm);
+      outline: none;
+      min-height: 36px;
+    }
+
+    .search-wrap input:focus {
+      border-color: var(--accent-cyan);
+    }
+
+    .search-wrap input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 5px;
+      background: var(--bg-inset);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 0.65rem;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-sky), var(--accent-cyan), var(--accent-emerald));
+      transition: width 0.25s ease;
+    }
+
+    /* ==========================================================================
+       SCENARIO CARDS (#301–#400)
+       ========================================================================== */
+    .scenario-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .scenario-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.2rem 1.25rem;
+      box-shadow: var(--shadow-card);
+      transition: border-color 0.15s ease;
+    }
+
+    .scenario-card.bookmarked {
+      border-color: rgba(245, 158, 11, 0.55);
+    }
+
+    .card-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-badges {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.42rem;
+    }
+
+    .bookmark-btn {
+      appearance: none;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.35rem 0.65rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      min-height: 34px;
+      transition: all 0.15s ease;
+    }
+
+    .bookmark-btn:hover {
+      border-color: var(--accent-amber);
+      color: var(--accent-amber);
+    }
+
+    .bookmark-btn.active {
+      background: var(--accent-amber-dim);
+      border-color: var(--accent-amber);
+      color: var(--accent-amber);
+    }
+
+    .scenario-prompt {
+      margin: 0 0 0.95rem;
+      font-size: 0.97rem;
+      font-weight: 600;
+      color: #f8fafc;
+      line-height: 1.56;
+    }
+
+    .scenario-prompt code,
+    .option-text code,
+    .explanation-box code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      color: var(--accent-cyan);
+      padding: 0.1rem 0.36rem;
+      border-radius: 4px;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .opt-btn {
+      width: 100%;
+      appearance: none;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.8rem 0.95rem;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.72rem;
+      transition: all 0.14s ease;
+      min-height: 46px;
+    }
+
+    .opt-btn:hover:not(:disabled) {
+      border-color: var(--accent-sky);
+      background: #1b2c50;
+    }
+
+    .opt-btn:disabled {
+      cursor: default;
+    }
+
+    .opt-letter {
+      flex-shrink: 0;
+      width: 25px;
+      height: 25px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-inset);
+      border: 1px solid var(--border-strong);
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-sky);
+      margin-top: 0.05rem;
+    }
+
+    .opt-btn.correct {
+      background: var(--accent-emerald-dim);
+      border-color: var(--accent-emerald);
+      color: #f8fafc;
+    }
+
+    .opt-btn.correct .opt-letter {
+      background: var(--accent-emerald);
+      border-color: var(--accent-emerald);
+      color: #041b11;
+    }
+
+    .opt-btn.incorrect {
+      background: var(--accent-rose-dim);
+      border-color: var(--accent-rose);
+      color: #ffe4e6;
+    }
+
+    .opt-btn.incorrect .opt-letter {
+      background: var(--accent-rose);
+      border-color: var(--accent-rose);
+      color: #210409;
+    }
+
+    .opt-btn.dimmed {
+      opacity: 0.56;
+    }
+
+    .explanation-box {
+      display: none;
+      margin-top: 0.95rem;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-strong);
+      border-left: 3px solid var(--accent-emerald);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 0.9rem 1rem;
+      font-size: 0.88rem;
+    }
+
+    .explanation-box.visible {
+      display: block;
+    }
+
+    .explanation-box.wrong-border {
+      border-left-color: var(--accent-rose);
+    }
+
+    .explanation-box.study-border {
+      border-left-color: var(--accent-cyan);
+    }
+
+    .exp-header {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.35rem;
+      display: block;
+    }
+
+    .exp-header.pass { color: var(--accent-emerald); }
+    .exp-header.fail { color: var(--accent-rose); }
+    .exp-header.study { color: var(--accent-cyan); }
+
+    .explanation-box p {
+      margin: 0;
+      color: var(--text-primary);
+      line-height: 1.55;
+    }
+
+    .empty-banner {
+      display: none;
+      text-align: center;
+      padding: 2.5rem 1rem;
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius-lg);
+      color: var(--text-secondary);
+    }
+
+    .footer-note {
+      margin-top: 2.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.73rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- TACTICAL HEADER -->
+    <header class="tactical-header">
+      <div class="header-top">
+        <span class="badge badge-sky">COMPTIA SERVER+ // SK1-006 SCENARIO VAULT</span>
+        <span class="badge badge-amber">BATCH 04 // VAULT #301&ndash;#400 // AI, CABLING &amp; PORTS</span>
+      </div>
+      <h1>CompTIA Server+ (SK1-006) Scenario Vault &mdash; Batch 4 (#301&ndash;#400)</h1>
+      <p>100 complete exam items covering AI/GPU clusters, liquid cooling &amp; high-density power (#301&ndash;#345), copper/fiber cabling &amp; transceivers (#346&ndash;#375), and essential network ports &amp; protocol quick-wins (#376&ndash;#400).</p>
+    </header>
+
+    <!-- STICKY TACTICAL COMMAND HUD -->
+    <section class="command-hud" aria-label="Exam Controls and Telemetry">
+      <div class="hud-row-primary">
+        <div class="hud-stats">
+          <div class="stat-cell">
+            <span class="stat-label">Answered</span>
+            <span class="stat-val" id="stat-answered">0 / 100</span>
+          </div>
+          <div class="stat-cell">
+            <span class="stat-label">Correct</span>
+            <span class="stat-val emerald" id="stat-correct">0</span>
+          </div>
+          <div class="stat-cell">
+            <span class="stat-label">Accuracy %</span>
+            <span class="stat-val emerald" id="stat-accuracy">0%</span>
+          </div>
+          <div class="stat-cell">
+            <span class="stat-label">Bookmarked</span>
+            <span class="stat-val amber" id="stat-bookmarked">0</span>
+          </div>
+        </div>
+
+        <div class="hud-actions">
+          <button type="button" class="ctrl-btn active-mode" id="btn-mode-toggle" title="Switch between Quiz Mode and Study Mode">
+            Mode: Quiz Mode
+          </button>
+          <button type="button" class="ctrl-btn danger" id="btn-reset" title="Clear all answers and reset progress">
+            &#8635; Reset Progress
+          </button>
+        </div>
+      </div>
+
+      <div class="hud-row-filters">
+        <div class="domain-pills" role="group" aria-label="Domain Filters">
+          <button type="button" class="filter-pill active" data-domain="all">All (100)</button>
+          <button type="button" class="filter-pill" data-domain="ai">AI &amp; Accelerators (45)</button>
+          <button type="button" class="filter-pill" data-domain="cabling">Cabling &amp; Optics (30)</button>
+          <button type="button" class="filter-pill" data-domain="ports">Ports &amp; Protocols (25)</button>
+          <button type="button" class="filter-pill bookmarked-pill" data-domain="bookmarked">&#9733; Bookmarked</button>
+        </div>
+
+        <div class="search-wrap">
+          <input type="search" id="search-input" placeholder="Search #ID, NVLink, OM4, port 636..." aria-label="Search scenarios" />
+        </div>
+      </div>
+
+      <div class="progress-bar" aria-hidden="true">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </section>
+
+    <!-- SCENARIO FEED -->
+    <main class="scenario-feed" id="scenario-feed"></main>
+
+    <div class="empty-banner" id="empty-banner">
+      No items match your active filter or search term. Reset filters to view all 100 scenarios (#301&ndash;#400).
+    </div>
+
+    <footer class="footer-note">
+      <span>SER-V6-VLAN // SK1-006 VAULT #301&ndash;#400</span>
+      <span>OFFLINE-READY SINGLE-FILE ARTIFACT // EMERGENCY GOOSE TACTICAL EDITION</span>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      /* ========================================================================
+         100 COMPLETE SCENARIOS & QUICK-WINS (#301–#400)
+         Schema: [id, domainKey, topicTag, difficulty, prompt, [A, B, C, D], correctIdx, whyAndSolution]
+         ======================================================================== */
+      const VAULT_DATA = [
+        // ======================================================================
+        // SECTION 1: AI INFRASTRUCTURE, GPUS, ACCELERATORS & NEW SK1-006 (#301–#345)
+        // ======================================================================
+        [301, "ai", "GPU Form Factors", "SCENARIO",
+          "An AI infrastructure architect is designing an 8-GPU LLM training node requiring full-mesh 900 GB/s peer-to-peer GPU bandwidth via NVSwitch rather than bottlenecking inter-GPU all-reduce traffic across PCIe Gen5 root complexes. Which GPU module form factor is engineered specifically for high-TDP NVSwitch baseboards?",
+          [
+            "SXM (Server PCI Express Module) mezzanine sockets with integrated NVLink/NVSwitch fabric",
+            "Standard dual-slot PCIe Gen5 CEM add-in cards without bridge connectors",
+            "M.2 2280 Key-M accelerator sticks installed on motherboard risers",
+            "U.3 2.5-inch hot-swappable front-bay drive caddies"
+          ],
+          0,
+          "Why & Solution: SXM modules (such as H100/H200/B200 SXM) mount directly onto high-power NVSwitch baseboards, unlocking full 900–1,800 GB/s NVLink all-to-all bandwidth and 700W–1000W+ thermal envelopes. PCIe CEM cards top out at 128 GB/s bidirectional PCIe Gen5 x16 and cannot connect to NVSwitch fabrics; M.2 and U.3 are storage form factors."
+        ],
+        [302, "ai", "GPU Interconnects", "SCENARIO",
+          "During distributed multi-node LLM training across 16 GPU servers, profiling reveals that gradient synchronization (`AllReduce`) spends 42% of step time copying tensors from GPU HBM3 memory through host CPU DDR5 RAM before hitting the 400GbE NICs. Which technology eliminates host CPU bounce buffers by allowing NICs to read/write GPU memory directly?",
+          [
+            "GPUDirect RDMA over InfiniBand or lossless RoCEv2",
+            "iSCSI multipath I/O over TCP port 3260",
+            "USB Attached SCSI (UAS) over USB4",
+            "SNMPv3 authPriv trap forwarding"
+          ],
+          0,
+          "Why & Solution: GPUDirect RDMA allows InfiniBand HCAs or RoCEv2 NICs to DMA data directly between remote nodes' GPU HBM memory over the PCIe switch, bypassing host CPU and system DDR5 memory entirely. iSCSI, UAS, and SNMPv3 have nothing to do with zero-copy GPU tensor transfers."
+        ],
+        [303, "ai", "AI Fabric Networking", "SCENARIO",
+          "A datacenter team is deploying a 400Gbps RoCEv2 (RDMA over Converged Ethernet) backend storage and GPU scale-out fabric using standard Ethernet switches instead of InfiniBand. Under bursty AllReduce collective traffic, packet drops trigger severe RDMA go-back-N retransmissions that collapse training throughput. Which two Ethernet features must be configured end-to-end?",
+          [
+            "Priority Flow Control (PFC / IEEE 802.1Qbb) and Explicit Congestion Notification (ECN / DCQCN)",
+            "Spanning Tree PortFast and DHCP Snooping",
+            "NAT masquerading and TCP Nagle's algorithm",
+            "Port Security MAC sticky learning and RIPv2"
+          ],
+          0,
+          "Why & Solution: RoCEv2 encapsulates InfiniBand transport headers inside UDP/IP packets and demands a lossless Ethernet fabric. DCB/PFC pauses specific priority queues before switch buffers overflow, while ECN marks packets early so endpoints throttle sending rates via DCQCN without dropping frames."
+        ],
+        [304, "ai", "Liquid Cooling", "SCENARIO",
+          "A new rack populated with eight 8-GPU servers draws 72 kW total, far exceeding the ~15–20 kW ceiling of traditional raised-floor cold-aisle air cooling. Facilities wants to capture 75%–85% of server heat directly at the CPUs and GPUs while keeping standard 19-inch rack accessibility without submerging entire chassis in dielectric fluid. Which cooling architecture fits best?",
+          [
+            "Direct-to-Chip (D2C) liquid cooling using closed-loop cold plates and Coolant Distribution Units (CDUs)",
+            "Two-phase dielectric immersion cooling tanks",
+            "Adding perforated floor tiles in the hot aisle",
+            "Replacing 15,000 RPM SAS drives with 5,400 RPM drives"
+          ],
+          0,
+          "Why & Solution: Direct-to-Chip (D2C) liquid cooling routes chilled water/glycol through sealed cold plates bolted directly onto high-wattage GPUs and CPUs, capturing ~75–85% of thermal load while preserving standard horizontal rack serviceability. Immersion submerges entire servers in dielectric fluid; perforated tiles in the hot aisle ruin containment."
+        ],
+        [305, "ai", "Immersion Cooling", "DEEP DIVE",
+          "An AI colocation facility deploys single-phase immersion cooling tanks for 100 kW compute pods. Before submerging standard off-the-shelf rack servers into the non-conductive dielectric hydrocarbon/fluorocarbon fluid, which two hardware modifications are mandatory?",
+          [
+            "Remove all chassis cooling fans (which drag in viscous fluid) and replace vented mechanical HDDs with sealed SSDs (or helium-sealed drives)",
+            "Coat all gold DIMM contacts with silicone grease and remove the CMOS battery",
+            "Replace all fiber-optic transceivers with unshielded Cat5e patch cables",
+            "Disable ECC memory and set all PSU fans to 100% duty cycle"
+          ],
+          0,
+          "Why & Solution: Dielectric fluid is far denser than air: spinning chassis fans burn massive power and risk cavitation/damage in liquid, while non-helium air-breathing HDDs have breather holes that allow fluid ingress onto platters. Fans must be removed (or spoofed via PWM dummy plugs) and storage must be solid-state or hermetically helium-sealed."
+        ],
+        [306, "ai", "Leak Detection", "SCENARIO",
+          "A facility operates Direct-to-Chip liquid-cooled AI racks fed by manifold loops inside the cabinets. To protect multi-million-dollar GPU baseboards from coolant leaks, the engineering team installs conductive sensing rope along the bottom of every rack manifold and CDU drip pan. What automated sequence should trigger immediately upon moisture detection?",
+          [
+            "Alert the BMS/DCIM console, isolate the affected rack's motorized solenoid shutoff valve, and gracefully drain/power down the impacted node",
+            "Increase CDU pump pressure to maximum to flush the leak out of the manifold",
+            "Trigger the room's wet-pipe water sprinkler system",
+            "Switch the rack PDUs from 415V three-phase to 120V single-phase"
+          ],
+          0,
+          "Why & Solution: Leak-detection rope cables detect conductive fluid within seconds and trigger BMS alarms, automated solenoid isolation valves to stop fluid flow to the leaking loop, and controlled node shutdown before liquid shorts active PCBs."
+        ],
+        [307, "ai", "High-Density Rack Power", "SCENARIO",
+          "Modern 60 kW to 100 kW AI racks increasingly distribute 415V/240V three-phase AC directly to rack PDUs (or rectify to 48V DC busbars inside Open Rack v3 cabinets) rather than using legacy 120V/208V feeds. What is the primary electrical advantage of stepping up to 415V 3-phase or 48V DC busbars?",
+          [
+            "Higher voltage reduces current (amperage) for the same wattage (P = V * I), slashing I²R resistive heat losses and copper cable thickness",
+            "48V DC eliminates the need for circuit breakers or UPS battery backups",
+            "415V AC allows standard 15A NEMA 5-15 household outlets to deliver 50 kW",
+            "Higher voltage slows GPU clock speeds to extend warranty coverage"
+          ],
+          0,
+          "Why & Solution: Since Power = Voltage × Current (and resistive wire loss = I²R), doubling or tripling distribution voltage cuts current draw proportionally, dramatically reducing copper conductor gauge, PDU whip bulk, and I²R conversion heat."
+        ],
+        [308, "ai", "HBM3 vs. DDR5 Memory", "QUICK WIN",
+          "Why do flagship AI training GPUs rely on stacked HBM3 / HBM3e (High Bandwidth Memory) directly on the GPU interposer rather than standard DDR5 DIMMs?",
+          [
+            "HBM3 uses ultra-wide 1024-bit+ through-silicon-via (TSV) stacks delivering 3–4+ TB/s of memory bandwidth to feed thousands of Tensor Cores without stalling",
+            "HBM3 is non-volatile storage that retains model weights after utility power loss",
+            "DDR5 DIMMs cannot operate in servers equipped with UEFI Secure Boot",
+            "HBM3 costs less per gigabyte than 7,200 RPM SATA hard drives"
+          ],
+          0,
+          "Why & Solution: LLM matrix multiplication is heavily memory-bandwidth-bound. HBM3/HBM3e stacks DRAM dies vertically right next to the GPU die over a 1024-bit+ bus, yielding 3.35–4.8 TB/s per GPU—an order of magnitude faster than socketed DDR5 channels (~300–400 GB/s). HBM is still volatile DRAM."
+        ],
+        [309, "ai", "Quantization & Precision", "SCENARIO",
+          "An AI operations engineer must deploy a 70-billion-parameter LLM onto a single server equipped with four 80 GB GPUs (320 GB total VRAM). In full FP32 (32-bit floating point), the model weights alone require ~280 GB plus KV cache overhead, causing Out-Of-Memory (OOM) crashes. Which technique reduces VRAM footprint by 50%–75% while preserving inference accuracy on Tensor Cores?",
+          [
+            "Model weight quantization from FP32 down to FP16/BF16 (half precision) or FP8/INT8",
+            "Enabling Linux swap space on a 7,200 RPM SATA HDD",
+            "Converting the model weights into a RAID 5 parity stripe",
+            "Disabling ECC memory on the GPU HBM3 stacks"
+          ],
+          0,
+          "Why & Solution: Quantization maps 32-bit floating-point weights to lower-bit formats like BF16/FP16 (2 bytes/param = ~140 GB) or FP8/INT8 (1 byte/param = ~70 GB), cutting VRAM consumption and accelerating Tensor Core matrix throughput. Swapping GPU tensors to an HDD would slow inference by orders of magnitude."
+        ],
+        [310, "ai", "MIG (Multi-Instance GPU)", "SCENARIO",
+          "A enterprise platform team runs seven lightweight internal inference microservices on a single NVIDIA H100 80GB GPU. Standard time-slicing causes noisy-neighbor latency spikes whenever one service receives a traffic burst. Which hardware feature partitions a single physical GPU into up to seven isolated instances with dedicated HBM memory, cache, and SM compute slices?",
+          [
+            "MIG (Multi-Instance GPU)",
+            "SR-IOV Ethernet port trunking",
+            "NUMA memory interleaving",
+            "RAID 10 volume striping"
+          ],
+          0,
+          "Why & Solution: Multi-Instance GPU (MIG) hardware-partitions supported NVIDIA GPUs (A100/H100/H200/B200) into up to 7 fully isolated GPU instances, each with dedicated streaming multiprocessors (SMs), L2 cache, and HBM memory bandwidth—eliminating noisy-neighbor contention."
+        ],
+        [311, "ai", "GPU Virtualization Modes", "SCENARIO",
+          "A VDI and AI engineering team needs to share physical datacenter GPUs across multiple virtual machines on an ESXi/KVM cluster while preserving live migration and centralized license management, rather than dedicating an entire physical PCIe slot exclusively to one VM. Which virtualization approach should they deploy?",
+          [
+            "vGPU (Virtual GPU) using a hypervisor GPU manager to slice physical GPU frames/compute across multiple VMs",
+            "Direct PCIe Passthrough (VT-d / IOMMU) binding the entire physical card to one single VM",
+            "Software-only CPU emulation via Mesa llvmpipe",
+            "USB-to-VGA display adapters attached to the BMC"
+          ],
+          0,
+          "Why & Solution: Direct PCIe Passthrough dedicates 100% of a physical GPU to a single VM (preventing sharing and complicating live migration). vGPU installs a hypervisor driver manager that presents virtualized GPU profiles to multiple concurrent VMs."
+        ],
+        [312, "ai", "AI Checkpoint Storage Bursts", "SCENARIO",
+          "Every 30 minutes during a 512-GPU foundation model training run, all 512 GPUs pause compute simultaneously to write a 1.2 TB model checkpoint to shared storage. On a standard single-head NAS appliance, checkpoint writes take 9 minutes—wasting 30% of expensive GPU cluster time. Which storage architecture eliminates this checkpoint bottleneck?",
+          [
+            "A parallel distributed file system (such as Lustre, IBM Spectrum Scale/GPFS, or BeeGFS) backed by all-flash NVMe-oF storage nodes",
+            "A single-controller 1GbE SMB/CIFS NAS with 5,400 RPM archive HDDs",
+            "An external eSATA drive daisy-chained to the head node",
+            "Writing checkpoints to an internal SDHC flash card on each node"
+          ],
+          0,
+          "Why & Solution: Parallel file systems (Lustre, GPFS/Spectrum Scale, WekaFS) stripe large files across dozens of NVMe storage servers simultaneously, allowing hundreds of GPU nodes to write terabyte checkpoints in seconds at hundreds of GB/s."
+        ],
+        [313, "ai", "NVMe-oF (NVMe over Fabrics)", "QUICK WIN",
+          "How does NVMe-oF (NVMe over Fabrics) improve upon legacy iSCSI when connecting remote all-flash storage arrays to AI and high-frequency compute nodes?",
+          [
+            "It extends native PCIe/NVMe multi-queue commands directly across RDMA (InfiniBand/RoCEv2) or Fibre Channel networks, eliminating SCSI translation overhead and achieving near-local latency",
+            "It translates NVMe commands into legacy parallel IDE/PATA packets over TCP port 21",
+            "It compresses all flash blocks using DES encryption over UDP port 69",
+            "It restricts storage queues to a single synchronous thread per server"
+          ],
+          0,
+          "Why & Solution: Legacy iSCSI wraps SCSI commands over TCP/IP, adding protocol translation latency and single-queue bottlenecks. NVMe-oF transports native NVMe commands (supporting 64K queues × 64K commands) directly over RDMA, TCP, or FC fabrics with microsecond overhead."
+        ],
+        [314, "ai", "AI Confidential Computing", "SCENARIO",
+          "A healthcare consortium is fine-tuning a proprietary clinical LLM on sensitive patient records inside a multi-tenant cloud datacenter and must ensure that neither the cloud hypervisor administrator nor physical memory probing can inspect model weights or patient tensors in GPU HBM3 memory. Which hardware security feature addresses this?",
+          [
+            "GPU Confidential Computing (hardware TEEs on Hopper/Blackwell GPUs paired with CPU SEV-SNP/TDX) encrypting data in-use across PCIe/NVLink and HBM",
+            "Enabling UEFI Legacy CSM boot and disabling IOMMU",
+            "Storing model weights on an unencrypted NFSv3 share",
+            "Setting SNMPv2c community string to `private`"
+          ],
+          0,
+          "Why & Solution: Confidential Computing extends hardware Trusted Execution Environments (TEEs) from the CPU (AMD SEV-SNP / Intel TDX) into the GPU (NVIDIA H100/B200 Confidential Compute), encrypting PCIe/NVLink transfers and HBM memory and providing cryptographic hardware attestation of GPU firmware."
+        ],
+        [315, "ai", "AI Model & Supply Chain Security", "SCENARIO",
+          "An MLOps engineer downloads an open-weight model packaged in Python `pickle` (`.pkl` / `.pt`) format from an unverified external repository and loads it onto an internal inference server, inadvertently executing arbitrary shellcode embedded inside the serialized weight file. Which safer serialization format prevents arbitrary code execution upon loading model weights?",
+          [
+            "Safetensors (`.safetensors`), which stores pure tensor arrays and JSON metadata without executable Python deserialization bytecode",
+            "Executable `.exe` self-extracting archives",
+            "Unverified `tar.gz` archives extracted as `root` with `--no-same-owner`",
+            "Legacy PHP serialized object streams"
+          ],
+          0,
+          "Why & Solution: Python's `pickle` module executes arbitrary `__reduce__` bytecode during deserialization—a major vector for malicious model poisoning. Hugging Face's `safetensors` format strictly stores raw tensor buffers with zero executable code."
+        ],
+        [316, "ai", "Inference Server Isolation", "SCENARIO",
+          "An enterprise deploys an internal RAG (Retrieval-Augmented Generation) AI assistant connected to corporate SharePoint and SQL databases. To prevent prompt-injection attacks from causing the LLM runtime or code-interpreter sandbox to pivot onto internal management VLANs, which two server-level controls should be enforced?",
+          [
+            "Run inference/code sandboxes in rootless microVMs/containers with strict egress firewall deny-by-default rules and least-privilege read-only service accounts",
+            "Run the LLM container with `--privileged --net=host` as `root`",
+            "Place the inference API directly on the Out-of-Band iDRAC/iLO management VLAN",
+            "Grant the RAG service account Domain Admin privileges so it never hits access-denied errors"
+          ],
+          0,
+          "Why & Solution: Defense-in-depth for AI inference servers requires strong workload isolation (microVMs like Firecracker/Kata or rootless containers), zero-trust egress filtering so compromised sandboxes cannot initiate outbound C2 or lateral scans, and least-privilege RAG retrieval tokens."
+        ],
+        [317, "ai", "Datacenter Sustainability: PUE", "QUICK WIN",
+          "A datacenter facility consumes 2.4 MW of total utility power (including chillers, pumps, UPS losses, and lighting), while the actual IT racks (servers, storage, switches) consume 2.0 MW. What is the facility's Power Usage Effectiveness (PUE), and what does an ideal PUE approach?",
+          [
+            "PUE = 1.20 (2.4 MW / 2.0 MW); an ideal theoretical PUE approaches 1.00",
+            "PUE = 0.83 (2.0 MW / 2.4 MW); an ideal theoretical PUE approaches 0.00",
+            "PUE = 4.40 (2.4 MW + 2.0 MW); an ideal theoretical PUE approaches 10.0",
+            "PUE = 1.20; an ideal PUE is 2.50 or higher"
+          ],
+          0,
+          "Why & Solution: PUE = Total Facility Power / IT Equipment Power = 2.4 MW / 2.0 MW = 1.20. A PUE of 1.0 means 100% of power goes to IT compute with zero cooling/conversion overhead. Liquid-cooled AI facilities often achieve PUEs of 1.08–1.15."
+        ],
+        [318, "ai", "Water Usage Effectiveness (WUE)", "QUICK WIN",
+          "Alongside PUE, modern sustainable datacenter operations track WUE (Water Usage Effectiveness) when evaluating adiabatic evaporative cooling towers versus closed-loop dry coolers. What does WUE measure?",
+          [
+            "Annual site water consumption (in liters) divided by total IT equipment energy consumed (in kWh)",
+            "Total wastewater discharged into municipal sewers divided by the number of server racks",
+            "Coolant flow rate in gallons per minute inside a single GPU cold plate",
+            "Relative humidity percentage inside the cold aisle"
+          ],
+          0,
+          "Why & Solution: Developed by The Green Grid, WUE = Annual Site Water Usage (Liters) / IT Equipment Energy (kWh). Closed-loop liquid cooling with dry coolers trades slightly higher fan/chiller electricity for near-zero WUE water consumption."
+        ],
+        [319, "ai", "Tensor Core Sparsity & Matrix Math", "QUICK WIN",
+          "What is the primary architectural difference between general-purpose CPU cores and GPU Tensor Cores in an AI server?",
+          [
+            "Tensor Cores are specialized hardware matrix-multiply-accumulate (MMA) units engineered to execute mixed-precision GEMM tensor operations at orders-of-magnitude higher FLOPS than scalar/vector CPU cores",
+            "Tensor Cores replace the motherboard's UEFI BIOS chip to manage fan PWM curves",
+            "Tensor Cores are dedicated hardware RAID parity engines for SATA drives",
+            "Tensor Cores handle TCP/IP checksum offloading on 1GbE RJ-45 ports"
+          ],
+          0,
+          "Why & Solution: CPUs optimize for low-latency serial branching and cache hierarchy, whereas GPU Tensor Cores execute massive parallel matrix-multiply-accumulate operations (`D = A × B + C`) in a single clock cycle, powering deep learning training and inference."
+        ],
+        [320, "ai", "GPU PCIe Gen5 Bandwidth Bottleneck", "SCENARIO",
+          "An engineer installs a PCIe Gen5 x16 GPU card into a server riser slot that is electrically wired for only PCIe Gen4 x8 lanes. What is the maximum unidirectional host-to-device transfer bandwidth available to that GPU?",
+          [
+            "~16 GB/s (PCIe Gen4 runs at ~2 GB/s per lane × 8 lanes), one-quarter of full PCIe Gen5 x16 (~64 GB/s)",
+            "~64 GB/s because PCIe Gen5 cards automatically double the electrical traces on the motherboard",
+            "~900 GB/s via automatic NVLink fallback over the PCIe slot",
+            "~1.25 GB/s (10 Gbps Ethernet equivalent)"
+          ],
+          0,
+          "Why & Solution: PCIe negotiates to the lowest common generation and lane width: PCIe Gen4 delivers ~2 GB/s per lane (~16 GB/s at x8), whereas PCIe Gen5 delivers ~4 GB/s per lane (~64 GB/s unidirectional / ~128 GB/s bidirectional at x16)."
+        ],
+        [321, "ai", "NVLink Bridge vs. PCIe Root Complex", "SCENARIO",
+          "A dual-GPU workstation/server has two PCIe GPUs installed in CPU Socket 0 and CPU Socket 1 respectively, without an NVLink bridge. During multi-GPU training, peer-to-peer transfers crawl because traffic must traverse Socket 0 → UPI Interconnect → Socket 1. How can the administrator improve inter-GPU communication on this existing chassis?",
+          [
+            "Move both GPUs onto PCIe slots wired to the SAME CPU socket root complex (and install an NVLink bridge if supported by the GPU model)",
+            "Enable Jumbo Frames (MTU 9000) on the onboard BMC management NIC",
+            "Move one DIMM from Channel A to Channel D",
+            "Switch the boot drive from GPT to MBR"
+          ],
+          0,
+          "Why & Solution: Placing both GPUs under the same CPU socket's PCIe switch/root complex avoids traversing the inter-socket UPI/Infinity Fabric link, and adding a physical NVLink bridge (where supported) creates a direct high-speed peer-to-peer path."
+        ],
+        [322, "ai", "AI Cluster Straggler Node Troubleshooting", "SCENARIO",
+          "During a synchronous 32-node distributed training job, overall iteration speed suddenly drops by 60% even though no nodes have crashed. Telemetry shows 31 nodes running at 99% GPU utilization while Node 19 runs at 40% GPU utilization and logs PCIe link speed degradation (`Downgraded from 32.0 GT/s to 8.0 GT/s`) and thermal throttling. Why does one slow node stall the entire cluster?",
+          [
+            "Synchronous data-parallel training uses barrier synchronization (`AllReduce`) at every step—all 31 healthy nodes must wait for the slowest 'straggler' node to finish before updating weights",
+            "Node 19 has taken over as the DHCP server for the InfiniBand subnet",
+            "Thermal throttling on Node 19 automatically halves the clock speed of all other 31 servers",
+            "The parallel file system locks all read operations whenever one GPU exceeds 75°C"
+          ],
+          0,
+          "Why & Solution: Synchronous distributed training (DDP/FSDP) operates in lockstep barriers: every worker must complete forward/backward passes before gradient averaging can finish. Identifying and cordoning/draining thermal or PCIe-degraded 'straggler' nodes restores full cluster throughput."
+        ],
+        [323, "ai", "DCGM (Data Center GPU Manager) Telemetry", "QUICK WIN",
+          "Which enterprise GPU telemetry and diagnostic suite is used on Linux AI nodes to monitor GPU HBM ECC uncorrectable errors, NVLink health, thermal throttling flags, and run active hardware stress diagnostics (`dcgmi diag`)?",
+          [
+            "NVIDIA DCGM (Data Center GPU Manager)",
+            "Windows Server WSUS",
+            "Active Directory Sites and Services",
+            "ISC DHCPd"
+          ],
+          0,
+          "Why & Solution: NVIDIA DCGM (`dcgmi`) provides cluster-grade GPU health telemetry, Prometheus metrics export, NVLink error counters, XID fault tracking, and active hardware diagnostics."
+        ],
+        [324, "ai", "GPU XID Error Codes", "SCENARIO",
+          "A Linux AI compute node drops a GPU from the CUDA device list (`nvidia-smi` shows `ERR!` or missing GPU) and `dmesg` logs `NVRM: Xid (PCI:0000:41:00): 79, GPU has fallen off the bus`. What are the two most common physical/hardware root causes for `Xid 79`?",
+          [
+            "Insufficient PSU/12VHPWR power delivery under transient load spikes, or thermal/PCIe seating failure on the riser/baseboard",
+            "An expired TLS certificate on TCP port 443",
+            "A mismatch between T568A and T568B pinouts on the management port",
+            "Running `df -i` on an XFS partition"
+          ],
+          0,
+          "Why & Solution: `Xid 79 (GPU has fallen off the bus)` indicates the host lost PCIe link communication with the GPU—typically triggered by transient power rail droops (loose 12VHPWR/8-pin cables or undersized PSUs), severe overheating, or improper PCIe riser seating."
+        ],
+        [325, "ai", "KV Cache & Context Window VRAM Scaling", "SCENARIO",
+          "An inference server hosting a 32B-parameter model handles short 512-token prompts effortlessly, but crashes with CUDA Out-Of-Memory errors when users submit 64,000-token documents with a batch size of 16. Which dynamic runtime memory structure grows linearly with sequence length and batch size?",
+          [
+            "The Key-Value (KV) Cache stored in GPU HBM VRAM during autoregressive token generation",
+            "The motherboard's 64 KB CMOS NVRAM chip",
+            "The server's UEFI EEPROM firmware partition",
+            "The Linux `/boot` ext4 partition"
+          ],
+          0,
+          "Why & Solution: During transformer inference, attention Key and Value tensors for every preceding token are cached in GPU VRAM (the KV Cache) to avoid recomputation. Long context windows (32k–128k+ tokens) and large batch sizes can consume tens of gigabytes of VRAM beyond static model weights."
+        ],
+        [326, "ai", "Batching & Throughput Optimization (vLLM / Triton)", "QUICK WIN",
+          "An AI inference server processes requests sequentially (batch size = 1), leaving GPU Tensor Cores 85% idle waiting on HBM weight reads. Which serving optimization dynamically groups incoming requests at the token iteration level to maximize GPU utilization and tokens-per-second?",
+          [
+            "Continuous (in-flight) batching paired with PagedAttention (e.g., vLLM / TensorRT-LLM / Triton Inference Server)",
+            "Disabling GPU boost clocks and pinning inference to a single CPU thread",
+            "Converting all REST API calls to unencrypted Telnet over port 23",
+            "Storing the KV cache on an external USB 2.0 flash drive"
+          ],
+          0,
+          "Why & Solution: Continuous (in-flight) batching inserts new requests as soon as earlier sequences finish generating, while PagedAttention eliminates VRAM fragmentation—multiplying inference throughput by 5x–20x."
+        ],
+        [327, "ai", "AI Training vs. Inference Hardware Profiles", "QUICK WIN",
+          "How do hardware requirements typically differ between large-scale foundation model Training servers and production Inference servers?",
+          [
+            "Training demands massive multi-GPU HBM capacity, NVLink/NVSwitch + 400G/800G RDMA fabrics, and liquid cooling; Inference often optimizes cost-per-token using fewer GPUs, INT8/FP8 quantization, or edge/PCIe accelerators",
+            "Training runs exclusively on single-core CPUs without GPUs, while Inference requires 100 kW immersion tanks",
+            "Training uses SATA HDDs for HBM memory, while Inference uses floppy disks",
+            "There is zero difference—both require identical 8-way SXM NVSwitch nodes"
+          ],
+          0,
+          "Why & Solution: Foundation training requires huge all-to-all gradient bandwidth (NVLink + InfiniBand/RoCEv2) and FP16/BF16/FP8 compute across clusters, whereas inference has zero inter-node gradient synchronization and thrives on lower-precision INT8/FP8 accelerators."
+        ],
+        [328, "ai", "Rail-Optimized Clos Topology for AI", "DEEP DIVE",
+          "In a large-scale 8-GPU-per-node AI cluster, why do architects wire each node's 8 backend RDMA NICs to 8 separate leaf switches (a 'Rail-Optimized' Clos topology) rather than plugging all 8 NICs from one server into the same single top-of-rack switch?",
+          [
+            "Rail optimization places GPU #0 from every server onto Leaf 0, GPU #1 onto Leaf 1, etc., allowing rank-to-rank `AllReduce` traffic to complete in a single leaf-switch hop without traversing oversubscribed spine links",
+            "Because Ethernet switches physically refuse to accept more than one cable from the same server",
+            "To force all GPU traffic through the corporate firewall on VLAN 1",
+            "Because InfiniBand cables cannot exceed 0.5 meters in length"
+          ],
+          0,
+          "Why & Solution: In ring/tree `AllReduce`, GPU `i` on Server A communicates primarily with GPU `i` on Server B. Connecting all GPU `i` NICs to Leaf Switch `i` keeps peer-rank traffic within a single non-blocking leaf switch hop, minimizing tail latency and spine congestion."
+        ],
+        [329, "ai", "Coolant Chemistry & Galvanic Corrosion in D2C Loops", "SCENARIO",
+          "A facilities technician tops off a Direct-to-Chip liquid cooling loop with plain untreated municipal tap water instead of the vendor-specified propylene-glycol + corrosion-inhibitor coolant. Within weeks, thermal performance degrades and micro-channel cold plates clog. Why?",
+          [
+            "Tap water minerals cause scale buildup, biological algae growth, and galvanic corrosion between copper cold plates and aluminum/steel manifold components",
+            "Tap water freezes at 25°C inside server cold plates",
+            "Tap water increases PCIe Gen5 lane attenuation",
+            "Tap water demagnetizes NVMe NAND flash cells"
+          ],
+          0,
+          "Why & Solution: Closed-loop D2C cooling requires deionized/distilled water mixed with inhibited propylene glycol and biocides to prevent galvanic corrosion across mixed metals, mineral scaling in microscopic cold-plate fins, and microbial fouling."
+        ],
+        [330, "ai", "Dew Point & Chilled Water Supply Temperature", "SCENARIO",
+          "To maximize energy efficiency ('free cooling' without energy-hungry chillers), an AI datacenter raises its Direct-to-Chip supply water temperature to 32°C (90°F)—warm-water liquid cooling. Aside from keeping silicon safely below thermal limits, what major operational benefit does warm-water cooling (30°C–40°C) provide?",
+          [
+            "It stays well above the room's dew point (eliminating condensation risk on pipes) and enables chiller-less dry coolers and waste-heat reuse",
+            "It allows servers to operate without any power supplies",
+            "It converts single-mode fiber into multimode fiber",
+            "It eliminates the need for ECC memory"
+          ],
+          0,
+          "Why & Solution: Warm-water cooling (30°C–45°C) removes heat efficiently from 85°C+ GPU dies while remaining safely above ambient dew point (preventing pipe condensation) and allowing economizer dry coolers to reject heat without mechanical refrigeration chillers."
+        ],
+        [331, "ai", "Power Capping & Dynamic Frequency Scaling", "SCENARIO",
+          "During a summer heatwave, utility curtailment requires a datacenter pod to temporarily reduce peak power draw by 15% without shutting down active AI training jobs. Which BMC / GPU management capability enforces a hard per-server or per-GPU wattage ceiling immediately?",
+          [
+            "Out-of-band BMC power capping (Intel Node Manager / Redfish PowerLimit) and GPU TDP power limits (`nvidia-smi -pl`)",
+            "Unplugging one PSU from every 2N dual-corded server",
+            "Deleting `/etc/fstab` on all compute nodes",
+            "Disabling Spanning Tree Protocol on core switches"
+          ],
+          0,
+          "Why & Solution: Modern BMCs (via Redfish/IPMI) and GPUs (`nvidia-smi -pl <watts>`) support dynamic hardware power capping, smoothly throttling clock frequencies to stay strictly under a defined wattage budget without dropping workloads. Unplugging one PSU does NOT reduce server power draw—it merely removes redundancy!"
+        ],
+        [332, "ai", "Transient Power Spikes & PSU Hold-Up Time", "SCENARIO",
+          "An 8-GPU server rated at 5.2 kW average load experiences instantaneous millisecond micro-bursts up to 7.8 kW when all Tensor Cores transition simultaneously from idle to 100% GEMM execution, tripping PSU over-current protection. Which power specification prevents spurious shutdowns during sub-second AI load transients?",
+          [
+            "PSUs with high peak transient excursion tolerance (e.g., 150%–200% for 10–100 ms) and adequate bulk capacitor hold-up time",
+            "Replacing the server's copper power cords with unshielded Cat6 cables",
+            "Lowering the UPS output frequency from 60 Hz to 25 Hz",
+            "Setting the CPU governor to `performance` in Linux"
+          ],
+          0,
+          "Why & Solution: Synchronized AI workloads generate massive millisecond current spikes (di/dt) when thousands of cores wake simultaneously. Enterprise AI PSUs (ATX 3.0/3.1 & CRPS) are engineered with bulk capacitance and high transient excursion ratings to absorb millisecond spikes without tripping OCP."
+        ],
+        [333, "ai", "Vector Databases & RAG Storage IOPS", "QUICK WIN",
+          "An enterprise RAG inference pipeline queries a 500-million-embedding vector database (HNSW index) to retrieve semantic context before every LLM prompt. Why must the vector index reside in system RAM or ultra-low-latency local NVMe SSDs rather than network-attached HDDs?",
+          [
+            "Graph-based Approximate Nearest Neighbor (ANN/HNSW) searches perform thousands of random non-sequential pointer hops per query, requiring sub-millisecond random read latency",
+            "Vector databases only compile on FAT32 partitions",
+            "HDDs physically block floating-point cosine similarity instructions",
+            "Network switches drop packets containing 1536-dimensional arrays"
+          ],
+          0,
+          "Why & Solution: HNSW vector graph traversal executes thousands of tiny random reads per query. Spinning HDDs (~100 IOPS, 5–10 ms latency) choke immediately, whereas RAM or local NVMe SSDs (500,000+ IOPS, <0.1 ms) keep retrieval under a few milliseconds."
+        ],
+        [334, "ai", "Data Poisoning & Training Dataset Integrity", "SCENARIO",
+          "Before ingesting a 4 TB external dataset into an on-premises fine-tuning cluster, a security engineer verifies SHA-256 cryptographic hashes against signed manifest files and scans for poisoned trigger samples. Which governance and integrity practice does this enforce?",
+          [
+            "Training data provenance, cryptographic integrity verification, and supply-chain sanitization",
+            "RAID 0 disk striping for faster sequential reads",
+            "SNMPv1 community string rotation",
+            "802.1Q native VLAN pruning"
+          ],
+          0,
+          "Why & Solution: Verifying SHA-256 checksums/signatures on datasets and base weights ensures data integrity and prevents supply-chain tampering or backdoor data poisoning prior to training."
+        ],
+        [335, "ai", "Redfish RESTful Out-of-Band API", "QUICK WIN",
+          "When automating firmware inventory, thermal telemetry, and power-capping across 200 heterogeneous AI and storage servers from different vendors, which modern JSON/HTTPS out-of-band management standard replaces legacy IPMI-over-LAN?",
+          [
+            "DMTF Redfish (RESTful HTTPS / JSON API over TCP 443)",
+            "Telnet CLI over TCP port 23",
+            "SNMPv1 over UDP port 161",
+            "TFTP over UDP port 69"
+          ],
+          0,
+          "Why & Solution: DMTF Redfish is the modern, secure RESTful HTTPS/JSON replacement for legacy IPMI, providing standardized schemas for bare-metal provisioning, thermal sensors, power limits, and firmware updates."
+        ],
+        [336, "ai", "GPU ECC Memory Scrubbing & Page Retirement", "SCENARIO",
+          "An NVIDIA H100 GPU detects recurring uncorrectable SRAM/HBM bit errors at a specific physical memory address during nightly diagnostics. Instead of scrapping the entire $30,000 GPU, how does modern enterprise GPU firmware isolate the defective cells?",
+          [
+            "Dynamic Page Retirement / Row Remapping permanently maps out the faulty HBM memory row/page upon GPU reset so future allocations bypass it",
+            "It formats the host server's NVMe boot drive",
+            "It disables half of the GPU's Tensor Cores permanently",
+            "It routes HBM memory accesses over the 1GbE BMC port"
+          ],
+          0,
+          "Why & Solution: Enterprise GPUs feature hardware Row Remapping / Dynamic Page Retirement in HBM firmware: defective memory cells are flagged in fuse/non-volatile tables and remapped to spare rows after a GPU reset."
+        ],
+        [337, "ai", "48V DC Open Rack v3 (ORv3) Power Shelf", "QUICK WIN",
+          "In Open Rack v3 (ORv3) AI cabinets, individual servers do not contain traditional 120V/240V AC power supplies. Instead, how do compute trays receive power inside the rack?",
+          [
+            "Centralized rack-level power shelves rectify 3-phase AC into 48V DC distributed along a rear blind-mate copper busbar that every server tray plugs into directly",
+            "Each server tray uses PoE++ from the top-of-rack switch",
+            "Each server contains an internal diesel micro-generator",
+            "Power is transmitted wirelessly via inductive coils on the rack rails"
+          ],
+          0,
+          "Why & Solution: ORv3 replaces redundant per-server AC-DC PSUs with centralized high-efficiency rack power shelves feeding a rear 48V DC blind-mate busbar, reducing conversion losses, heat, and hot-swap complexity."
+        ],
+        [338, "ai", "Edge AI Server Environmental Hardening", "SCENARIO",
+          "A manufacturing plant deploys ruggedized inference servers on the factory floor to run real-time computer-vision defect detection on assembly lines. Unlike a Tier III datacenter, the factory floor has airborne metal dust, vibration, and 42°C ambient heat. Which hardware design features are essential?",
+          [
+            "Fanless or filtered positive-pressure sealed chassis, solid-state storage (no spinning HDDs), wide-temperature industrial components, and shock-isolated mounts",
+            "Open-frame 42U perforated racks with 15,000 RPM magnetic hard drives",
+            "Unfiltered intake fans pulling ambient factory air directly across bare motherboards",
+            "Water-cooled open reservoirs without lids"
+          ],
+          0,
+          "Why & Solution: Edge/industrial servers outside conditioned datacenters require dust/particulate filtration or sealed conduction cooling, vibration-immune SSDs, and extended operating temperature ratings (e.g., 0°C–50°C)."
+        ],
+        [339, "ai", "API Rate Limiting & Token Quotas on Inference Endpoints", "SCENARIO",
+          "An internal LLM API gateway experiences repeated GPU OOM crashes and denial-of-service slowdowns because a misconfigured batch script floods the endpoint with thousands of concurrent maximum-length requests. Which application/gateway controls protect inference availability?",
+          [
+            "Token-per-minute (TPM) and request-per-minute (RPM) rate limiting, max `max_tokens` caps, and request queuing with timeouts",
+            "Disabling TLS encryption on the API reverse proxy",
+            "Switching the server NIC from full-duplex to half-duplex",
+            "Mounting `/tmp` as `noexec`"
+          ],
+          0,
+          "Why & Solution: Because LLM compute scales with output tokens and batch concurrency, inference gateways enforce RPM/TPM rate limits, maximum sequence length ceilings, and bounded request queues to prevent resource exhaustion."
+        ],
+        [340, "ai", "Server Asset Lifecycle & E-Waste / WEEE Compliance", "QUICK WIN",
+          "When retiring an older generation of GPU compute nodes, why must the IT asset disposition (ITAD) workflow track GPU serial numbers, sanitize onboard flash/BMC NVRAM, and use certified R2/e-Stewards recyclers?",
+          [
+            "To prevent residual sensitive data/keys in BMC/NVMe chips from leaking and ensure hazardous heavy metals/capacitors are disposed of in compliance with environmental regulations (e.g., WEEE)",
+            "Because decommissioned GPUs automatically wipe their own HBM memory via magnetic induction",
+            "To avoid paying annual per-socket Microsoft True-Up fees on scrapped hardware",
+            "Because WEEE regulations prohibit reusing 19-inch steel server racks"
+          ],
+          0,
+          "Why & Solution: Proper ITAD/lifecycle decommissioning requires wiping non-volatile storage and BMC configs, updating the CMDB/asset inventory, obtaining certificates of destruction/sanitization, and using certified recyclers (R2 / e-Stewards / WEEE) for environmental compliance."
+        ],
+        [341, "ai", "NUMA Alignment of GPUs & NICs (PCIe Topology)", "DEEP DIVE",
+          "On a dual-socket server with 4 GPUs and 4 400GbE RDMA NICs, `nvidia-smi topo -m` shows that GPU 0 and NIC 0 sit on CPU Socket 0 (`PIX` / `NODE`), whereas GPU 0 and NIC 2 sit across CPU sockets (`SYS`). For peak GPUDirect RDMA speed, how should software pin NICs to GPUs?",
+          [
+            "Bind each GPU to the NIC sharing the exact same local CPU socket / PCIe root complex (`PIX` or `NODE` affinity) to avoid cross-socket `SYS` bottlenecks",
+            "Force all 4 GPUs to communicate exclusively through NIC 3 on Socket 1",
+            "Disable IOMMU/VT-d so all PCIe devices share a single IRQ interrupt",
+            "Route all RDMA traffic over the 1GbE motherboard BMC port"
+          ],
+          0,
+          "Why & Solution: `nvidia-smi topo -m` maps PCIe affinity: `PIX` (same PCIe switch) and `NODE` (same NUMA/CPU socket) deliver full-speed GPUDirect RDMA, whereas `SYS` crosses the inter-socket UPI/Infinity Fabric bus and degrades throughput."
+        ],
+        [342, "ai", "GPU Clock Throttling Diagnostics", "SCENARIO",
+          "An AI engineer notices a training node running 25% slower than identical peers. Running `nvidia-smi -q -d PERFORMANCE` shows `HW Thermal Slowdown : Active` and `SW Power Cap : Not Active`. What should the technician inspect immediately?",
+          [
+            "GPU heatsink/cold-plate contact, chassis fan RPMs, blocked front bezel air filters, or CDU coolant flow/temperature to that node",
+            "Whether the Windows DHCP lease has expired",
+            "Whether DNS reverse PTR records are configured for the node",
+            "Whether the Linux `/var` partition is formatted as ext4 instead of XFS"
+          ],
+          0,
+          "Why & Solution: `HW Thermal Slowdown : Active` proves the GPU hardware is actively down-clocking itself because die or HBM temperature crossed its thermal threshold—pointing directly to airflow obstruction, fan failure, dried thermal interface material, or liquid-cooling flow issues."
+        ],
+        [343, "ai", "AI Model Weight Encryption at Rest", "QUICK WIN",
+          "An enterprise stores proprietary fine-tuned model weights worth $5M on a central NVMe storage array. Which storage-level control protects those model files if physical drives are stolen from the datacenter?",
+          [
+            "Data-at-rest encryption using Self-Encrypting Drives (SEDs / FIPS 140-3) or volume-level LUKS/BitLocker backed by an external KMS",
+            "Hiding the directory using a leading dot (`.models`) on Linux",
+            "Enabling Spanning Tree BPDU Guard on the storage switch",
+            "Using Cat6A shielded patch cables"
+          ],
+          0,
+          "Why & Solution: Full-disk/volume encryption (SEDs, LUKS, BitLocker) with keys managed by a separate Key Management Server (KMS) ensures stolen physical media cannot be read offline."
+        ],
+        [344, "ai", "AI Cluster Time Synchronization (PTP vs. NTP)", "SCENARIO",
+          "Distributed financial AI inference nodes and telemetry pipelines require sub-microsecond clock accuracy across servers—far tighter than standard NTP's millisecond-level precision. Which protocol uses hardware NIC timestamping to synchronize clocks to nanosecond/sub-microsecond precision?",
+          [
+            "PTP (Precision Time Protocol / IEEE 1588) with hardware timestamping NICs and Boundary/Transparent Clocks",
+            "SNTP over unencrypted dial-up modems",
+            "HTTP `Date:` response headers",
+            "NetBIOS Name Service broadcasts"
+          ],
+          0,
+          "Why & Solution: Standard NTP achieves ~1–10 ms accuracy over Ethernet. IEEE 1588 Precision Time Protocol (PTP) uses hardware timestamping in NICs and switches to achieve sub-microsecond (<1 µs) synchronization."
+        ],
+        [345, "ai", "Air-Gapped On-Premises AI Deployment", "SCENARIO",
+          "A defense contractor must run an internal LLM coding assistant inside a completely air-gapped classified network with zero internet access. Upon startup, the container fails because the Hugging Face client library attempts to query `huggingface.co` to verify tokenizer files. How must the server be configured?",
+          [
+            "Pre-stage all model weights, tokenizers, and container images into an internal local artifact registry/object store and set offline flags (`HF_HUB_OFFLINE=1` / `TRANSFORMERS_OFFLINE=1`)",
+            "Temporarily connect the classified server to public Wi-Fi during boot",
+            "Disable SELinux and firewalld so the container bypasses DNS",
+            "Install a USB 5G cellular modem on the air-gapped server"
+          ],
+          0,
+          "Why & Solution: Air-gapped AI deployments require mirrored internal container/model registries (Harbor, MinIO/S3, Artifactory) and explicit offline environment flags (`HF_HUB_OFFLINE=1`) so libraries load strictly from local paths without external DNS/HTTPS calls."
+        ],
+
+        // ======================================================================
+        // SECTION 2: TRADITIONAL & HIGH-SPEED CABLING, CONNECTORS & OPTICS (#346–#375)
+        // ======================================================================
+        [346, "cabling", "Cat5e vs. Cat6 vs. Cat6A Distance Limits", "QUICK WIN",
+          "A technician is running horizontal twisted-pair copper cabling from a top-of-rack 10GBASE-T switch to servers located 85 meters away across a datacenter hall. Why will Cat6 fail to reliably sustain 10 Gbps at 85 meters, whereas Cat6A succeeds?",
+          [
+            "Cat6 supports 10 Gbps only up to 55 meters due to alien crosstalk (AXT), whereas Cat6A (500 MHz) sustains 10 Gbps up to the full 100-meter Ethernet channel limit",
+            "Cat6 only contains 4 copper wires (2 pairs), whereas Cat6A contains 8 wires",
+            "Cat6A converts electrical signals into 850 nm laser light inside the RJ-45 plug",
+            "Cat6 maximum cable length for 1 Gbps is strictly 15 meters"
+          ],
+          0,
+          "Why & Solution: Cat5e caps at 1 Gbps (100m); Cat6 supports 10GBASE-T up to 37–55 meters depending on alien crosstalk; Cat6A operates at 500 MHz with tighter twist/shielding to guarantee full 10 Gbps up to 100 meters. Cat8 supports 25G/40GBASE-T up to 30 meters."
+        ],
+        [347, "cabling", "Cat8 Copper Distance Ceiling", "QUICK WIN",
+          "What is the maximum standardized channel length and target speed of Category 8 (Cat8) shielded twisted-pair copper cabling in a datacenter?",
+          [
+            "25 Gbps or 40 Gbps up to 30 meters (designed for Top-of-Rack / End-of-Row switch-to-server links)",
+            "100 Gbps up to 10 kilometers",
+            "10 Gbps up to 550 meters",
+            "1 Gbps up to 1,000 meters"
+          ],
+          0,
+          "Why & Solution: Cat8 (2000 MHz, shielded S/FTP) is engineered specifically for short intra-row datacenter runs—supporting 25GBASE-T and 40GBASE-T up to a maximum distance of 30 meters."
+        ],
+        [348, "cabling", "T568A vs. T568B & Straight-Through vs. Crossover", "QUICK WIN",
+          "A technician crimps a custom patch cord with T568A pinouts on one RJ-45 plug and T568B pinouts on the opposite plug. What type of cable has the technician created, and when was it historically required?",
+          [
+            "A Crossover cable (swapping transmit pairs 1/2 with receive pairs 3/6), historically used to connect like devices (switch-to-switch or host-to-host) before Auto-MDIX",
+            "A Straight-Through patch cable used for standard workstation-to-switch connections",
+            "A Rollover (console) cable reversing all 8 pins (1-to-8, 2-to-7) for RS-232 serial console ports",
+            "A Twinax Direct Attach Copper (DAC) SFP+ cable"
+          ],
+          0,
+          "Why & Solution: Same standard on both ends (T568B–T568B or T568A–T568A) = Straight-Through cable. T568A on one end + T568B on the other = Crossover cable (swaps pins 1&2 with 3&6). Reversing all 8 pins (1↔8, 2↔7, 3↔6, 4↔5) = Rollover console cable."
+        ],
+        [349, "cabling", "Rollover Console Cable", "QUICK WIN",
+          "An engineer needs to connect a laptop's USB-to-Serial adapter to the RJ-45 console port on a newly unboxed top-of-rack switch to configure its initial management IP. Which cable pinout reverses pins 1 through 8 symmetrically from one end to the other?",
+          [
+            "Rollover (Cisco console) cable",
+            "Straight-through Cat6 patch cable",
+            "T568A-to-T568B crossover cable",
+            "OM4 LC-to-LC duplex fiber patch cord"
+          ],
+          0,
+          "Why & Solution: A Rollover cable (commonly flat light-blue RJ-45 to DB9 or RJ-45 to RJ-45) reverses pins 1–8 in exact mirror order to connect DTE serial ports to switch/router console ports (typically at 9600 baud, 8-N-1)."
+        ],
+        [350, "cabling", "Plenum (CMP) vs. Riser (CMR) Fire Jackets", "SCENARIO",
+          "Facilities inspectors halt a network installation because technicians routed standard PVC / Riser-rated (`CMR`) Cat6A cables through the open air-handling ceiling space above the server room used for HVAC air return. Which cable jacket rating is legally required by fire codes in air-handling spaces?",
+          [
+            "Plenum-rated (`CMP` / OFNP for fiber) low-smoke, fire-retardant jackets that do not emit toxic halogenated fumes when burned",
+            "Riser-rated (`CMR` / OFNR) jackets designed exclusively for vertical shaft runs between floors",
+            "Outdoor direct-burial gel-filled polyethylene jackets",
+            "Unshielded UTP PVC station wire"
+          ],
+          0,
+          "Why & Solution: Dropped ceilings and raised floors used as HVAC air-return plenums require Plenum-rated cables (`CMP` for copper, `OFNP` for optical fiber) so a fire does not spread toxic smoke through the building's ventilation system. `CMR`/`OFNR` is for vertical riser shafts between floors."
+        ],
+        [351, "cabling", "Single-Mode (SMF) vs. Multi-Mode (MMF) Fiber", "QUICK WIN",
+          "Which key physical and optical properties distinguish Single-Mode Fiber (SMF) from Multi-Mode Fiber (MMF)?",
+          [
+            "SMF uses a tiny ~9 µm core with 1310/1550 nm lasers (yellow jacket) for long-haul multi-kilometer runs; MMF uses a wider 50/62.5 µm core with 850 nm LEDs/VCSELs (aqua/lime jacket) for short datacenter runs",
+            "SMF uses a 62.5 µm plastic core for 10-meter runs; MMF uses a 9 µm glass core for 80-kilometer undersea cables",
+            "SMF carries PoE++ electrical voltage alongside light; MMF carries data only",
+            "SMF uses RJ-45 copper plugs; MMF uses DB9 serial plugs"
+          ],
+          0,
+          "Why & Solution: Single-Mode Fiber (OS1/OS2, yellow jacket) guides a single light mode down a ~9 µm core using 1310/1550 nm lasers with minimal modal dispersion (distances up to 10–80+ km). Multi-Mode Fiber (OM3/OM4 aqua, OM5 lime-green) uses a 50 µm core and lower-cost 850 nm VCSEL optics for short intra-datacenter runs (up to 100–400m)."
+        ],
+        [352, "cabling", "APC (Green) vs. UPC (Blue) Fiber Polish Mismatch", "SCENARIO",
+          "A technician patches a single-mode OS2 fiber link between two racks using a green angled-polish (`LC/APC`) patch cord plugged into a blue ultra-polish (`LC/UPC`) transceiver bulkhead. Immediately, link attenuation spikes by >5 dB, severe back-reflection occurs, and the physical ferrules suffer micro-chipping. Why?",
+          [
+            "APC connectors have an 8-degree angled end-face (green) while UPC connectors have a flat 0-degree end-face (blue)—mating them leaves an air gap and damages the glass ferrules",
+            "Green fiber connectors are strictly for 850 nm multimode OM3 cables",
+            "Blue UPC connectors carry electrical PoE power that melts green APC ferrules",
+            "APC connectors use a 2.5 mm ST bayonet twist lock incompatible with 1.25 mm LC latches"
+          ],
+          0,
+          "Why & Solution: Never mate green APC (8° angled physical contact, engineered to minimize return loss in PON/long-haul optics) with blue UPC (0° flat ultra physical contact). Always match Green-to-Green (APC-to-APC) and Blue-to-Blue (UPC-to-UPC)."
+        ],
+        [353, "cabling", "Fiber Connector Types (LC, SC, ST, MPO/MTP)", "QUICK WIN",
+          "A datacenter engineer is deploying high-density 100GBASE-SR4 and 400GBASE-SR8 parallel optical transceivers that combine 8 to 24 fiber strands inside a single rectangular multi-fiber push-on ferrule. Which fiber connector standard is used?",
+          [
+            "MPO / MTP (Multi-Fiber Push-On) 12-fiber or 24-fiber ribbon connector",
+            "ST (Straight Tip) twist-lock bayonet connector",
+            "SC (Subscriber/Square Connector) single-fiber push-pull",
+            "BNC coaxial twist connector"
+          ],
+          0,
+          "Why & Solution: LC (1.25 mm small form-factor latch) is standard for single/duplex 1G–25G/100G-LR optics; SC (2.5 mm square push-pull) and ST (2.5 mm bayonet twist) are older single-fiber connectors; MPO/MTP terminates 8, 12, or 24 fibers in one rectangular ferrule for parallel 40G/100G/400G/800G optics."
+        ],
+        [354, "cabling", "SFP / SFP+ / SFP28 / QSFP+ / QSFP28 Speeds", "QUICK WIN",
+          "Match each optical transceiver form factor to its standard Ethernet line rate: `SFP+`, `SFP28`, `QSFP+`, and `QSFP28`.",
+          [
+            "SFP+ = 10 Gbps; SFP28 = 25 Gbps; QSFP+ = 40 Gbps (4×10G); QSFP28 = 100 Gbps (4×25G)",
+            "SFP+ = 1 Gbps; SFP28 = 10 Gbps; QSFP+ = 25 Gbps; QSFP28 = 400 Gbps",
+            "SFP+ = 100 Gbps; SFP28 = 40 Gbps; QSFP+ = 10 Gbps; QSFP28 = 1 Gbps",
+            "SFP+ = 25 Gbps; SFP28 = 100 Gbps; QSFP+ = 800 Gbps; QSFP28 = 10 Gbps"
+          ],
+          0,
+          "Why & Solution: SFP = 1G; SFP+ = 10G; SFP28 = 25G (single lane at 25 Gbps). Quad ('Q') transceivers bundle 4 lanes: QSFP+ = 4 × 10G = 40 Gbps; QSFP28 = 4 × 25G = 100 Gbps; QSFP-DD (Double Density) = 8 × 50G = 400 Gbps."
+        ],
+        [355, "cabling", "QSFP28 Breakout Cabling (100G to 4x 25G)", "SCENARIO",
+          "A top-of-rack switch has 100GbE `QSFP28` ports, and an engineer needs to connect four individual servers equipped with 25GbE `SFP28` NICs into a single switch port without buying a separate 25GbE switch. Which cable assembly accomplishes this?",
+          [
+            "A 100GbE QSFP28-to-4×25GbE SFP28 breakout DAC/AOC cable (with the switch port configured in 4×25G breakout mode)",
+            "A passive Cat5e Y-splitter adapter",
+            "A single-strand OS2 LC-to-ST crossover cable",
+            "An SFF-8484 to SFF-8482 internal SAS octopus cable"
+          ],
+          0,
+          "Why & Solution: Because a QSFP28 port consists of four independent 25 Gbps lanes, a breakout cable fans out one QSFP28 plug into four SFP28 plugs (and one QSFP+ 40G fans out to four SFP+ 10G plugs) once the switch port is set to breakout mode."
+        ],
+        [356, "cabling", "DAC (Direct Attach Copper) vs. AOC (Active Optical Cable)", "SCENARIO",
+          "An architect is cabling 25GbE servers to a Top-of-Rack switch inside the same cabinet (1.5 m runs) versus cabling servers 12 meters away in an End-of-Row rack. Why are passive Twinax DAC cables preferred inside the rack, while AOC (Active Optical Cables) are preferred for the 12-meter End-of-Row runs?",
+          [
+            "Passive Twinax DACs are ultra-low-cost and lowest-latency up to ~3–5 meters, whereas AOCs convert signals to fiber for lightweight, EMI-immune runs up to 15–100 meters",
+            "Passive DAC cables support 10 kilometers without repeaters, while AOC cables cap at 0.5 meters",
+            "DAC cables carry 48V DC rack power to the servers, while AOC cables carry only ICMP packets",
+            "AOC cables use RJ-45 copper plugs while DAC cables use ST bayonet plugs"
+          ],
+          0,
+          "Why & Solution: Passive Twinax Direct Attach Copper (DAC) cables have permanently attached SFP+/SFP28/QSFP28 ends with zero optical lasers—cheap, cool, and sub-nanosecond latency for intra-rack runs (≤3–5m). Active Optical Cables (AOCs) embed optical transceivers into fixed fiber assemblies, avoiding bulky copper bend-radius and attenuation over 7–100m runs."
+        ],
+        [357, "cabling", "Transceiver Vendor Coding / EEPROM Lock", "SCENARIO",
+          "After inserting a third-party 10GBASE-SR SFP+ transceiver into a brand-name enterprise switch, the port stays `err-disabled` and logs `%PHY-4-UNSUPPORTED_TRANSCEIVER: Unrecognized SFP module`. What causes this issue, and what is the standard remediation?",
+          [
+            "The switch firmware checks the transceiver's I2C EEPROM vendor ID against an OEM whitelist; either install an OEM-coded compatible transceiver or enable the switch's unsupported-transceiver command",
+            "The multimode fiber polarity is reversed on the LC clip",
+            "The switch's CMOS battery is dead",
+            "The SFP+ module must be formatted with `mkfs.ext4` first"
+          ],
+          0,
+          "Why & Solution: Enterprise switches read the transceiver's internal EEPROM via I2C; non-OEM vendor strings trigger `unsupported transceiver` blocks unless OEM-coded optics are used or the switch override (e.g., `service unsupported-transceiver`) is configured."
+        ],
+        [358, "cabling", "Fiber Polarity (Tx/Rx Crossover)", "SCENARIO",
+          "A technician connects two servers back-to-back with 10GBASE-LR SFP+ transceivers using a duplex LC-to-LC single-mode fiber patch cord, and neither NIC shows link light. Looking at the transceiver status, `Tx Power` is normal (-2.1 dBm) while `Rx Power` reads `-40.0 dBm` (no signal). What is the most common physical mistake?",
+          [
+            "Straight-through Tx-to-Tx / Rx-to-Rx polarity—flipping the LC duplex clip so Tx on Side A connects to Rx on Side B restores the link",
+            "Single-mode fiber requires a PoE++ midspan injector to illuminate the laser",
+            "10GBASE-LR requires Cat6A shielded copper within 3 meters",
+            "The Linux kernel is missing the `nvme-core` driver"
+          ],
+          0,
+          "Why & Solution: Optical transceivers transmit on one fiber strand (`Tx`) and receive on the other (`Rx`). If `Tx` is patched into `Tx` instead of crossing over to `Rx`, `Rx Power` reads `-40 dBm` (dark). Swapping the two LC legs on one end (A-to-B polarity) immediately brings the link up."
+        ],
+        [359, "cabling", "Fiber Optic End-Face Contamination", "SCENARIO",
+          "A newly installed 100GbE single-mode fiber link experiences intermittent CRC errors and high packet loss despite using matching OS2 UPC optics within distance limits. Inspecting the LC ferrule with a fiber inspection scope reveals dust and skin oil on the glass core. How must the technician clean it?",
+          [
+            "Use a lint-free one-click fiber optic ferrule cleaner (or 99%+ optical-grade isopropyl alcohol with lint-free wipes) and inspect before mating",
+            "Wipe the glass ferrule on a cotton shirt sleeve and blow compressed shop air into the transceiver",
+            "Apply dielectric silicone grease to the glass core to fill scratches",
+            "Sand the ceramic ferrule lightly with fine emery cloth"
+          ],
+          0,
+          "Why & Solution: A single 9 µm single-mode core is smaller than a speck of dust or skin oil. Contaminated end-faces scatter laser light and can permanently pit/burn glass ferrules when mated. Always clean with dedicated dry one-click cleaners or lint-free optical wipes."
+        ],
+        [360, "cabling", "Internal Mini-SAS HD Connectors (SFF-8643 / SFF-8644)", "QUICK WIN",
+          "In modern 12 Gbps SAS-3 / 24 Gbps SAS-4 servers, which compact high-density connector replaced legacy SFF-8087 for internal controller-to-backplane cabling, and which connector replaced SFF-8088 for external JBOD cabling?",
+          [
+            "SFF-8643 (Internal Mini-SAS HD) and SFF-8644 (External Mini-SAS HD)",
+            "MD50-M and DB25 parallel SCSI",
+            "RJ-11 and BNC coaxial",
+            "USB Type-B and FireWire IEEE 1394a"
+          ],
+          0,
+          "Why & Solution: Legacy 6 Gbps SAS-2 used SFF-8087 (internal) and SFF-8088 (external). High-density 12G/24G SAS-3/4 uses Mini-SAS HD: **SFF-8643** internally and **SFF-8644** externally."
+        ],
+        [361, "cabling", "Minimum Bend Radius & Cable Management", "SCENARIO",
+          "Technicians tightly zip-tie bundles of Cat6A and OM4 fiber patch cords at sharp 90-degree angles against steel rack posts and slam the rear perforated door shut, pinching the cables. Which two physical layer issues result from violating minimum bend radius and over-tightening zip ties?",
+          [
+            "Copper pair geometry deformation causing impedance/crosstalk failures, and macro-bending in fiber optics allowing light to escape the cladding (high attenuation or broken glass cores)",
+            "Automatic conversion from full-duplex to half-duplex PoE+",
+            "Increased CPU clock multiplier drift",
+            "DHCP lease exhaustion on the core router"
+          ],
+          0,
+          "Why & Solution: Exceeding minimum bend radius (typically ≥4× cable outer diameter for copper, ≥10–20× for fiber) or crushing jackets with tight plastic zip ties alters copper twist spacing (causing NEXT/return loss) and causes optical macro-bend loss or fiber fracture. Always use Velcro hook-and-loop straps and smooth radius waterfall trays."
+        ],
+        [362, "cabling", "EMI / Alien Crosstalk & Power/Data Separation", "SCENARIO",
+          "Unshielded Cat6 network cables routed directly parallel inside the same metal tray alongside 480V three-phase AC power feeds suffer heavy CRC frame errors whenever chiller motors cycle on. Which cabling best practice prevents Electromagnetic Interference (EMI)?",
+          [
+            "Separate data and AC power runs into distinct grounded pathways (crossing at 90-degree angles only if necessary), or deploy shielded twisted-pair (`STP`/`S/FTP`) or EMI-immune fiber-optic cabling",
+            "Coil the excess Cat6 slack tightly around the 480V power conduit",
+            "Strip the outer PVC jacket off the Cat6 cables to improve cooling",
+            "Switch from T568B to T568A pinouts"
+          ],
+          0,
+          "Why & Solution: High-voltage AC cables induce electromagnetic interference (EMI) into adjacent unshielded copper pairs. Keep power and data separated in dedicated trays (crossing perpendicularly at 90° when unavoidable), use properly grounded shielded cabling, or run optical fiber (which is 100% immune to EMI)."
+        ],
+        [363, "cabling", "RJ-45 8P8C vs. RJ-11 6P2C/6P4C", "QUICK WIN",
+          "Which modular connector format is standardized for Ethernet twisted-pair horizontal cabling and patch panels?",
+          [
+            "8P8C (8 Position, 8 Contact) modular plug/jack, commonly referred to as RJ-45",
+            "6P2C (6 Position, 2 Contact) RJ-11 telephone plug",
+            "F-type threaded coaxial connector",
+            "DB15 VGA analog video connector"
+          ],
+          0,
+          "Why & Solution: Ethernet twisted-pair uses 8-position, 8-contact (`8P8C` / RJ-45) connectors terminating all 4 twisted pairs (8 conductors). Never plug a narrower 6-position RJ-11 plug into an RJ-45 jack, as it bends outer pins 1 and 8."
+        ],
+        [364, "cabling", "PoE Standards (802.3af, 802.3at, 802.3bt)", "QUICK WIN",
+          "An engineer needs to power high-wattage ceiling environmental sensors, IP cameras, and edge micro-appliances requiring up to 55W per port over Cat6A cabling from a rack switch. Which IEEE Power over Ethernet standard delivers up to 60W (Type 3) or 90W–100W (Type 4) at the PSE port?",
+          [
+            "IEEE 802.3bt (PoE++ / 4PPoE — 60W Type 3 / 90W+ Type 4)",
+            "IEEE 802.3af (PoE — max 15.4W at PSE)",
+            "IEEE 802.3at (PoE+ — max 30W at PSE)",
+            "IEEE 802.1Q (VLAN Tagging)"
+          ],
+          0,
+          "Why & Solution: IEEE 802.3af (PoE) delivers 15.4W; 802.3at (PoE+) delivers 30W; 802.3bt (PoE++ / 4-pair PoE) delivers 60W (Type 3) up to 90W–100W (Type 4) across all four twisted pairs."
+        ],
+        [365, "cabling", "SFP+ in SFP28 Slot Backward Compatibility", "SCENARIO",
+          "A newly delivered server has dual-port 25GbE `SFP28` NICs, while the existing top-of-rack switch currently only has 10GbE `SFP+` ports. Can the technician insert 10GBASE-SR `SFP+` optics into the server's `SFP28` cage to establish a 10 Gbps link until the switch is upgraded?",
+          [
+            "Yes—SFP28 cages share the exact same physical form factor as SFP+ and are backward-compatible with 10G SFP+ transceivers/DACs (provided the NIC firmware supports 10G speed)",
+            "No—SFP28 cages are twice as wide as SFP+ cages and physically block SFP+ modules",
+            "Yes, and the link will automatically negotiate to 25 Gbps using the 10G SFP+ optic",
+            "No—SFP+ uses copper RJ-45 while SFP28 uses coaxial BNC"
+          ],
+          0,
+          "Why & Solution: SFP, SFP+, and SFP28 share the identical physical transceiver dimensions. SFP28 ports are generally backward-compatible with 10G SFP+ optics (operating at 10 Gbps), though you cannot run 25 Gbps over a 10G SFP+ module."
+        ],
+        [366, "cabling", "10GBASE-T Copper vs. SFP+ Fiber/DAC Power & Latency", "QUICK WIN",
+          "Why do datacenter top-of-rack deployments overwhelmingly favor SFP+/SFP28 DACs or optical transceivers over 10GBASE-T (RJ-45 copper) for server-to-switch links?",
+          [
+            "10GBASE-T PHYs consume significantly more power (~2–5W per port vs. <0.5–1W for DAC/SFP+), generate more heat, and add ~1.5–2.5 microseconds of serialization latency",
+            "10GBASE-T cannot run over TCP/IP networks",
+            "10GBASE-T limits Ethernet frames to 64 bytes maximum",
+            "SFP+ transceivers work over unshielded telephone wire up to 500 meters"
+          ],
+          0,
+          "Why & Solution: 10GBASE-T requires complex PAM-16 digital signal processing and echo cancellation on 4 copper pairs, burning ~3–5x more wattage per port and adding ~2 µs latency compared to SFP+ DAC/optics."
+        ],
+        [367, "cabling", "Patch Panel Punch-Down Standards (110 vs. Krone)", "QUICK WIN",
+          "When terminating horizontal Cat6A solid-core building cabling onto the rear of a rackmount Ethernet patch panel, which punch-down block type and conductor rule apply?",
+          [
+            "110-type IDC (Insulation Displacement Connector) blocks using solid-core horizontal cable (with stranded patch cords used from the front patch panel to servers)",
+            "BNC twist-lock blocks using RG-59 coaxial cable",
+            "Soldering solid-core wires directly onto gold SFP+ laser lenses",
+            "Using stranded-core cable inside long permanent walls and solid-core cable for flexing patch cords"
+          ],
+          0,
+          "Why & Solution: Permanent structured horizontal runs use solid-core copper terminated on 110 IDC patch panels/keystones (less attenuation over distance), whereas flexible patch cords from panels to servers use stranded-core conductors so they don't snap when flexed."
+        ],
+        [368, "cabling", "OM3 vs. OM4 vs. OM5 Multimode Jacket Colors", "QUICK WIN",
+          "During a rack audit, a technician encounters multimode fiber patch cords with **Aqua** jackets and newer multimode patch cords with **Lime-Green** jackets. What do those two jacket colors indicate?",
+          [
+            "Aqua = OM3 / OM4 laser-optimized 50 µm multimode fiber; Lime-Green = OM5 wideband multimode fiber (engineered for SWDM short-wavelength division multiplexing)",
+            "Aqua = Single-Mode OS2 fiber; Lime-Green = Cat6A shielded copper",
+            "Aqua = Angled APC polish; Lime-Green = Flat UPC polish",
+            "Aqua = Plenum-rated jacket; Lime-Green = Outdoor direct-burial jacket"
+          ],
+          0,
+          "Why & Solution: Standardized TIA-598 jacket colors: Orange = legacy OM1/OM2 MMF; Aqua = OM3/OM4 MMF; Lime-Green = OM5 wideband MMF; Yellow = OS1/OS2 Single-Mode Fiber."
+        ],
+        [369, "cabling", "Cable Certification vs. Basic Continuity Verification", "SCENARIO",
+          "A cabling contractor installs 48 new Cat6A runs in a datacenter and presents a basic LED wire-map continuity test showing all 8 pins pass. Before accepting sign-off for 10GBASE-T production traffic, which higher tier of testing must the engineer demand?",
+          [
+            "Full TIA-568 Level IIIe/2G Certification testing measuring insertion loss, NEXT, FEXT, Alien Crosstalk (PSAACRF), return loss, and propagation delay skew",
+            "A simple ICMP `ping 127.0.0.1` loopback test on the server",
+            "Measuring cable weight on a shipping scale",
+            "Checking whether the RJ-45 boots glow under UV light"
+          ],
+          0,
+          "Why & Solution: Basic verification/wire-map testers only check pin-to-pin continuity and opens/shorts. Certification testers sweep the full 500 MHz frequency spectrum to certify insertion loss, return loss, near/far-end crosstalk, and alien crosstalk compliance."
+        ],
+        [370, "cabling", "OTDR (Optical Time-Domain Reflectometer) Fault Location", "SCENARIO",
+          "An underground 4 km OS2 single-mode fiber trunk connecting two datacenter buildings goes down after nearby construction work. Which test instrument injects optical pulses and measures Rayleigh backscattering to pinpoint the exact distance in meters to the fiber break or macro-bend?",
+          [
+            "OTDR (Optical Time-Domain Reflectometer)",
+            "TDR (Time-Domain Reflectometer) clipped onto copper twisted pairs",
+            "Digital multimeter set to AC voltage",
+            "USB protocol analyzer"
+          ],
+          0,
+          "Why & Solution: An OTDR sends light pulses down a fiber strand and analyzes reflected light spikes/drops over time to locate splices, connectors, macro-bends, and exact break distances in meters/kilometers. (Copper cables use a metallic TDR)."
+        ],
+        [371, "cabling", "Transceiver DOM / DDM Optical Power Telemetry", "SCENARIO",
+          "A 25GBASE-LR optical link experiences sporadic packet drops. Running `show interfaces transceiver detail` on the switch reveals `Tx Power: -1.5 dBm`, `Rx Power: -19.8 dBm` (just above the `-20.0 dBm` receiver sensitivity floor). Which transceiver feature reports real-time laser power, temperature, and bias current?",
+          [
+            "DOM / DDM (Digital Optical Monitoring / Digital Diagnostics Monitoring)",
+            "DHCP Snooping Option 82",
+            "Spanning Tree BPDUGuard",
+            "IPMI Serial-over-LAN"
+          ],
+          0,
+          "Why & Solution: DOM/DDM (SFF-8472) exposes real-time transceiver optical `Tx`/`Rx` power (in dBm), temperature, voltage, and laser bias current—allowing engineers to spot dirty connectors or failing lasers before complete link loss."
+        ],
+        [372, "cabling", "Loopback Plugs for NIC & Transceiver Isolation", "QUICK WIN",
+          "A server port shows link-down, and the technician needs to isolate whether the fault lies in the server's SFP+ transceiver/NIC or in the structured building fiber plant. Inserting a physical **fiber loopback plug** directly into the server's transceiver immediately brings the NIC link `UP` with zero errors. What does this prove?",
+          [
+            "The server NIC and SFP+ transceiver transmit/receive paths are completely healthy—the fault lies downstream in the patch cord, patch panel, or switch port",
+            "The server's motherboard PCIe slot is dead",
+            "The Linux kernel is missing the NIC driver",
+            "The switch port is configured as an access port on VLAN 1"
+          ],
+          0,
+          "Why & Solution: A hardware loopback plug routes the transceiver's own `Tx` output directly back into its `Rx` input. If the NIC comes up cleanly with a loopback plug, the server hardware and optic are verified good, isolating the fault to the external cabling or switch."
+        ],
+        [373, "cabling", "Labeling Standards (TIA-606) at Both Cable Ends", "QUICK WIN",
+          "Per enterprise datacenter cabling standards (TIA-606), where must heat-shrink or wrap-around identification labels be placed on every patch cord and horizontal trunk run?",
+          [
+            "On BOTH ends of every cable (within ~2–4 inches of each connector) encoding source/destination rack, U-position, panel, and port IDs",
+            "Only on the middle of the cable hidden inside the overhead ladder tray",
+            "Only on the switch end, leaving the server end unlabeled",
+            "Written in erasable pencil on the back of the server chassis"
+          ],
+          0,
+          "Why & Solution: TIA-606 mandates durable, machine-printed labels on **both ends** of every copper and fiber cable so a technician at either the server rack or core patch panel can trace the circuit immediately without tugging live cables."
+        ],
+        [374, "cabling", "KVM Dongle / CIM (Computer Interface Module) Cabling", "QUICK WIN",
+          "Modern enterprise IP-KVM switches connect to dozens of rack servers using slim Cat5e/Cat6 patch cables rather than bulky bundled VGA+USB octopus cables. What small inline adapter converts each server's VGA/DisplayPort and USB ports onto the Cat5e/Cat6 KVM cable?",
+          [
+            "A KVM Computer Interface Module (CIM) / Server Interface Pod",
+            "An SFF-8470 external SAS jackscrew cable",
+            "An MPO-24 multimode trunk cassette",
+            "A NEMA L6-30P twist-lock power whip"
+          ],
+          0,
+          "Why & Solution: Digital IP-KVM switches use small inline KVM pods / Computer Interface Modules (CIMs) plugged into the server's video + USB ports, transmitting keyboard, video, mouse, and virtual media over standard Cat5e/Cat6 cable back to the KVM switch."
+        ],
+        [375, "cabling", "BiDi (Bidirectional) Single-Strand Fiber Optics", "SCENARIO",
+          "A facility only has a single spare OS2 single-mode fiber strand available between two closets (instead of a standard duplex pair) and needs to establish a 10 Gbps link without pulling new fiber. Which optical transceiver technology transmits and receives simultaneously over a single strand of fiber?",
+          [
+            "BiDi (Bidirectional) transceivers using WDM (e.g., 1270 nm Tx / 1330 nm Rx on Side A paired with 1330 nm Tx / 1270 nm Rx on Side B)",
+            "Standard 10GBASE-SR multimode duplex transceivers",
+            "Passive Twinax DAC copper cables",
+            "Half-duplex 10BASE-T hubs"
+          ],
+          0,
+          "Why & Solution: BiDi (Bidirectional) optics use Wave Division Multiplexing (WDM) to send and receive on two distinct wavelengths (e.g., 1270 nm and 1330 nm) over a single simplex fiber strand. The two ends must be complementary matched pairs."
+        ],
+
+        // ======================================================================
+        // SECTION 3: CORE NETWORK PORTS, PROTOCOLS & QUICK-WINS (#376–#400)
+        // ======================================================================
+        [376, "ports", "DNS Transport: UDP 53 vs. TCP 53", "QUICK WIN",
+          "A firewall administrator opens **UDP port 53** outbound to internal DNS servers, allowing normal client `A` and `AAAA` record lookups to succeed. However, secondary DNS servers fail to pull full zone updates (`AXFR`/`IXFR`) from the primary DNS server, and large DNSSEC-signed responses truncate and fail. Which port/protocol rule is missing?",
+          [
+            "TCP port 53 (required for DNS zone transfers and large responses exceeding 512/EDNS0 UDP payload limits)",
+            "UDP port 69 (TFTP zone sync)",
+            "TCP port 389 (LDAP directory replication)",
+            "UDP port 123 (NTP clock sync)"
+          ],
+          0,
+          "Why & Solution: Standard DNS queries use UDP 53 for low-latency single-packet lookups, while **TCP 53** is mandatory for zone transfers (`AXFR`/`IXFR`) and fallback when DNSSEC/TXT responses exceed UDP packet size limits."
+        ],
+        [377, "ports", "LDAP (389) vs. LDAPS (636)", "QUICK WIN",
+          "A security compliance scan flags an internal Linux application server performing Active Directory user authentication over **TCP port 389** without StartTLS, exposing user credentials in cleartext on the wire. Which port enforces implicit TLS encryption for directory binds?",
+          [
+            "TCP port 636 (LDAPS — LDAP over SSL/TLS)",
+            "TCP port 23 (Telnet)",
+            "UDP port 161 (SNMP polling)",
+            "TCP port 80 (HTTP)"
+          ],
+          0,
+          "Why & Solution: Standard unencrypted LDAP runs on TCP/UDP 389 (unless upgraded in-band via StartTLS), whereas **LDAPS** enforces implicit SSL/TLS encryption on **TCP port 636**."
+        ],
+        [378, "ports", "Kerberos Authentication Port (88)", "QUICK WIN",
+          "An Active Directory domain-joined server is placed behind a strict internal firewall. Users can ping the Domain Controller and resolve DNS, but domain logins and Kerberos Ticket Granting Ticket (`TGT`) requests fail immediately. Which port must be opened to the Domain Controller's KDC?",
+          [
+            "TCP/UDP port 88 (Kerberos)",
+            "TCP port 22 (SSH)",
+            "UDP port 69 (TFTP)",
+            "TCP port 3389 (RDP)"
+          ],
+          0,
+          "Why & Solution: Kerberos Key Distribution Center (KDC) authentication operates on **TCP and UDP port 88**. (Note: TCP 88 is especially critical when Kerberos tickets grow large due to many AD group memberships)."
+        ],
+        [379, "ports", "SSH / SCP / SFTP (22) vs. Telnet (23)", "QUICK WIN",
+          "An auditor requires replacing legacy cleartext remote CLI management and file transfers on network appliances with encrypted cryptographic equivalents. Which port carries SSH, SCP, and SFTP, and which cleartext port must be disabled?",
+          [
+            "Enable TCP port 22 (SSH/SCP/SFTP) and disable TCP port 23 (Telnet)",
+            "Enable TCP port 21 (FTP) and disable TCP port 443 (HTTPS)",
+            "Enable UDP port 69 (TFTP) and disable TCP port 22 (SSH)",
+            "Enable TCP port 80 (HTTP) and disable TCP port 636 (LDAPS)"
+          ],
+          0,
+          "Why & Solution: **TCP 22** carries SSH (encrypted terminal), SCP (secure copy), and SFTP (SSH File Transfer Protocol), replacing cleartext **Telnet (TCP 23)** and **FTP (TCP 20/21)**."
+        ],
+        [380, "ports", "WinRM PowerShell Remoting Ports (5985 / 5986)", "QUICK WIN",
+          "An administrator configures Windows PowerShell Remoting (`Enter-PSSession` / `Invoke-Command`) across an enterprise server VLAN. Which two TCP ports are used by WinRM for HTTP and HTTPS transport respectively?",
+          [
+            "TCP port 5985 (WinRM HTTP) and TCP port 5986 (WinRM HTTPS)",
+            "TCP port 3389 (RDP) and TCP port 5900 (VNC)",
+            "TCP port 135 (RPC) and TCP port 445 (SMB)",
+            "TCP port 8080 and TCP port 8443"
+          ],
+          0,
+          "Why & Solution: Windows Remote Management (WinRM / WS-Management) uses **TCP 5985** (default encrypted message payload over HTTP) and **TCP 5986** (TLS-wrapped HTTPS)."
+        ],
+        [381, "ports", "IPMI / RMCP+ Out-of-Band Port (623)", "QUICK WIN",
+          "Which UDP port is used by IPMI 2.0 / RMCP+ for out-of-band BMC power control and Serial-over-LAN (and must be strictly firewalled to the OOB management VLAN)?",
+          [
+            "UDP port 623",
+            "TCP port 25",
+            "UDP port 53",
+            "TCP port 143"
+          ],
+          0,
+          "Why & Solution: IPMI / RMCP+ uses **UDP port 623**. Because IPMI 2.0 cipher-suite-0 vulnerabilities historically allowed authentication bypasses, UDP 623 must never be exposed outside a hardened OOB management network."
+        ],
+        [382, "ports", "SNMP Polling (161) vs. SNMP Traps (162)", "QUICK WIN",
+          "A monitoring server polls managed servers on one port to query CPU/disk metrics, while managed servers asynchronously push urgent hardware failure alerts to the monitoring collector on a second port. Which two UDP ports correspond to SNMP Polling and SNMP Traps?",
+          [
+            "UDP port 161 (SNMP Agent Polling) and UDP port 162 (SNMP Traps / Informs)",
+            "TCP port 20 (FTP Data) and TCP port 21 (FTP Control)",
+            "UDP port 67 (DHCP Server) and UDP port 68 (DHCP Client)",
+            "TCP port 587 (SMTP Submission) and TCP port 993 (IMAPS)"
+          ],
+          0,
+          "Why & Solution: The NMS polls agents on **UDP 161** (`GET`/`GETNEXT`), while agents send unsolicited asynchronous alerts (Traps/Informs) to the NMS on **UDP 162**."
+        ],
+        [383, "ports", "Syslog (UDP 514 vs. TLS TCP 6514)", "QUICK WIN",
+          "Which port carries standard unencrypted UDP Syslog messages, and which port carries encrypted Syslog over TLS?",
+          [
+            "UDP port 514 (standard Syslog) and TCP port 6514 (Syslog over TLS)",
+            "TCP port 445 (SMB) and TCP port 2049 (NFS)",
+            "UDP port 123 (NTP) and UDP port 623 (IPMI)",
+            "TCP port 110 (POP3) and TCP port 995 (POP3S)"
+          ],
+          0,
+          "Why & Solution: Classic Syslog uses **UDP 514** (best-effort datagrams), whereas RFC 5425 Syslog over TLS uses **TCP 6514** for reliable, encrypted log transport."
+        ],
+        [384, "ports", "RDP (3389) vs. VNC (5900)", "QUICK WIN",
+          "Which default TCP ports are used by Microsoft Remote Desktop Protocol (RDP) and Virtual Network Computing (VNC) respectively?",
+          [
+            "TCP port 3389 (RDP) and TCP port 5900 (VNC)",
+            "TCP port 22 (SSH) and TCP port 23 (Telnet)",
+            "TCP port 80 (HTTP) and TCP port 443 (HTTPS)",
+            "TCP port 135 (RPC) and TCP port 139 (NetBIOS)"
+          ],
+          0,
+          "Why & Solution: Windows RDP listens on **TCP 3389** (and UDP 3389 for RDP 8+ transport optimization), while VNC servers listen on **TCP 5900** (+ display offset, e.g., 5901)."
+        ],
+        [385, "ports", "DHCP DORA Process & Ports (67 / 68)", "QUICK WIN",
+          "During bare-metal server provisioning, a host broadcasts a `DHCPDISCOVER` packet to obtain an IP lease. What is the exact four-step DHCP handshake sequence, and which UDP ports do the server and client use?",
+          [
+            "DORA (Discover → Offer → Request → Acknowledge); Server listens on UDP 67, Client listens on UDP 68",
+            "SYN → SYN-ACK → ACK → FIN; Server listens on TCP 53, Client on TCP 80",
+            "Request → Challenge → Response → Grant; Server listens on UDP 161, Client on UDP 162",
+            "Discover → Offer → Request → Acknowledge; Server listens on TCP 445, Client on TCP 139"
+          ],
+          0,
+          "Why & Solution: DHCP follows **DORA** (Client broadcasts `Discover` → Server sends `Offer` → Client broadcasts `Request` → Server sends `Acknowledge`). DHCP servers listen on **UDP 67** and clients receive on **UDP 68**."
+        ],
+        [386, "ports", "TFTP (UDP 69) in PXE Network Booting", "QUICK WIN",
+          "Why does PXE bare-metal boot firmware use TFTP (**UDP port 69**) rather than SFTP or HTTPS to download the initial `pxelinux.0` / `bootmgfw.efi` bootloader?",
+          [
+            "TFTP has an ultra-small code footprint with zero authentication or complex TCP stack overhead, allowing it to fit inside tiny NIC boot ROM chips",
+            "TFTP encrypts all boot images with AES-256-GCM by default",
+            "TFTP is a Layer 2 protocol that bypasses IP addressing completely",
+            "TFTP supports multi-terabyte file transfers faster than NVMe"
+          ],
+          0,
+          "Why & Solution: Trivial File Transfer Protocol (TFTP, **UDP 69**) is intentionally minimal and stateless so NIC PXE ROM firmware can fetch initial bootstrap files before an OS TCP/IP stack exists."
+        ],
+        [387, "ports", "NTP Port (UDP 123)", "QUICK WIN",
+          "Which port and transport protocol must be allowed on perimeter/internal firewalls so Stratum 1/2 time servers can synchronize system clocks across all domain controllers and hypervisors?",
+          [
+            "UDP port 123 (NTP)",
+            "TCP port 110 (POP3)",
+            "TCP port 3260 (iSCSI)",
+            "UDP port 514 (Syslog)"
+          ],
+          0,
+          "Why & Solution: Network Time Protocol (NTP) operates over **UDP port 123**."
+        ],
+        [388, "ports", "Email Server Ports (SMTP 25/587, IMAP 143/993, POP3 110/995)", "QUICK WIN",
+          "A systems administrator is hardening a corporate mail relay and client access server. Which port combination maps encrypted SMTP client submission, encrypted IMAPS, and encrypted POP3S?",
+          [
+            "TCP 587 (SMTP Submission + STARTTLS), TCP 993 (IMAPS), and TCP 995 (POP3S)",
+            "TCP 25 (cleartext relay), TCP 143 (cleartext IMAP), and TCP 110 (cleartext POP3)",
+            "TCP 22 (SSH), TCP 23 (Telnet), and TCP 80 (HTTP)",
+            "TCP 389 (LDAP), TCP 445 (SMB), and TCP 3389 (RDP)"
+          ],
+          0,
+          "Why & Solution: Server-to-server mail routing uses TCP 25; authenticated client submission uses **TCP 587** (or legacy SMTPS 465); encrypted **IMAPS** uses **TCP 993** (vs. unencrypted 143); encrypted **POP3S** uses **TCP 995** (vs. unencrypted 110)."
+        ],
+        [389, "ports", "DNS Record Types (A, AAAA, CNAME, MX, PTR, SRV, TXT)", "SCENARIO",
+          "During an Active Directory migration, domain-joined clients fail to locate domain controllers and LDAP/Kerberos services even though forward `A` records ping properly. Which DNS record type allows clients to discover service hostnames and ports (such as `_ldap._tcp` and `_kerberos._tcp`)?",
+          [
+            "SRV (Service Locator) records",
+            "PTR (Pointer) reverse-lookup records",
+            "MX (Mail Exchanger) records",
+            "CNAME (Canonical Name) alias records"
+          ],
+          0,
+          "Why & Solution: **SRV** records map service names and protocols (`_service._proto.domain`) to target hostnames, priorities, weights, and port numbers—essential for Active Directory, SIP, and XMPP discovery. (`A` = IPv4, `AAAA` = IPv6, `CNAME` = alias, `MX` = mail server, `PTR` = IP-to-name reverse lookup, `TXT` = SPF/DKIM/DMARC/verification text)."
+        ],
+        [390, "ports", "ARP (Address Resolution Protocol) & Gratuitous ARP", "SCENARIO",
+          "When an active/passive high-availability load balancer fails over its Virtual IP (VIP) from Node 1 to Node 2, how does Node 2 immediately instruct all local Ethernet switches and routers on the subnet to update their MAC address tables to point to Node 2's NIC?",
+          [
+            "Node 2 broadcasts a Gratuitous ARP (GARP) frame announcing the VIP-to-MAC mapping to the local Layer 2 broadcast domain",
+            "Node 2 sends an OSPF LSA Type 5 update to external BGP peers",
+            "Node 2 queries DNS PTR records on UDP port 53",
+            "Node 2 triggers an IPMI cold reset on the core switch"
+          ],
+          0,
+          "Why & Solution: ARP resolves Layer 3 IPv4 addresses to Layer 2 MAC addresses. During HA VIP failover, the newly active node sends a **Gratuitous ARP (GARP)** broadcast so switches immediately update CAM tables and hosts flush stale ARP entries without waiting for ARP cache timeouts."
+        ],
+        [391, "ports", "ICMP Path MTU Discovery (Type 3 Code 4)", "SCENARIO",
+          "A security administrator blocks **all** ICMP packet types (`iptables -A INPUT -p icmp -j DROP`) on a Linux edge server. Soon afterward, clients connecting over VPN tunnels (which have a smaller 1400-byte MTU) establish TCP handshakes (`SYN/ACK`) cleanly, but large HTTPS data transfers stall and hang indefinitely. Why?",
+          [
+            "Blocking ICMP `Destination Unreachable — Fragmentation Needed` (Type 3, Code 4) breaks Path MTU Discovery (PMTUD), causing the server to keep sending oversized 1500-byte packets that the VPN tunnel drops silently",
+            "HTTPS TLS 1.3 requires ICMP Echo Request (`ping`) before every HTTP GET",
+            "Blocking ICMP disables TCP port 443 in the Linux kernel",
+            "VPN tunnels encapsulate TCP inside ICMP Echo Reply frames"
+          ],
+          0,
+          "Why & Solution: Never blindly block all ICMP! Path MTU Discovery relies on routers returning **ICMP Type 3, Code 4 (Fragmentation Needed and DF Set)** so the sender lowers its TCP MSS/packet size to fit smaller tunnel MTUs. Blocking it creates a 'PMTUD black hole'."
+        ],
+        [392, "ports", "RPC Endpoint Mapper (TCP 135) & NetBIOS (137–139)", "QUICK WIN",
+          "Which port serves as the Microsoft Remote Procedure Call (RPC) Endpoint Mapper used by DCOM, WMI, and Active Directory replication to negotiate dynamic high ports, and which legacy ports belong to NetBIOS?",
+          [
+            "TCP port 135 (RPC Endpoint Mapper); UDP 137/138 and TCP 139 (NetBIOS)",
+            "TCP port 445 (SMB); TCP port 2049 (NFS)",
+            "TCP port 88 (Kerberos); TCP port 636 (LDAPS)",
+            "UDP port 67 (DHCP); UDP port 69 (TFTP)"
+          ],
+          0,
+          "Why & Solution: Microsoft RPC Endpoint Mapper listens on **TCP 135** to direct clients to dynamic RPC service ports, while legacy NetBIOS Name/Datagram/Session services use **UDP 137, UDP 138, and TCP 139**."
+        ],
+        [393, "ports", "HTTP (80) vs. HTTPS (443) & HSTS", "QUICK WIN",
+          "Which HTTP security response header instructs modern web browsers to automatically upgrade all future requests for a domain to **HTTPS (TCP 443)** and refuse insecure **HTTP (TCP 80)** fallback connections?",
+          [
+            "HSTS (`Strict-Transport-Security`)",
+            "CORS (`Access-Control-Allow-Origin`)",
+            "SNMP (`sysContact`)",
+            "DHCP (`Option 66`)"
+          ],
+          0,
+          "Why & Solution: HTTP Strict Transport Security (**HSTS**) forces browsers to connect exclusively over HTTPS (TCP 443) for a specified `max-age`, preventing SSL-stripping downgrade attacks over TCP 80."
+        ],
+        [394, "ports", "TCP 3-Way Handshake & Connection States (SYN_RECV / TIME_WAIT)", "SCENARIO",
+          "Running `ss -tan` on a busy web server shows 18,000 sockets stuck in `SYN_RECV` while legitimate users experience connection timeouts. Which network condition or attack does a flood of half-open `SYN_RECV` states indicate?",
+          [
+            "A TCP SYN Flood DoS attack (or asymmetric routing dropping final `ACK` packets), mitigated by enabling Linux `net.ipv4.tcp_syncookies = 1`",
+            "Normal graceful connection teardown (`FIN` handshake)",
+            "An expired DNS `MX` record",
+            "A failed CMOS battery on the RAID controller"
+          ],
+          0,
+          "Why & Solution: In a TCP 3-way handshake (`SYN` → `SYN-ACK` → `ACK`), sockets sit in `SYN_RECV` after sending `SYN-ACK` while awaiting the client's `ACK`. A SYN flood exhausts the backlog queue; enabling **SYN cookies** (`tcp_syncookies=1`) validates connections cryptographically without allocating state until the `ACK` returns."
+        ],
+        [395, "ports", "UDP vs. TCP Protocol Selection", "QUICK WIN",
+          "Why do real-time streaming telemetry, VoIP/RTP, DNS lookups, DHCP, TFTP, and SNMP traps use **UDP** instead of **TCP**?",
+          [
+            "UDP is connectionless with an 8-byte header and zero handshake or retransmission delay, prioritizing low latency and minimal overhead over guaranteed ordered delivery",
+            "UDP provides built-in AES-256 encryption and congestion window scaling",
+            "UDP guarantees in-order packet delivery across multiple internet paths",
+            "UDP is the only protocol permitted across Layer 3 routers"
+          ],
+          0,
+          "Why & Solution: TCP (20-byte header) guarantees reliable, ordered delivery via 3-way handshakes, sequence numbers, and retransmissions. UDP (8-byte header) skips connection setup and retransmission stalls—ideal for low-latency queries and real-time streams."
+        ],
+        [396, "ports", "NAT / PAT Port Exhaustion on Outbound Gateways", "SCENARIO",
+          "An internal application cluster behind a single outbound NAT IP address opens 65,000 simultaneous outbound HTTPS connections to external APIs, and new outbound connections suddenly fail with `Cannot assign requested address`. What network boundary has been exhausted?",
+          [
+            "Ephemeral source ports (65,535 max ports per single NAT public IP address under PAT / IP masquerading)",
+            "The server's 4 TB NVMe boot drive inodes",
+            "The 4096 VLAN ID limit on the local switch",
+            "The 32 GB capacity ceiling of an SDHC card"
+          ],
+          0,
+          "Why & Solution: Port Address Translation (PAT / NAPT) maps internal sessions onto unique 16-bit source ports (1–65,535) on a single public IP. High-concurrency outbound clusters require a pool of multiple NAT public IPs or reduced `TIME_WAIT` reuse tuning."
+        ],
+        [397, "ports", "Static IP Reservation vs. Dynamic DHCP Pool", "QUICK WIN",
+          "Why should infrastructure servers, Domain Controllers, DNS servers, and BMC interfaces use static IP assignments (or DHCP reservations) rather than dynamic random DHCP pool leases?",
+          [
+            "To ensure deterministic, unchanging IP addresses so DNS records, firewall ACLs, storage targets, and monitoring systems never break when leases renew",
+            "Because DHCP clients cannot communicate over TCP port 443",
+            "Because static IP addresses bypass the need for a subnet mask or default gateway",
+            "Because DHCP servers only assign IPv6 link-local addresses"
+          ],
+          0,
+          "Why & Solution: Infrastructure endpoints must remain reachable at predictable IP addresses across reboots so static firewall rules, storage initiator ACLs, and DNS entries remain valid."
+        ],
+        [398, "ports", "Subnet Mask & CIDR Broadcast Address Quick-Win", "QUICK WIN",
+          "A server is configured with IP address `10.24.18.75/26`. What are the exact Network ID, Usable Host Range, and Directed Broadcast Address for this subnet?",
+          [
+            "Network ID: `10.24.18.64`; Usable Hosts: `10.24.18.65` – `10.24.18.126` (62 hosts); Broadcast: `10.24.18.127`",
+            "Network ID: `10.24.18.0`; Usable Hosts: `10.24.18.1` – `10.24.18.254` (254 hosts); Broadcast: `10.24.18.255`",
+            "Network ID: `10.24.18.64`; Usable Hosts: `10.24.18.65` – `10.24.18.94` (30 hosts); Broadcast: `10.24.18.95`",
+            "Network ID: `10.24.18.0`; Usable Hosts: `10.24.18.1` – `10.24.18.126` (126 hosts); Broadcast: `10.24.18.127`"
+          ],
+          0,
+          "Why & Solution: A `/26` mask (`255.255.255.192`) has a block size of `256 - 192 = 64` addresses (62 usable hosts). Multiples of 64 are `.0`, `.64`, `.128`, `.192`. Thus `10.24.18.75` falls in the `.64` subnet (`10.24.18.64` network, `.65–.126` usable, `.127` broadcast)."
+        ],
+        [399, "ports", "SSH Tunneling / Local Port Forwarding", "SCENARIO",
+          "A web management console on a remote internal server listens strictly on `127.0.0.1:8080` (loopback only) and is blocked from direct network access. Which SSH command forwards local port `9090` on the admin's laptop securely through an encrypted SSH tunnel (`TCP 22`) to `127.0.0.1:8080` on `10.10.20.5`?",
+          [
+            "`ssh -L 9090:127.0.0.1:8080 admin@10.10.20.5`",
+            "`ssh -R 22:10.10.20.5:80 admin@127.0.0.1`",
+            "`scp -P 8080 admin@10.10.20.5:/var/www .`",
+            "`telnet 10.10.20.5 8080`"
+          ],
+          0,
+          "Why & Solution: `ssh -L <local_port>:<dest_host>:<dest_port> user@jump_host` creates an encrypted local port forward over TCP 22, allowing `http://localhost:9090` on the admin workstation to reach the remote host's loopback-bound service safely."
+        ],
+        [400, "ports", "Baseline Documentation & Runbook Verification", "QUICK WIN",
+          "After completing a major network port hardening, cabling label audit, and server firmware baseline update, which operational artifact should be updated and stored in a central, version-controlled repository so any on-call engineer can troubleshoot incidents at 3:00 AM?",
+          [
+            "Standard Operating Procedures (SOPs) / Runbooks, network topology & port-matrix diagrams, and the Configuration Management Database (CMDB) baseline",
+            "A local plaintext `passwords.txt` file on the jump host desktop",
+            "An unversioned sticky note attached to the cold-aisle rack door",
+            "The server's volatile `/tmp` RAM disk"
+          ],
+          0,
+          "Why & Solution: Complete operational readiness pairs technical hardening with living, version-controlled SOP runbooks, accurate port/cabling diagrams, and updated CMDB hardware/software baselines—ensuring rapid mean-time-to-resolution (MTTR) during night-shift emergencies."
+        ]
+      ];
+
+      /* ========================================================================
+         PERSISTENCE & STATE MANAGEMENT (localStorage: sk1_006_vault_301_400)
+         ======================================================================== */
+      const STORAGE_KEY = "sk1_006_vault_301_400";
+
+      let state = {
+        answers: {},      // { [id]: chosenOptionIndex }
+        bookmarks: [],    // [id, id, ...]
+        mode: "quiz"      // "quiz" | "study"
+      };
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === "object") {
+              state.answers = parsed.answers && typeof parsed.answers === "object" ? parsed.answers : {};
+              state.bookmarks = Array.isArray(parsed.bookmarks) ? parsed.bookmarks : [];
+              state.mode = parsed.mode === "study" ? "study" : "quiz";
+            }
+          }
+        } catch (e) {
+          // Fallback gracefully if storage is restricted
+        }
+      }
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {
+          // Ignore storage quota errors
+        }
+      }
+
+      loadState();
+
+      let activeDomain = "all";
+      let searchQuery = "";
+
+      const feedEl = document.getElementById("scenario-feed");
+      const emptyBannerEl = document.getElementById("empty-banner");
+      const statAnsweredEl = document.getElementById("stat-answered");
+      const statCorrectEl = document.getElementById("stat-correct");
+      const statAccuracyEl = document.getElementById("stat-accuracy");
+      const statBookmarkedEl = document.getElementById("stat-bookmarked");
+      const progressFillEl = document.getElementById("progress-fill");
+
+      const btnModeToggle = document.getElementById("btn-mode-toggle");
+      const btnReset = document.getElementById("btn-reset");
+      const searchInput = document.getElementById("search-input");
+      const filterPills = Array.from(document.querySelectorAll(".filter-pill"));
+
+      const letters = ["A", "B", "C", "D"];
+
+      /* ========================================================================
+         SAFE INLINE CODE FORMATTER
+         ======================================================================== */
+      function formatTextWithCode(str) {
+        const escaped = str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+        return escaped.replace(/`([^`]+)`/g, "<code>$1</code>");
+      }
+
+      /* ========================================================================
+         TELEMETRY HUD UPDATER
+         ======================================================================== */
+      function updateTelemetry() {
+        const total = VAULT_DATA.length;
+        const answeredCount = Object.keys(state.answers).length;
+        let correctCount = 0;
+
+        VAULT_DATA.forEach(function (item) {
+          if (state.answers[item[0]] === item[6]) {
+            correctCount++;
+          }
+        });
+
+        statAnsweredEl.textContent = answeredCount + " / " + total;
+        statCorrectEl.textContent = String(correctCount);
+        const accPct = answeredCount === 0 ? 0 : Math.round((correctCount / answeredCount) * 100);
+        statAccuracyEl.textContent = accPct + "%";
+        statBookmarkedEl.textContent = String(state.bookmarks.length);
+        progressFillEl.style.width = Math.round((answeredCount / total) * 100) + "%";
+
+        const isStudy = state.mode === "study";
+        btnModeToggle.textContent = isStudy ? "Mode: Study Mode" : "Mode: Quiz Mode";
+        btnModeToggle.classList.toggle("active-mode", !isStudy);
+        btnModeToggle.classList.toggle("active-study", isStudy);
+      }
+
+      /* ========================================================================
+         RENDER ALL 100 SCENARIO CARDS
+         ======================================================================== */
+      function renderVault() {
+        const frag = document.createDocumentFragment();
+        const qLower = searchQuery.trim().toLowerCase();
+        const bookmarkSet = new Set(state.bookmarks);
+        let visibleCount = 0;
+
+        const domainLabels = {
+          ai: "AI & Accelerators",
+          cabling: "Cabling & Optics",
+          ports: "Ports & Protocols"
+        };
+
+        const difficultyBadgeClass = {
+          "QUICK WIN": "badge-emerald",
+          "SCENARIO": "badge-cyan",
+          "DEEP DIVE": "badge-amber"
+        };
+
+        VAULT_DATA.forEach(function (item) {
+          const id = item[0];
+          const domainKey = item[1];
+          const topicTag = item[2];
+          const difficulty = item[3];
+          const promptText = item[4];
+          const options = item[5];
+          const correctIdx = item[6];
+          const explanation = item[7];
+
+          const isBookmarked = bookmarkSet.has(id);
+
+          // Domain filter
+          if (activeDomain === "bookmarked" && !isBookmarked) return;
+          if (activeDomain !== "all" && activeDomain !== "bookmarked" && domainKey !== activeDomain) return;
+
+          // Keyword search
+          if (qLower) {
+            const haystack = (
+              "#" + id + " " + id + " " + topicTag + " " + difficulty + " " +
+              promptText + " " + options.join(" ") + " " + explanation
+            ).toLowerCase();
+            if (!haystack.includes(qLower)) return;
+          }
+
+          visibleCount++;
+
+          const hasAnswered = Object.prototype.hasOwnProperty.call(state.answers, id);
+          const chosenIdx = hasAnswered ? state.answers[id] : -1;
+          const isStudy = state.mode === "study";
+          const revealAnswer = hasAnswered || isStudy;
+
+          const card = document.createElement("article");
+          card.className = "scenario-card" + (isBookmarked ? " bookmarked" : "");
+          card.id = "q-" + id;
+
+          // Header row
+          const header = document.createElement("div");
+          header.className = "card-header";
+
+          const badgesWrap = document.createElement("div");
+          badgesWrap.className = "card-badges";
+          badgesWrap.innerHTML =
+            '<span class="badge badge-sky">#' + id + '</span>' +
+            '<span class="badge badge-cyan">' + domainLabels[domainKey] + '</span>' +
+            '<span class="badge ' + (difficultyBadgeClass[difficulty] || "badge-emerald") + '">' + difficulty + '</span>' +
+            '<span class="badge badge-sky">' + topicTag + '</span>';
+
+          const bmBtn = document.createElement("button");
+          bmBtn.type = "button";
+          bmBtn.className = "bookmark-btn" + (isBookmarked ? " active" : "");
+          bmBtn.innerHTML = isBookmarked ? "&#9733; Bookmarked" : "&#9734; Bookmark";
+          bmBtn.addEventListener("click", function () {
+            const idx = state.bookmarks.indexOf(id);
+            if (idx >= 0) {
+              state.bookmarks.splice(idx, 1);
+            } else {
+              state.bookmarks.push(id);
+            }
+            saveState();
+            updateTelemetry();
+            renderVault();
+          });
+
+          header.appendChild(badgesWrap);
+          header.appendChild(bmBtn);
+
+          // Prompt
+          const promptEl = document.createElement("p");
+          promptEl.className = "scenario-prompt";
+          promptEl.innerHTML = formatTextWithCode(promptText);
+
+          // Options
+          const optsGrid = document.createElement("div");
+          optsGrid.className = "options-grid";
+
+          options.forEach(function (optStr, optIdx) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "opt-btn";
+
+            if (revealAnswer) {
+              if (optIdx === correctIdx) {
+                btn.classList.add("correct");
+              } else if (hasAnswered && optIdx === chosenIdx) {
+                btn.classList.add("incorrect");
+              } else {
+                btn.classList.add("dimmed");
+              }
+            }
+
+            if (hasAnswered || isStudy) {
+              btn.disabled = true;
+            }
+
+            btn.innerHTML =
+              '<span class="opt-letter">' + letters[optIdx] + '</span>' +
+              '<span class="option-text">' + formatTextWithCode(optStr) + '</span>';
+
+            btn.addEventListener("click", function () {
+              if (Object.prototype.hasOwnProperty.call(state.answers, id) || state.mode === "study") return;
+              state.answers[id] = optIdx;
+              saveState();
+              updateTelemetry();
+              renderVault();
+            });
+
+            optsGrid.appendChild(btn);
+          });
+
+          // Rationale Panel
+          const expBox = document.createElement("div");
+          expBox.className = "explanation-box";
+
+          if (revealAnswer) {
+            expBox.classList.add("visible");
+            let headerHtml = "";
+            if (hasAnswered) {
+              const isRight = chosenIdx === correctIdx;
+              if (!isRight) expBox.classList.add("wrong-border");
+              headerHtml = isRight
+                ? '<span class="exp-header pass">&#10003; Correct &mdash; Answer: ' + letters[correctIdx] + '</span>'
+                : '<span class="exp-header fail">&#10007; Incorrect (Selected ' + letters[chosenIdx] + ') &mdash; Correct Answer: ' + letters[correctIdx] + '</span>';
+            } else {
+              expBox.classList.add("study-border");
+              headerHtml = '<span class="exp-header study">&#9670; Study Mode Solution &mdash; Answer: ' + letters[correctIdx] + '</span>';
+            }
+            expBox.innerHTML = headerHtml + "<p>" + formatTextWithCode(explanation) + "</p>";
+          }
+
+          card.appendChild(header);
+          card.appendChild(promptEl);
+          card.appendChild(optsGrid);
+          card.appendChild(expBox);
+          frag.appendChild(card);
+        });
+
+        feedEl.innerHTML = "";
+        feedEl.appendChild(frag);
+        emptyBannerEl.style.display = visibleCount === 0 ? "block" : "none";
+      }
+
+      /* ========================================================================
+         EVENT BINDINGS
+         ======================================================================== */
+      btnModeToggle.addEventListener("click", function () {
+        state.mode = state.mode === "quiz" ? "study" : "quiz";
+        saveState();
+        updateTelemetry();
+        renderVault();
+      });
+
+      btnReset.addEventListener("click", function () {
+        state.answers = {};
+        saveState();
+        updateTelemetry();
+        renderVault();
+      });
+
+      filterPills.forEach(function (pill) {
+        pill.addEventListener("click", function () {
+          filterPills.forEach(function (p) { p.classList.remove("active"); });
+          pill.classList.add("active");
+          activeDomain = pill.getAttribute("data-domain");
+          renderVault();
+        });
+      });
+
+      searchInput.addEventListener("input", function () {
+        searchQuery = searchInput.value;
+        renderVault();
+      });
+
+      // Initialize
+      updateTelemetry();
+      renderVault();
+    })();
+  </script>
+</body>
+</html>

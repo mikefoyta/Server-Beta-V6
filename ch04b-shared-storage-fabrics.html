@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SER-V6 // SK0-006 — Chapter 4B: Shared Storage, Fabrics &amp; Protocols</title>
+  <style>
+    /* ==========================================================================
+       DESIGN TOKENS & RESET (Emergency Goose Tactical Dark-Navy Theme)
+       Zero External Dependencies — Pure Inline CSS + Vanilla JS
+       ========================================================================== */
+    :root {
+      --bg-base: #080f1e;
+      --bg-surface: #0f1b33;
+      --bg-panel: #132240;
+      --bg-inset: #050a14;
+      --border-subtle: #1e325c;
+      --border-strong: #2e4b85;
+      --accent-sky: #38bdf8;
+      --accent-sky-dim: rgba(56, 189, 248, 0.14);
+      --accent-cyan: #22d3ee;
+      --accent-cyan-dim: rgba(34, 211, 238, 0.14);
+      --accent-emerald: #10b981;
+      --accent-emerald-dim: rgba(16, 185, 129, 0.15);
+      --accent-amber: #f59e0b;
+      --accent-amber-dim: rgba(245, 158, 11, 0.15);
+      --accent-rose: #f43f5e;
+      --accent-rose-dim: rgba(244, 63, 94, 0.15);
+      --text-primary: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+      --shadow-card: 0 10px 28px -6px rgba(0, 0, 0, 0.55);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ==========================================================================
+       APP SHELL & TACTICAL HEADER
+       ========================================================================== */
+    .app-shell {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 1.15rem 1rem 3.5rem;
+    }
+
+    .tactical-header {
+      background: linear-gradient(145deg, var(--bg-surface) 0%, #0a1428 100%);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.35rem 1.45rem;
+      margin-bottom: 1.2rem;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tactical-header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-sky), var(--accent-cyan), var(--accent-emerald));
+    }
+
+    .header-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.71rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+    }
+
+    .badge-sky {
+      color: var(--accent-sky);
+      background: var(--accent-sky-dim);
+      border-color: rgba(56, 189, 248, 0.32);
+    }
+
+    .badge-cyan {
+      color: var(--accent-cyan);
+      background: var(--accent-cyan-dim);
+      border-color: rgba(34, 211, 238, 0.32);
+    }
+
+    .badge-emerald {
+      color: var(--accent-emerald);
+      background: var(--accent-emerald-dim);
+      border-color: rgba(16, 185, 129, 0.32);
+    }
+
+    .badge-amber {
+      color: var(--accent-amber);
+      background: var(--accent-amber-dim);
+      border-color: rgba(245, 158, 11, 0.32);
+    }
+
+    .badge-rose {
+      color: var(--accent-rose);
+      background: var(--accent-rose-dim);
+      border-color: rgba(244, 63, 94, 0.32);
+    }
+
+    .tactical-header h1 {
+      margin: 0 0 0.35rem;
+      font-size: clamp(1.25rem, 3.4vw, 1.72rem);
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      color: #f8fafc;
+    }
+
+    .tactical-header p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.91rem;
+    }
+
+    /* ==========================================================================
+       3-TAB NAVIGATION SWITCHBOARD
+       ========================================================================== */
+    .nav-tabs {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+      background: var(--bg-inset);
+      padding: 0.45rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 1.3rem;
+    }
+
+    @media (min-width: 680px) {
+      .nav-tabs {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .tab-btn {
+      appearance: none;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 0.78rem 0.85rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      min-height: 48px;
+      text-align: center;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .tab-btn.active {
+      background: var(--bg-surface);
+      color: var(--accent-sky);
+      border-color: var(--border-strong);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    }
+
+    .tab-pill {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.12rem 0.48rem;
+      border-radius: 999px;
+      background: var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .tab-btn.active .tab-pill {
+      background: var(--accent-cyan);
+      color: #051324;
+    }
+
+    .view-panel {
+      display: none;
+      animation: fadeSlide 0.2s ease-out;
+    }
+
+    .view-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================================================
+       TAB 1: ARCHITECTURE & PROTOCOLS MATRIX
+       ========================================================================== */
+    .filter-toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (min-width: 780px) {
+      .filter-toolbar {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.42rem;
+    }
+
+    .filter-chip {
+      appearance: none;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 0.5rem 0.78rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      min-height: 40px;
+    }
+
+    .filter-chip:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+    }
+
+    .filter-chip.active {
+      background: var(--accent-cyan-dim);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    .search-box {
+      flex: 1;
+      max-width: 100%;
+    }
+
+    @media (min-width: 780px) {
+      .search-box {
+        max-width: 280px;
+      }
+    }
+
+    .search-box input {
+      width: 100%;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.88rem;
+      padding: 0.58rem 0.85rem;
+      border-radius: var(--radius-md);
+      outline: none;
+      min-height: 40px;
+      transition: border-color 0.15s ease;
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent-sky);
+    }
+
+    .search-box input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .decoder-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .ghost-btn {
+      appearance: none;
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      padding: 0.42rem 0.72rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      min-height: 36px;
+    }
+
+    .ghost-btn:hover {
+      border-color: var(--accent-sky);
+      color: var(--accent-sky);
+    }
+
+    .decoder-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+    }
+
+    .decoder-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .decoder-card:hover {
+      border-color: var(--border-strong);
+    }
+
+    .decoder-card.open {
+      border-color: rgba(56, 189, 248, 0.48);
+      box-shadow: var(--shadow-card);
+    }
+
+    .card-header-btn {
+      width: 100%;
+      appearance: none;
+      background: transparent;
+      border: none;
+      color: inherit;
+      text-align: left;
+      padding: 1.05rem 1.15rem;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.9rem;
+      min-height: 60px;
+    }
+
+    .card-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .card-title {
+      font-size: 1.04rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin: 0;
+    }
+
+    .card-hook {
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .chevron {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-sky);
+      transition: transform 0.2s ease, background 0.2s ease;
+      margin-top: 0.15rem;
+    }
+
+    .decoder-card.open .chevron {
+      transform: rotate(180deg);
+      background: var(--accent-cyan-dim);
+    }
+
+    .card-body {
+      display: none;
+      padding: 0 1.15rem 1.2rem;
+      border-top: 1px solid var(--border-subtle);
+      background: rgba(5, 10, 20, 0.45);
+    }
+
+    .decoder-card.open .card-body {
+      display: block;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      margin-top: 0.95rem;
+    }
+
+    @media (min-width: 680px) {
+      .comparison-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+    }
+
+    .sub-pane {
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 0.95rem;
+    }
+
+    .sub-pane h4 {
+      margin: 0 0 0.45rem;
+      font-size: 0.82rem;
+      font-family: var(--font-mono);
+      color: var(--accent-sky);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .sub-pane.cyan h4 { color: var(--accent-cyan); }
+    .sub-pane.emerald h4 { color: var(--accent-emerald); }
+    .sub-pane.amber h4 { color: var(--accent-amber); }
+    .sub-pane.rose h4 { color: var(--accent-rose); }
+
+    .sub-pane p, .sub-pane ul {
+      margin: 0;
+      font-size: 0.88rem;
+      color: var(--text-primary);
+    }
+
+    .sub-pane ul {
+      padding-left: 1.15rem;
+    }
+
+    .sub-pane li {
+      margin-bottom: 0.32rem;
+    }
+
+    .topology-diagram {
+      margin-top: 0.95rem;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 0.95rem;
+      overflow-x: auto;
+    }
+
+    .topology-diagram-title {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--accent-cyan);
+      margin-bottom: 0.65rem;
+      display: block;
+    }
+
+    .topo-columns {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    @media (min-width: 720px) {
+      .topo-columns {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .topo-pillar {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+    }
+
+    .topo-node {
+      background: var(--bg-inset);
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      padding: 0.38rem 0.5rem;
+      color: #f8fafc;
+      font-weight: 600;
+    }
+
+    .topo-node.highlight-sky { border-color: var(--accent-sky); color: var(--accent-sky); }
+    .topo-node.highlight-cyan { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+    .topo-node.highlight-emerald { border-color: var(--accent-emerald); color: var(--accent-emerald); }
+
+    .topo-arrow {
+      color: var(--text-muted);
+      margin: 0.28rem 0;
+      font-size: 0.75rem;
+    }
+
+    .exam-trap-callout {
+      margin-top: 0.85rem;
+      background: var(--accent-emerald-dim);
+      border-left: 3px solid var(--accent-emerald);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 0.75rem 0.95rem;
+      font-size: 0.87rem;
+    }
+
+    .exam-trap-callout strong {
+      color: var(--accent-emerald);
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    .data-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 0.9rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-inset);
+    }
+
+    .tactical-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      min-width: 520px;
+    }
+
+    .tactical-table th, .tactical-table td {
+      padding: 0.65rem 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .tactical-table th {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      color: var(--accent-cyan);
+      background: rgba(15, 27, 51, 0.95);
+      letter-spacing: 0.03em;
+    }
+
+    .tactical-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius-lg);
+      color: var(--text-secondary);
+      display: none;
+    }
+
+    /* ==========================================================================
+       TAB 2: FRAME & PROTOCOL INSPECTOR (FIGURE 4.15 & PORT DECODER)
+       ========================================================================== */
+    .inspector-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.35rem;
+      margin-bottom: 1.2rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .section-heading {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: #f8fafc;
+    }
+
+    .frame-stack-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .frame-row-label {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.4rem;
+      margin-bottom: 0.45rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    .wire-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
+      gap: 0.45rem;
+      background: var(--bg-inset);
+      padding: 0.55rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .hdr-block {
+      appearance: none;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 0.55rem;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.16s ease;
+      min-height: 56px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.22rem;
+    }
+
+    .hdr-block small {
+      font-size: 0.65rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .hdr-block:hover {
+      border-color: var(--accent-sky);
+      transform: translateY(-1px);
+    }
+
+    .hdr-block.active {
+      background: var(--accent-sky-dim);
+      border-color: var(--accent-sky);
+      color: #ffffff;
+      box-shadow: 0 0 0 1px var(--accent-sky);
+    }
+
+    .hdr-block.fcoe-accent.active {
+      background: var(--accent-cyan-dim);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 1px var(--accent-cyan);
+    }
+
+    .hdr-detail-pane {
+      background: var(--bg-inset);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.1rem;
+    }
+
+    .hdr-detail-pane h3 {
+      margin: 0.4rem 0 0.35rem;
+      font-size: 1.04rem;
+      color: #f8fafc;
+    }
+
+    .hdr-detail-pane p {
+      margin: 0 0 0.65rem;
+      font-size: 0.89rem;
+      color: var(--text-primary);
+    }
+
+    .hdr-meta-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-bottom: 0.65rem;
+    }
+
+    /* ==========================================================================
+       TAB 3: NIGHT-SHIFT GAUNTLET (10 TOUGH SCENARIO QUESTIONS)
+       ========================================================================== */
+    .quiz-hud {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .hud-top-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.85rem;
+    }
+
+    .hud-stats {
+      display: flex;
+      align-items: center;
+      gap: 1.35rem;
+    }
+
+    .stat-block {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-sky);
+    }
+
+    .stat-value.emerald { color: var(--accent-emerald); }
+
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-inset);
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-sky), var(--accent-cyan), var(--accent-emerald));
+      transition: width 0.28s ease;
+    }
+
+    .reset-btn {
+      appearance: none;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.65rem 1rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      min-height: 44px;
+    }
+
+    .reset-btn:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      background: var(--accent-cyan-dim);
+    }
+
+    .quiz-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+    }
+
+    .question-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .q-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .q-prompt {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: #f8fafc;
+      margin: 0 0 1rem;
+      line-height: 1.56;
+    }
+
+    .options-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .option-btn {
+      width: 100%;
+      appearance: none;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1rem;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.91rem;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      transition: all 0.15s ease;
+      min-height: 48px;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--accent-sky);
+      background: var(--bg-panel);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-letter {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-sky);
+      margin-top: 0.05rem;
+    }
+
+    .option-btn.correct {
+      background: var(--accent-emerald-dim);
+      border-color: var(--accent-emerald);
+      color: #f8fafc;
+    }
+
+    .option-btn.correct .option-letter {
+      background: var(--accent-emerald);
+      border-color: var(--accent-emerald);
+      color: #041b12;
+    }
+
+    .option-btn.incorrect {
+      background: var(--accent-rose-dim);
+      border-color: var(--accent-rose);
+      color: #ffe4e6;
+    }
+
+    .option-btn.incorrect .option-letter {
+      background: var(--accent-rose);
+      border-color: var(--accent-rose);
+      color: #23040a;
+    }
+
+    .option-btn.dimmed {
+      opacity: 0.54;
+    }
+
+    .rationale-box {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.95rem 1.05rem;
+      border-radius: var(--radius-md);
+      background: var(--bg-inset);
+      border: 1px solid var(--border-strong);
+      font-size: 0.88rem;
+    }
+
+    .rationale-box.visible {
+      display: block;
+      animation: fadeSlide 0.2s ease-out;
+    }
+
+    .rationale-status {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.45rem;
+      display: block;
+    }
+
+    .rationale-status.pass { color: var(--accent-emerald); }
+    .rationale-status.fail { color: var(--accent-rose); }
+
+    .rationale-box p {
+      margin: 0 0 0.55rem;
+      color: var(--text-primary);
+    }
+
+    .rationale-box p:last-child {
+      margin-bottom: 0;
+      color: var(--text-secondary);
+    }
+
+    .summary-banner {
+      display: none;
+      margin-top: 1.25rem;
+      padding: 1.35rem;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(145deg, rgba(16, 185, 129, 0.14), rgba(56, 189, 248, 0.12));
+      border: 1px solid var(--accent-emerald);
+      text-align: center;
+    }
+
+    .summary-banner.visible {
+      display: block;
+    }
+
+    .summary-banner h3 {
+      margin: 0 0 0.4rem;
+      color: #f8fafc;
+      font-size: 1.15rem;
+    }
+
+    .summary-banner p {
+      margin: 0 0 0.95rem;
+      color: var(--text-secondary);
+      font-size: 0.91rem;
+    }
+
+    .footer-note {
+      margin-top: 2.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.73rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- TACTICAL HEADER -->
+    <header class="tactical-header">
+      <div class="header-meta">
+        <span class="badge badge-sky">SER-V6 // SK0-006 &mdash; CHAPTER 4B: SHARED STORAGE &amp; FABRICS</span>
+        <span class="badge badge-cyan">PROTOCOL &amp; FABRIC DISPATCH // HER EXCELLENCY THE EMERGENCY GOOSE EDITION</span>
+      </div>
+      <h1>Shared Storage Topologies, SAN Fabrics &amp; Protocol Encapsulation</h1>
+      <p>Sybex Chapter 4 (pp. 160&ndash;166) field reference &amp; night-shift 10-question exam gauntlet: DAS vs. NAS vs. SAN, File vs. Block access, NFS/SMB ports, iSCSI vs. FCoE frames, Fibre Channel WWNs, and asset documentation.</p>
+    </header>
+
+    <!-- 3-TAB NAVIGATION BAR -->
+    <nav class="nav-tabs" role="tablist" aria-label="Chapter 4B Study Modules">
+      <button class="tab-btn active" id="tab-matrix" role="tab" aria-selected="true" aria-controls="panel-matrix" type="button">
+        <span>1. Architecture &amp; Protocols Matrix</span>
+        <span class="tab-pill">6 Cards</span>
+      </button>
+      <button class="tab-btn" id="tab-inspector" role="tab" aria-selected="false" aria-controls="panel-inspector" type="button">
+        <span>2. Frame &amp; Protocol Inspector</span>
+        <span class="tab-pill">Fig 4.15</span>
+      </button>
+      <button class="tab-btn" id="tab-gauntlet" role="tab" aria-selected="false" aria-controls="panel-gauntlet" type="button">
+        <span>3. Night-Shift Gauntlet</span>
+        <span class="tab-pill">10 Tough Qs</span>
+      </button>
+    </nav>
+
+    <!-- ======================================================================
+         TAB 1: ARCHITECTURE & PROTOCOLS MATRIX
+         ====================================================================== -->
+    <main id="panel-matrix" class="view-panel active" role="tabpanel" aria-labelledby="tab-matrix">
+      <div class="filter-toolbar">
+        <div class="filter-pills" role="group" aria-label="Filter storage architecture cards">
+          <button class="filter-chip active" data-filter="all" type="button">All (6)</button>
+          <button class="filter-chip" data-filter="topologies" type="button">Topologies &amp; Access</button>
+          <button class="filter-chip" data-filter="nas" type="button">NAS Protocols</button>
+          <button class="filter-chip" data-filter="san" type="button">SAN Fabrics</button>
+          <button class="filter-chip" data-filter="external" type="button">External &amp; Assets</button>
+        </div>
+        <div class="search-box">
+          <input type="search" id="matrix-search" placeholder="Search (e.g., FCoE, WWN, 2049, SDXC)..." aria-label="Search reference cards" />
+        </div>
+      </div>
+
+      <div class="decoder-actions">
+        <button class="ghost-btn" id="expand-all-btn" type="button">+ Expand All</button>
+        <button class="ghost-btn" id="collapse-all-btn" type="button">- Collapse All</button>
+      </div>
+
+      <div class="decoder-grid" id="matrix-grid">
+        <!-- CARD 1: DAS VS NAS VS SAN (FIGURE 4.12 & TABLES 4.1-4.2) -->
+        <article class="decoder-card open" data-category="topologies" data-keywords="das nas san direct attached network storage area figure 4.12 tcp/ip ethernet switch fc switch snapshot latency">
+          <button class="card-header-btn" type="button" aria-expanded="true">
+            <div class="card-title-group">
+              <div class="card-tags">
+                <span class="badge badge-sky">Topologies // Figure 4.12</span>
+                <span class="badge badge-amber">Tables 4.1 &amp; 4.2</span>
+              </div>
+              <h2 class="card-title">DAS vs. NAS vs. SAN: Core Storage Topologies</h2>
+              <p class="card-hook">Local bus attachment vs. shared TCP/IP file appliances vs. isolated high-speed storage networks.</p>
+            </div>
+            <span class="chevron" aria-hidden="true">&#9662;</span>
+          </button>
+          <div class="card-body">
+            <!-- VISUAL TOPOLOGY DIAGRAM (FIGURE 4.12) -->
+            <div class="topology-diagram">
+              <span class="topology-diagram-title">Figure 4.12 // Where the File System &amp; Transport Sit</span>
+              <div class="topo-columns">
+                <div class="topo-pillar">
+                  <div class="topo-node">Application Server</div>
+                  <div class="topo-arrow">&darr;</div>
+                  <div class="topo-node highlight-emerald">Server OS File System</div>
+                  <div class="topo-arrow">&darr; Local Bus (SATA/SAS/USB/SCSI)</div>
+                  <div class="topo-node">Local Storage (DAS)</div>
+                </div>
+                <div class="topo-pillar">
+                  <div class="topo-node">Application Servers</div>
+                  <div class="topo-arrow">&darr; TCP/IP LAN (NFS/SMB/HTTP)</div>
+                  <div class="topo-node highlight-sky">Ethernet Switches</div>
+                  <div class="topo-arrow">&darr; File System Lives on NAS</div>
+                  <div class="topo-node">NAS Storage Appliance</div>
+                </div>
+                <div class="topo-pillar">
+                  <div class="topo-node">Application Servers</div>
+                  <div class="topo-arrow">&darr;</div>
+                  <div class="topo-node highlight-cyan">Server OS File System</div>
+                  <div class="topo-arrow">&darr; Private Storage Fabric (FC/iSCSI)</div>
+                  <div class="topo-node">FC Switch &rarr; SAN Raw Blocks</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="comparison-grid">
+              <div class="sub-pane emerald">
+                <h4>DAS (Direct Attached Storage)</h4>
+                <ul>
+                  <li>Drives attach locally to the server via <strong>SATA, USB, SCSI, or SAS</strong>&mdash;zero network connection between server and storage.</li>
+                  <li>Still qualifies as DAS even with multiple drives and hardware RAID.</li>
+                  <li>Simple and well-understood, but harder to scale or share across hosts than NAS/SAN.</li>
+                </ul>
+              </div>
+              <div class="sub-pane">
+                <h4>NAS (Network Attached Storage &mdash; Table 4.1)</h4>
+                <ul>
+                  <li><strong>Pros:</strong> Accessed over standard TCP/IP Ethernet LAN/WAN; inexpensive; GUI-managed; supports multiple RAID levels &amp; built-in backup software; easy Ethernet troubleshooting.</li>
+                  <li><strong>Cons:</strong> Higher latency &amp; lower reliability than SAN; competes with regular LAN traffic (Ethernet congestion/packet drops); less effective for frequent OS rollback snapshots than SAN.</li>
+                </ul>
+              </div>
+              <div class="sub-pane cyan">
+                <h4>SAN (Storage Area Network &mdash; Table 4.2)</h4>
+                <ul>
+                  <li><strong>Pros:</strong> Dedicated high-speed private network separate from the LAN via storage switches; highly scalable; online maintenance without server downtime; long Fibre Channel runs; strong physical isolation.</li>
+                  <li><strong>Cons:</strong> Expensive; requires specialized admin skills; cannot leverage legacy investments; fewer vendors.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="exam-trap-callout">
+              <strong>SK0-006 Exam Trigger</strong>
+              A multi-disk external JBOD or RAID enclosure cabled directly to one server's SAS HBA without a network switch in between is <strong>DAS</strong>, not a SAN. Meanwhile, frequent VM/OS state rollback snapshots favor <strong>SAN</strong> over NAS.
+            </div>
+          </div>
+        </article>
+
+        <!-- CARD 2: FILE-LEVEL VS BLOCK-LEVEL ACCESS (TABLE 4.3) -->
+        <article class="decoder-card" data-category="topologies" data-keywords="file-level block-level access table 4.3 external bootup raw blocks folders nas san">
+          <button class="card-header-btn" type="button" aria-expanded="false">
+            <div class="card-title-group">
+              <div class="card-tags">
+                <span class="badge badge-sky">Topologies // Table 4.3</span>
+                <span class="badge badge-emerald">Boot Capability Rule</span>
+              </div>
+              <h2 class="card-title">File-Level Access (NAS) vs. Block-Level Access (SAN)</h2>
+              <p class="card-hook">Why servers can boot an OS directly from a SAN LUN, but treat a NAS share strictly as remote folders.</p>
+            </div>
+            <span class="chevron" aria-hidden="true">&#9662;</span>
+          </button>
+          <div class="card-body">
+            <div class="data-table-wrap">
+              <table class="tactical-table">
+                <thead>
+                  <tr>
+                    <th>Characteristic</th>
+                    <th>File-Level Access (NAS)</th>
+                    <th>Block-Level Access (SAN)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Data Presentation</strong></td>
+                    <td>Stores and presents data as complete files and folders (file system owned by NAS).</td>
+                    <td>Presents raw storage blocks (LUNs); each block volume acts like an independent local hard drive formatted by the server OS.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Performance &amp; Reliability</strong></td>
+                    <td>Subject to file-protocol and TCP/IP LAN overhead.</td>
+                    <td>Higher performance and higher reliability over dedicated storage paths.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>External OS Bootup</strong></td>
+                    <td><strong>Not supported</strong> for standard OS boot volumes.</td>
+                    <td><strong>Supported</strong>&mdash;connected diskless blade/rack servers can boot their OS externally from a SAN LUN.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Best-Fit Workload</strong></td>
+                    <td>Inexpensive, easy-to-manage bulk shared file storage.</td>
+                    <td>High-IOPS databases, virtualization datastores, OS boot-from-SAN.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="exam-trap-callout">
+              <strong>SK0-006 Exam Trigger</strong>
+              Whenever a scenario requires diskless servers to perform <strong>external bootup</strong> over storage infrastructure or demands raw block volumes treated as local disks, the architecture must be a <strong>Block-Level SAN</strong>.
+            </div>
+          </div>
+        </article>
+
+        <!-- CARD 3: NAS FILE PROTOCOLS (NFS VS CIFS/SMB) -->
+        <article class="decoder-card" data-category="nas" data-keywords="nfs cifs smb network file system server message block 2049 445 snfs des linux windows">
+          <button class="card-header-btn" type="button" aria-expanded="false">
+            <div class="card-title-group">
+              <div class="card-tags">
+                <span class="badge badge-cyan">NAS Protocols</span>
+                <span class="badge badge-amber">Port &amp; Dialect Check</span>
+              </div>
+              <h2 class="card-title">NAS File-Sharing Protocols: NFS vs. CIFS / SMB</h2>
+              <p class="card-hook">Unix/Linux TCP 2049 (with SNFS DES) vs. Windows TCP 445 (SMB 3.1.1 / CIFS dialect).</p>
+            </div>
+            <span class="chevron" aria-hidden="true">&#9662;</span>
+          </button>
+          <div class="card-body">
+            <div class="comparison-grid">
+              <div class="sub-pane">
+                <h4>NFS (Network File System)</h4>
+                <ul>
+                  <li>Client/server file-sharing protocol primarily used in <strong>Unix / Linux</strong> environments (current standard: <strong>NFSv4</strong>).</li>
+                  <li>Operates over <strong>TCP port 2049</strong>.</li>
+                  <li><strong>Secure NFS (SNFS)</strong> provides confidentiality using Data Encryption Standard (<strong>DES</strong>) per Sybex reference.</li>
+                </ul>
+              </div>
+              <div class="sub-pane cyan">
+                <h4>CIFS / SMB (Server Message Block)</h4>
+                <ul>
+                  <li>Application-layer protocol used primarily in <strong>Windows</strong> networks for shared file and resource access.</li>
+                  <li><strong>CIFS</strong> (Common Internet File System) is a specific dialect of <strong>SMB</strong> (modern version: <strong>SMB 3.1.1</strong> introduced with Windows 10 / Server 2016).</li>
+                  <li>Operates directly over <strong>TCP port 445</strong>.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="exam-trap-callout">
+              <strong>SK0-006 Exam Trigger</strong>
+              Memorize the exact firewall port pair: <strong>NFS = TCP 2049</strong> (Linux/Unix), <strong>SMB/CIFS = TCP 445</strong> (Windows). Also remember that CIFS is a dialect of SMB, not a competing hardware bus.
+            </div>
+          </div>
+        </article>
+
+        <!-- CARD 4: SAN FABRICS — FIBRE CHANNEL, ISCSI & FCOE -->
+        <article class="decoder-card" data-category="san" data-keywords="san fabrics fibre channel fc hba wwn world wide name oui iscsi fcoe figure 4.13 4.14 4.15 table 4.4">
+          <button class="card-header-btn" type="button" aria-expanded="false">
+            <div class="card-title-group">
+              <div class="card-tags">
+                <span class="badge badge-cyan">SAN Fabrics // Figures 4.13&ndash;4.15</span>
+                <span class="badge badge-rose">Critical Encapsulation Trap</span>
+              </div>
+              <h2 class="card-title">SAN Fabrics: Fibre Channel (FC), iSCSI &amp; FCoE</h2>
+              <p class="card-hook">Dedicated optical WWN fabrics vs. IP-routable iSCSI vs. non-IP Layer 2 FCoE frames.</p>
+            </div>
+            <span class="chevron" aria-hidden="true">&#9662;</span>
+          </button>
+          <div class="card-body">
+            <div class="comparison-grid">
+              <div class="sub-pane">
+                <h4>Classic Fibre Channel (FC)</h4>
+                <ul>
+                  <li>Dedicated high-speed optical storage network using specialized <strong>Fiber Switches</strong> (Fig. 4.14) and server <strong>Fiber HBAs</strong>.</li>
+                  <li>Each Fiber HBA is addressed by a unique <strong>World Wide Name (WWN)</strong>, which&mdash;like an Ethernet MAC address&mdash;includes an IEEE-assigned Organizational Unique Identifier (<strong>OUI</strong>).</li>
+                  <li>Enables long-distance remote SAN connectivity and strict physical isolation from LAN traffic.</li>
+                </ul>
+              </div>
+              <div class="sub-pane emerald">
+                <h4>iSCSI (Internet SCSI &mdash; Table 4.4)</h4>
+                <ul>
+                  <li>Encapsulates SCSI block commands inside standard <strong>TCP/IP packets</strong> over Ethernet (TCP port 3260).</li>
+                  <li><strong>Pros:</strong> Uses familiar Ethernet hardware, eliminates parallel SCSI cable distance limits, inexpensive in small deployments.</li>
+                  <li><strong>Cons:</strong> Software initiator CPU overhead can hurt performance; susceptible to IP network congestion; at large scale can cost as much as Fibre Channel.</li>
+                </ul>
+              </div>
+              <div class="sub-pane cyan">
+                <h4>FCoE (Fibre Channel over Ethernet)</h4>
+                <ul>
+                  <li>Encapsulates native Fibre Channel frames directly inside <strong>Layer 2 Ethernet frames</strong> to converge LAN and SAN cabling onto 10GbE+ NICs (CNAs).</li>
+                  <li><strong>CRITICAL RULE:</strong> Unlike iSCSI, <strong>FCoE does NOT use IP or TCP at all</strong>&mdash;it operates strictly at Layer 2 and cannot be routed across IP subnets.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="exam-trap-callout">
+              <strong>SK0-006 Exam Trigger</strong>
+              Compare Figure 4.15 carefully: <strong>iSCSI</strong> carries <code>Ethernet | IP | TCP | iSCSI | Data</code> (Layer 3/4 routable). <strong>FCoE</strong> carries <code>Ethernet | FCoE | FC | FC Payload</code> (Layer 2 only&mdash;zero IP header!). Meanwhile, Fibre Channel HBAs are identified by <strong>WWNs</strong>, never IP addresses.
+            </div>
+          </div>
+        </article>
+
+        <!-- CARD 5: REMOVABLE & LEGACY EXTERNAL INTERFACES (FIGURES 4.10 & 4.11) -->
+        <article class="decoder-card" data-category="external" data-keywords="usb to scsi md50-m usb-a uas secure digital sd sdhc sdxc compact flash figure 4.10 4.11">
+          <button class="card-header-btn" type="button" aria-expanded="false">
+            <div class="card-title-group">
+              <div class="card-tags">
+                <span class="badge badge-sky">External &amp; Removable // Figs 4.10&ndash;4.11</span>
+              </div>
+              <h2 class="card-title">USB-to-SCSI Bridges &amp; Flash Card Standards (SD / CF)</h2>
+              <p class="card-hook">MD50-M legacy SCSI adapters and SD / SDHC / SDXC capacity ceilings.</p>
+            </div>
+            <span class="chevron" aria-hidden="true">&#9662;</span>
+          </button>
+          <div class="card-body">
+            <div class="comparison-grid">
+              <div class="sub-pane">
+                <h4>USB-to-SCSI Adapter (Figure 4.10)</h4>
+                <ul>
+                  <li>Bridges legacy parallel SCSI peripherals (such as older tape drives or diagnostic arrays) to a modern server's <strong>USB-A</strong> port using an <strong>MD50-M</strong> (50-pin micro-D) SCSI connector.</li>
+                  <li>Modern USB 3.0 storage enclosures leverage <strong>USB Attached SCSI (UAS)</strong> for command queuing and higher throughput.</li>
+                </ul>
+              </div>
+              <div class="sub-pane amber">
+                <h4>Secure Digital (SD) &amp; CompactFlash (Figure 4.11)</h4>
+                <ul>
+                  <li><strong>SD Capacity Tiers (Sybex p. 160):</strong> Standard SD (listed up to 512 GB in text / 2 GB legacy base), <strong>SDHC</strong> (High Capacity: up to <strong>32 GB</strong>), and <strong>SDXC</strong> (Extra Capacity: up to <strong>2 TB</strong>).</li>
+                  <li><strong>Three Physical SD Sizes:</strong> Standard SD, miniSD, and microSD (often used in servers for internal hypervisor boot or iDRAC/iLO vFlash service cards).</li>
+                  <li><strong>CompactFlash (CF):</strong> Larger legacy solid-state card format read via multi-card USB readers.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="exam-trap-callout">
+              <strong>SK0-006 Exam Trigger</strong>
+              Know the two key SD capacity thresholds: <strong>SDHC tops out at 32 GB</strong>, while <strong>SDXC scales up to 2 TB</strong>.
+            </div>
+          </div>
+        </article>
+
+        <!-- CARD 6: ASSET MANAGEMENT & DOCUMENTATION -->
+        <article class="decoder-card" data-category="external" data-keywords="asset management documentation turnover inventory serial number location wwn mac lifecycle">
+          <button class="card-header-btn" type="button" aria-expanded="false">
+            <div class="card-title-group">
+              <div class="card-tags">
+                <span class="badge badge-emerald">Asset Management &amp; Ops</span>
+              </div>
+              <h2 class="card-title">Asset Management &amp; Infrastructure Documentation</h2>
+              <p class="card-hook">Preventing institutional amnesia across staff turnover, audits, and emergency replacements.</p>
+            </div>
+            <span class="chevron" aria-hidden="true">&#9662;</span>
+          </button>
+          <div class="card-body">
+            <div class="comparison-grid">
+              <div class="sub-pane">
+                <h4>Why Documentation Fails</h4>
+                <p>Poor record keeping combined with frequent IT staff turnover leaves teams unable to verify exact hardware counts, physical rack/room locations, or active warranty/license coverage during outages and audits.</p>
+              </div>
+              <div class="sub-pane emerald">
+                <h4>Mandatory Storage &amp; Hardware Records</h4>
+                <ul>
+                  <li>Unique hardware identifiers: Serial numbers, asset tags, NIC MAC addresses, and Fiber HBA <strong>WWNs</strong>.</li>
+                  <li>Physical topology &amp; cabling maps: Rack elevation, PDU circuits, switch port mappings, and SAN zoning.</li>
+                  <li>Lifecycle &amp; compliance metadata: Purchase date, warranty expiration, firmware baselines, and disposal/sanitization certificates.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="exam-trap-callout">
+              <strong>SK0-006 Exam Trigger</strong>
+              When a scenario describes a newly hired administrator unable to locate undocumented servers, identify switch-to-SAN cabling, or prove hardware ownership during an audit, the root cause is a failure in <strong>Asset Management &amp; Documentation</strong>.
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="empty-state" id="matrix-empty">
+        No matching Chapter 4B reference cards found. Clear your search filter to view all 6 cards.
+      </div>
+    </main>
+
+    <!-- ======================================================================
+         TAB 2: FRAME & PROTOCOL INSPECTOR (FIGURE 4.15 & PORT DECODER)
+         ====================================================================== -->
+    <section id="panel-inspector" class="view-panel" role="tabpanel" aria-labelledby="tab-inspector">
+      <div class="inspector-box">
+        <div class="section-heading">
+          <h2>Interactive Wire-Frame &amp; Header Inspector (Figure 4.15)</h2>
+          <span class="badge badge-cyan">Click Any Header Block</span>
+        </div>
+        <p style="margin: 0 0 1rem; color: var(--text-secondary); font-size: 0.89rem;">
+          Inspect each encapsulation block below to compare how <strong>iSCSI</strong> rides over TCP/IP (Layer 3/4) while <strong>FCoE</strong> rides directly inside Layer 2 Ethernet frames without IP.
+        </p>
+
+        <div class="frame-stack-group">
+          <!-- WIRE 1: iSCSI ENCAPSULATION -->
+          <div>
+            <div class="frame-row-label">
+              <span><strong>1. iSCSI Frame Stack</strong> (Block SAN over TCP/IP Ethernet)</span>
+              <span class="badge badge-emerald">Layer 3/4 Routable &bull; TCP 3260</span>
+            </div>
+            <div class="wire-strip">
+              <button type="button" class="hdr-block active" data-hdr="iscsi-eth">
+                <span>Ethernet Header</span>
+                <small>Layer 2 &bull; MAC</small>
+              </button>
+              <button type="button" class="hdr-block" data-hdr="iscsi-ip">
+                <span>IP Header</span>
+                <small>Layer 3 &bull; Routable</small>
+              </button>
+              <button type="button" class="hdr-block" data-hdr="iscsi-tcp">
+                <span>TCP Header</span>
+                <small>Layer 4 &bull; Port 3260</small>
+              </button>
+              <button type="button" class="hdr-block" data-hdr="iscsi-encap">
+                <span>iSCSI Encap</span>
+                <small>IQN &bull; SCSI CDB</small>
+              </button>
+              <button type="button" class="hdr-block" data-hdr="iscsi-data">
+                <span>Data Payload</span>
+                <small>Raw Storage Blocks</small>
+              </button>
+            </div>
+          </div>
+
+          <!-- WIRE 2: FCoE ENCAPSULATION -->
+          <div>
+            <div class="frame-row-label">
+              <span><strong>2. FCoE Frame Stack</strong> (Converged Layer 2 Storage Fabric)</span>
+              <span class="badge badge-rose">Non-Routable Layer 2 &bull; NO IP!</span>
+            </div>
+            <div class="wire-strip">
+              <button type="button" class="hdr-block fcoe-accent" data-hdr="fcoe-eth">
+                <span>Ethernet Header</span>
+                <small>Layer 2 &bull; Lossless CEE</small>
+              </button>
+              <button type="button" class="hdr-block fcoe-accent" data-hdr="fcoe-hdr">
+                <span>FCoE Header</span>
+                <small>EtherType 0x8906</small>
+              </button>
+              <button type="button" class="hdr-block fcoe-accent" data-hdr="fcoe-fc">
+                <span>FC Header</span>
+                <small>WWN &bull; FC-2 Framing</small>
+              </button>
+              <button type="button" class="hdr-block fcoe-accent" data-hdr="fcoe-payload">
+                <span>FC Payload</span>
+                <small>Fibre Channel Data</small>
+              </button>
+            </div>
+          </div>
+
+          <!-- WIRE 3: NAS FILE PROTOCOLS -->
+          <div>
+            <div class="frame-row-label">
+              <span><strong>3. NAS File-Level Protocols</strong> (Shared Folders over TCP/IP LAN)</span>
+              <span class="badge badge-sky">File-Level &bull; TCP 2049 / 445</span>
+            </div>
+            <div class="wire-strip" style="grid-template-columns: repeat(2, 1fr);">
+              <button type="button" class="hdr-block" data-hdr="nas-nfs">
+                <span>NFSv4 / SNFS</span>
+                <small>Unix/Linux &bull; TCP 2049</small>
+              </button>
+              <button type="button" class="hdr-block" data-hdr="nas-smb">
+                <span>CIFS / SMB 3.1.1</span>
+                <small>Windows &bull; TCP 445</small>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- DYNAMIC HEADER READOUT -->
+        <div class="hdr-detail-pane" id="hdr-detail-pane">
+          <div class="hdr-meta-pills" id="hdr-pills">
+            <span class="badge badge-sky">iSCSI Stack // Layer 2</span>
+            <span class="badge badge-cyan">Addressing: MAC Address</span>
+          </div>
+          <h3 id="hdr-title">Ethernet Header (iSCSI Outer Frame)</h3>
+          <p id="hdr-desc">Wraps the IP packet for local hop transmission across standard Ethernet switches. Unlike FCoE, standard Ethernet switches do not require specialized lossless Fibre Channel extensions just to forward iSCSI frames.</p>
+          <div class="exam-trap-callout" id="hdr-trap">
+            <strong>CompTIA Exam Note</strong>
+            Standard Jumbo Frames (MTU 9000) are frequently enabled on iSCSI Ethernet interfaces to reduce packet-fragmentation overhead during large block transfers.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         TAB 3: NIGHT-SHIFT GAUNTLET (10 TOUGH SK0-006 SCENARIO QUESTIONS)
+         ====================================================================== -->
+    <section id="panel-gauntlet" class="view-panel" role="tabpanel" aria-labelledby="tab-gauntlet">
+      <div class="quiz-hud">
+        <div class="hud-top-row">
+          <div class="hud-stats">
+            <div class="stat-block">
+              <span class="stat-label">Progress</span>
+              <span class="stat-value" id="hud-answered">0 / 10</span>
+            </div>
+            <div class="stat-block">
+              <span class="stat-label">Score</span>
+              <span class="stat-value emerald" id="hud-score">0%</span>
+            </div>
+          </div>
+          <button class="reset-btn" id="reset-quiz-btn" type="button">&#8635; Reset Gauntlet</button>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div class="progress-fill" id="quiz-progress-fill"></div>
+        </div>
+      </div>
+
+      <div class="quiz-list" id="quiz-list"></div>
+
+      <div class="summary-banner" id="quiz-summary">
+        <h3 id="summary-title">Night-Shift Gauntlet Complete</h3>
+        <p id="summary-text"></p>
+        <button class="reset-btn" id="summary-reset-btn" type="button">&#8635; Retake 10-Question Gauntlet</button>
+      </div>
+    </section>
+
+    <footer class="footer-note">
+      <span>SER-V6 // SK0-006 CHAPTER 4B STUDY PORTAL</span>
+      <span>OFFLINE-READY SINGLE-FILE ARTIFACT // HER EXCELLENCY THE EMERGENCY GOOSE EDITION</span>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      /* ========================================================================
+         1. 3-TAB NAVIGATION SWITCHBOARD
+         ======================================================================== */
+      const tabs = [
+        { btn: document.getElementById("tab-matrix"), panel: document.getElementById("panel-matrix") },
+        { btn: document.getElementById("tab-inspector"), panel: document.getElementById("panel-inspector") },
+        { btn: document.getElementById("tab-gauntlet"), panel: document.getElementById("panel-gauntlet") }
+      ];
+
+      tabs.forEach(function (t) {
+        t.btn.addEventListener("click", function () {
+          tabs.forEach(function (other) {
+            const active = other === t;
+            other.btn.classList.toggle("active", active);
+            other.btn.setAttribute("aria-selected", String(active));
+            other.panel.classList.toggle("active", active);
+          });
+        });
+      });
+
+      /* ========================================================================
+         2. TAB 1: ARCHITECTURE & PROTOCOLS MATRIX FILTERING & SEARCH
+         ======================================================================== */
+      const matrixGrid = document.getElementById("matrix-grid");
+      const cards = Array.from(matrixGrid.querySelectorAll(".decoder-card"));
+      const filterChips = Array.from(document.querySelectorAll(".filter-chip"));
+      const searchInput = document.getElementById("matrix-search");
+      const emptyState = document.getElementById("matrix-empty");
+      const expandAllBtn = document.getElementById("expand-all-btn");
+      const collapseAllBtn = document.getElementById("collapse-all-btn");
+
+      let activeCategory = "all";
+
+      cards.forEach(function (card) {
+        const headerBtn = card.querySelector(".card-header-btn");
+        headerBtn.addEventListener("click", function () {
+          const willOpen = !card.classList.contains("open");
+          card.classList.toggle("open", willOpen);
+          headerBtn.setAttribute("aria-expanded", String(willOpen));
+        });
+      });
+
+      expandAllBtn.addEventListener("click", function () {
+        cards.forEach(function (card) {
+          if (card.style.display !== "none") {
+            card.classList.add("open");
+            card.querySelector(".card-header-btn").setAttribute("aria-expanded", "true");
+          }
+        });
+      });
+
+      collapseAllBtn.addEventListener("click", function () {
+        cards.forEach(function (card) {
+          card.classList.remove("open");
+          card.querySelector(".card-header-btn").setAttribute("aria-expanded", "false");
+        });
+      });
+
+      function applyMatrixFilters() {
+        const query = searchInput.value.trim().toLowerCase();
+        let visibleCount = 0;
+
+        cards.forEach(function (card) {
+          const category = card.getAttribute("data-category");
+          const keywords = (card.getAttribute("data-keywords") || "").toLowerCase();
+          const textContent = card.textContent.toLowerCase();
+
+          const matchesCategory = activeCategory === "all" || category === activeCategory;
+          const matchesSearch = !query || keywords.includes(query) || textContent.includes(query);
+
+          if (matchesCategory && matchesSearch) {
+            card.style.display = "";
+            visibleCount++;
+          } else {
+            card.style.display = "none";
+          }
+        });
+
+        emptyState.style.display = visibleCount === 0 ? "block" : "none";
+      }
+
+      filterChips.forEach(function (chip) {
+        chip.addEventListener("click", function () {
+          filterChips.forEach(function (c) { c.classList.remove("active"); });
+          chip.classList.add("active");
+          activeCategory = chip.getAttribute("data-filter");
+          applyMatrixFilters();
+        });
+      });
+
+      searchInput.addEventListener("input", applyMatrixFilters);
+
+      /* ========================================================================
+         3. TAB 2: FRAME & PROTOCOL INSPECTOR DATA & INTERACTION
+         ======================================================================== */
+      const headerSpecs = {
+        "iscsi-eth": {
+          pills: ["iSCSI Stack // Layer 2", "Addressing: MAC Address"],
+          title: "Ethernet Header (iSCSI Outer Frame)",
+          desc: "Wraps the IP packet for local hop transmission across standard Ethernet switches. Unlike FCoE, standard Ethernet switches do not require specialized lossless Fibre Channel extensions just to forward iSCSI frames.",
+          trap: "Standard Jumbo Frames (MTU 9000) are frequently enabled on iSCSI Ethernet interfaces to reduce packet-fragmentation overhead during large block transfers."
+        },
+        "iscsi-ip": {
+          pills: ["iSCSI Stack // Layer 3", "Addressing: IPv4 / IPv6 &bull; Routable"],
+          title: "IP Header (Routable Storage Transport)",
+          desc: "Because iSCSI encapsulates SCSI commands inside standard IP packets, iSCSI storage traffic can traverse Layer 3 routers across different IP subnets and WAN links.",
+          trap: "This IP header is the #1 architectural difference between iSCSI and FCoE: iSCSI is Layer 3 routable, whereas FCoE has NO IP header at all."
+        },
+        "iscsi-tcp": {
+          pills: ["iSCSI Stack // Layer 4", "Default Port: TCP 3260"],
+          title: "TCP Header (Reliable Delivery & Flow Control)",
+          desc: "TCP provides ordered, reliable delivery and congestion backoff over standard IP networks, operating by default on TCP port 3260.",
+          trap: "Because iSCSI relies on software TCP/IP processing (unless offloaded via a dedicated iSCSI HBA/TOE), heavy traffic can spike host CPU utilization and suffer from LAN congestion."
+        },
+        "iscsi-encap": {
+          pills: ["iSCSI Stack // Session Layer", "Identifier: IQN (iSCSI Qualified Name)"],
+          title: "iSCSI Encapsulation Header",
+          desc: "Wraps native SCSI Command Descriptor Blocks (CDBs) into Protocol Data Units (PDUs) addressed between an iSCSI Initiator (client server) and iSCSI Target (SAN array) using IQNs.",
+          trap: "Do not confuse IQNs (iSCSI Qualified Names, e.g., iqn.2026-11.com.example:storage1) with Fibre Channel WWNs."
+        },
+        "iscsi-data": {
+          pills: ["iSCSI Stack // Payload", "Access Mode: Block-Level"],
+          title: "iSCSI Data Payload (Raw Storage Blocks)",
+          desc: "Carries raw disk blocks directly to the initiator server's OS, allowing the server to format the LUN with NTFS, ext4, or VMFS and even boot externally from the SAN.",
+          trap: "Even though iSCSI rides over Ethernet like a NAS, it delivers block-level access—making it a SAN protocol, not a file-level NAS protocol."
+        },
+        "fcoe-eth": {
+          pills: ["FCoE Stack // Layer 2 Only", "Requirement: Lossless Converged Ethernet (DCB)"],
+          title: "Ethernet Header (FCoE Converged Link)",
+          desc: "Carries FCoE directly over 10GbE+ Converged Network Adapters (CNAs), consolidating LAN and SAN cabling onto a single physical wire.",
+          trap: "FCoE requires Data Center Bridging (DCB) / Priority Flow Control (PFC) to guarantee a lossless Layer 2 Ethernet fabric—standard lossy Ethernet switches will corrupt Fibre Channel frames."
+        },
+        "fcoe-hdr": {
+          pills: ["FCoE Stack // Layer 2 Encapsulation", "Non-Routable (Zero IP)"],
+          title: "FCoE Header (Direct Layer 2 Wrapper)",
+          desc: "Sits immediately after the Ethernet header (EtherType 0x8906) to map Fibre Channel framing onto Ethernet without touching TCP or IP.",
+          trap: "Figure 4.15 Exam Trap: Look at the FCoE block diagram—there is NO IP block and NO TCP block. FCoE cannot be routed across IP routers."
+        },
+        "fcoe-fc": {
+          pills: ["FCoE Stack // Fibre Channel Layer", "Addressing: 64-bit WWN (IEEE OUI)"],
+          title: "FC Header (Fibre Channel Routing & Addressing)",
+          desc: "Preserves native Fibre Channel frame headers, flow control, and World Wide Name (WWN) addressing so existing FC SAN zoning and management tools work seamlessly.",
+          trap: "Fiber HBAs and CNAs use 64-bit WWNs (containing an IEEE-assigned OUI, analogous to a MAC address) rather than IP addresses."
+        },
+        "fcoe-payload": {
+          pills: ["FCoE Stack // Payload", "Access Mode: Block-Level"],
+          title: "Fibre Channel Payload",
+          desc: "Carries native Fibre Channel SCSI block payloads across the converged switch fabric to the SAN storage array.",
+          trap: "FCoE bridges Ethernet server NICs (CNAs) into a Fibre Channel SAN without needing separate Fiber HBAs and twin cabling."
+        },
+        "nas-nfs": {
+          pills: ["NAS File Protocol // Unix/Linux", "Port: TCP 2049 &bull; SNFS (DES)"],
+          title: "NFSv4 & Secure NFS (SNFS)",
+          desc: "Client/server file-level sharing protocol standard on Unix and Linux hosts (current version: NFSv4). Operates over TCP port 2049; Secure NFS (SNFS) provides confidentiality using DES encryption.",
+          trap: "NFS presents files and folders over TCP 2049—it cannot present raw unformatted blocks for external OS bootup."
+        },
+        "nas-smb": {
+          pills: ["NAS File Protocol // Windows", "Port: TCP 445 &bull; SMB 3.1.1 / CIFS"],
+          title: "CIFS / SMB 3.1.1 (Server Message Block)",
+          desc: "Application-layer file and resource sharing protocol used primarily in Windows environments (CIFS is an older dialect of SMB; SMB 3.1.1 was introduced with Windows 10 / Server 2016). Runs over TCP port 445.",
+          trap: "If Windows clients cannot mount a NAS share after a firewall change while Linux NFS clients still work, verify TCP port 445 is open."
+        }
+      };
+
+      const hdrButtons = Array.from(document.querySelectorAll(".hdr-block"));
+      const hdrPillsEl = document.getElementById("hdr-pills");
+      const hdrTitleEl = document.getElementById("hdr-title");
+      const hdrDescEl = document.getElementById("hdr-desc");
+      const hdrTrapEl = document.getElementById("hdr-trap");
+
+      hdrButtons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          const key = btn.getAttribute("data-hdr");
+          const spec = headerSpecs[key];
+          if (!spec) return;
+
+          hdrButtons.forEach(function (b) { b.classList.remove("active"); });
+          btn.classList.add("active");
+
+          hdrPillsEl.innerHTML =
+            '<span class="badge badge-sky">' + spec.pills[0] + '</span>' +
+            '<span class="badge badge-cyan">' + spec.pills[1] + '</span>';
+          hdrTitleEl.textContent = spec.title;
+          hdrDescEl.textContent = spec.desc;
+          hdrTrapEl.innerHTML = "<strong>CompTIA Exam Note</strong>" + spec.trap;
+        });
+      });
+
+      /* ========================================================================
+         4. TAB 3: NIGHT-SHIFT GAUNTLET (10 TOUGH SK0-006 SCENARIO QUESTIONS)
+         ======================================================================== */
+      const gauntletQuestions = [
+        {
+          id: 1,
+          tag: "SAN Fabrics // Figure 4.15 Encapsulation",
+          prompt: "A storage architect is designing a consolidated 10GbE fabric to carry Fibre Channel storage traffic from blade servers to a central SAN array. A junior engineer proposes routing this FCoE traffic across a Layer 3 IP router to a disaster-recovery subnet three miles away. Why must the architect reject this design?",
+          options: [
+            "FCoE encapsulates Fibre Channel frames directly inside Layer 2 Ethernet headers without an IP header, making it non-routable across Layer 3 IP networks",
+            "FCoE encapsulates SCSI commands inside UDP port 2049 datagrams, which are dropped by enterprise IP routers",
+            "FCoE requires parallel SCSI bus terminators every 12 meters and cannot operate over optical fiber",
+            "FCoE only supports file-level CIFS shares and cannot transport block-level SAN LUNs"
+          ],
+          correctIndex: 0,
+          explanation: "As shown in Figure 4.15, FCoE wraps Fibre Channel frames directly inside a Layer 2 Ethernet header (Ethernet | FCoE | FC | FC Payload) and uses no IP or TCP headers at all. Because it lacks a Layer 3 IP header, FCoE cannot be routed across IP subnets—unlike iSCSI.",
+          distractors: "TCP/UDP port 2049 belongs to NFS; FCoE runs over lossless 10GbE+ optical/twinax Ethernet with zero parallel SCSI terminators; FCoE transports block-level Fibre Channel SAN frames."
+        },
+        {
+          id: 2,
+          tag: "Access Models // Table 4.3 Boot Requirement",
+          prompt: "An enterprise is deploying 24 diskless blade servers in a high-density chassis and requires every blade to boot its operating system directly from centralized storage volumes, with each volume appearing to the blade OS as an independent local disk. Which storage architecture satisfies this requirement?",
+          options: [
+            "A file-level NAS appliance accessed over TCP/IP using NFSv4",
+            "A block-level SAN presenting raw LUNs over Fibre Channel or iSCSI",
+            "A file-level NAS gateway configured with SMB 3.1.1 shares",
+            "An external eSATA enclosure connected via a 2-meter unpowered data cable"
+          ],
+          correctIndex: 1,
+          explanation: "Per Table 4.3, block-level SAN storage stores data in raw blocks where each block volume is treated as an independent hard drive and explicitly supports external OS bootup of connected diskless servers.",
+          distractors: "File-level NAS protocols (NFSv4 and SMB 3.1.1) present pre-formatted files and folders rather than raw bootable block devices; eSATA is a single-host direct cable, not a 24-blade shared boot fabric."
+        },
+        {
+          id: 3,
+          tag: "Fibre Channel // HBA Addressing",
+          prompt: "A storage administrator is configuring zone security on a newly installed Fibre Channel switch so that two database servers can access specific LUNs on an all-flash SAN array. Which hardware identifier does the administrator use to uniquely identify each server's Fiber HBA on the fabric?",
+          options: [
+            "An iSCSI Qualified Name (IQN) assigned in the OS software initiator",
+            "A 64-bit World Wide Name (WWN) containing an IEEE-assigned OUI",
+            "A Layer 3 IPv4 address assigned via DHCP on TCP port 3260",
+            "An SFF-8470 jackscrew bus ID set via DIP switches on the HBA"
+          ],
+          correctIndex: 1,
+          explanation: "Each Fibre Channel HBA is burned with a unique World Wide Name (WWN), which—analogous to an Ethernet MAC address—uses an Organizational Unique Identifier (OUI) assigned by the IEEE.",
+          distractors: "IQNs and IP addresses/TCP 3260 identify iSCSI nodes, not native Fibre Channel HBAs; SFF-8470 is an external SAS copper connector, not a Fibre Channel identifier."
+        },
+        {
+          id: 4,
+          tag: "Topologies // Table 4.1 NAS Limitations",
+          prompt: "A virtualization engineer hosts 40 production virtual machines on a shared NAS appliance connected over the primary corporate 1GbE LAN. During peak business hours, VM disk latency spikes severely and frequent OS rollback snapshots degrade overall performance. Based on Table 4.1, which two architectural limitations of NAS explain these symptoms?",
+          options: [
+            "NAS uses block-level Fibre Channel switches that lack Ethernet flow control, and NAS cannot support any RAID levels",
+            "NAS traffic competes with regular LAN data on a shared Ethernet network prone to congestion/packet drops, and frequent OS rollback snapshots perform better on a SAN",
+            "NAS requires dedicated Fiber HBAs with WWN zoning and cannot operate over TCP/IP",
+            "NAS limits cable runs to 2 meters and prohibits GUI-based management"
+          ],
+          correctIndex: 1,
+          explanation: "Table 4.1 highlights that NAS shares the TCP/IP Ethernet LAN—so storage I/O competes with regular user traffic and suffers from Ethernet packet drops/congestion—and that taking frequent OS rollback snapshots works significantly better on a SAN.",
+          distractors: "NAS uses TCP/IP Ethernet (not Fibre Channel HBAs), supports multiple RAID levels and GUI management, and is not restricted to 2-meter eSATA cable limits."
+        },
+        {
+          id: 5,
+          tag: "NAS Protocols // Cross-Platform Firewall Rules",
+          prompt: "A systems administrator deploys a dual-protocol NAS appliance on an isolated storage VLAN. Linux application servers must mount shared directories using NFSv4, while Windows file servers must map shares using SMB 3.1.1 / CIFS. Which two TCP ports must be permitted through the VLAN firewall?",
+          options: [
+            "TCP 445 and TCP 3260",
+            "TCP 2049 and TCP 445",
+            "TCP 139 and TCP 2049",
+            "TCP 443 and TCP 3389"
+          ],
+          correctIndex: 1,
+          explanation: "NFS operates over TCP port 2049 for Unix/Linux file sharing, while modern SMB 3.1.1 / CIFS operates directly over TCP port 445 for Windows file and resource sharing.",
+          distractors: "TCP 3260 is used by block-level iSCSI; TCP 139 is legacy NetBIOS Session Service rather than modern SMB 3.1.1; TCP 443 and 3389 are HTTPS and RDP."
+        },
+        {
+          id: 6,
+          tag: "Storage Topologies // DAS Classification Trap",
+          prompt: "A database server is connected via an internal SFF-8484 to SFF-8482 SAS breakout cable to an eight-drive local RAID 10 enclosure inside the same rack. There is no Ethernet switch, Fibre Channel switch, or network layer between the server and the drives. How is this storage architecture classified?",
+          options: [
+            "Direct Attached Storage (DAS)",
+            "Converged Storage Area Network (SAN)",
+            "Network Attached Storage (NAS)",
+            "Fibre Channel over Ethernet (FCoE)"
+          ],
+          correctIndex: 0,
+          explanation: "As noted on Sybex p. 161, multiple drives and fault-tolerant RAID arrays are still classified as Direct Attached Storage (DAS) whenever they connect locally to a single server via SATA, USB, SCSI, or SAS with no network connection in between.",
+          distractors: "SAN, NAS, and FCoE all require a shared network or switching fabric (Ethernet or Fibre Channel) separating storage from one or more host servers."
+        },
+        {
+          id: 7,
+          tag: "iSCSI Trade-Offs // Table 4.4 Enterprise Scale",
+          prompt: "A rapidly expanding enterprise initially chose software-based iSCSI over its existing Ethernet infrastructure to avoid Fibre Channel costs. After scaling to 120 high-throughput application hosts, the team encounters elevated server CPU overhead, latency spikes during network bursts, and total infrastructure costs rivaling Fibre Channel. Which Table 4.4 iSCSI trade-offs did the team hit?",
+          options: [
+            "iSCSI is limited to 2-meter cable runs and requires parallel SCSI terminators on every switch port",
+            "iSCSI is susceptible to IP network congestion, can suffer software-driven performance issues, and in large deployments can become as expensive as or more expensive than Fibre Channel",
+            "iSCSI only supports file-level HTTP transfers and cannot encapsulate SCSI block commands",
+            "iSCSI requires IEEE WWN zoning and cannot run over standard Ethernet switches"
+          ],
+          correctIndex: 1,
+          explanation: "Table 4.4 explicitly warns that while iSCSI is inexpensive in simple deployments and eliminates SCSI distance limits, it relies on software (causing potential performance overhead), is susceptible to IP network congestion, and at large scale can cost as much as or more than Fibre Channel.",
+          distractors: "iSCSI eliminates parallel SCSI distance/termination limits, encapsulates block-level SCSI commands over IP, and runs on standard Ethernet without Fibre Channel WWNs."
+        },
+        {
+          id: 8,
+          tag: "Removable Flash // SD Capacity Standards",
+          prompt: "A server technician is preparing an internal SD flash card for an embedded hypervisor boot module that requires a 64 GB flash image. The technician grabs an older SDHC card from a spare-parts bin, but the server's card reader refuses to format it to 64 GB. Why?",
+          options: [
+            "SDHC cards have a maximum capacity ceiling of 32 GB; a 64 GB card requires the SDXC standard (which scales up to 2 TB)",
+            "SDHC cards only work in CompactFlash Type II slots and cannot be read by USB card readers",
+            "SDHC cards use parallel SCSI signaling and require an MD50-M adapter",
+            "SDHC cards are strictly read-only ROM modules used for BIOS EEPROM recovery"
+          ],
+          correctIndex: 0,
+          explanation: "Per Sybex p. 160, Secure Digital High Capacity (SDHC) cards cap out at 32 GB, whereas Secure Digital Extra Capacity (SDXC) extends capacity up to 2 TB.",
+          distractors: "SDHC cards work in standard SD/multi-card USB readers, do not use parallel SCSI MD50-M connectors, and are rewritable NAND flash media."
+        },
+        {
+          id: 9,
+          tag: "External Interfaces // Figure 4.10 Legacy Bridge",
+          prompt: "During a legal hold audit, a technician must recover archival records from a legacy external tape drive equipped with a 50-pin micro-D (MD50-M) parallel SCSI port, attaching it to a modern rack server that only has USB-A ports. Which hardware component from Figure 4.10 enables this connection?",
+          options: [
+            "An eSATA-to-SFF-8470 passive crossover cable",
+            "A USB-to-SCSI adapter bridging the MD50-M connector to USB-A",
+            "A Converged Network Adapter (CNA) configured for lossless FCoE",
+            "An SFF-8484 internal SAS octopus breakout cable"
+          ],
+          correctIndex: 1,
+          explanation: "Figure 4.10 illustrates a USB-to-SCSI adapter featuring an MD50-M (50-pin micro-D) connector on the SCSI peripheral end and a USB-A plug on the host server end.",
+          distractors: "eSATA, SFF-8470, SFF-8484, and FCoE CNAs are serial SATA, SAS, or Ethernet storage interfaces and cannot mate with a 50-pin parallel MD50-M SCSI port."
+        },
+        {
+          id: 10,
+          tag: "Asset Management // Governance & Turnover",
+          prompt: "Following high turnover in a regional datacenter team, an incoming lead discovers dozens of unlabeled fiber patch cables, unrecorded Fiber HBA WWNs, and several decommissioned servers still listed as active in finance spreadsheets. Which operational discipline directly prevents and remediates this breakdown?",
+          options: [
+            "Migrating all NAS shares from NFSv4 to Secure NFS (SNFS) with DES encryption",
+            "Establishing strict Asset Management and Documentation tracking device inventory, physical rack locations, WWNs/MACs, and cable paths",
+            "Converting all RAID 5 arrays to RAID 0 to eliminate parity metadata overhead",
+            "Replacing all 10,000 RPM SAS drives with 5,400 RPM SATA drives"
+          ],
+          correctIndex: 1,
+          explanation: "Sybex p. 166 emphasizes that rigorous Asset Management and Documentation—recording exact device counts, physical rack locations, WWNs/serial numbers, and cabling—is essential to prevent institutional knowledge loss across staff turnover.",
+          distractors: "Changing NFS encryption, stripping RAID redundancy, or swapping drive RPMs addresses unrelated protocol, availability, or spindle-speed metrics rather than inventory tracking."
+        }
+      ];
+
+      const quizListEl = document.getElementById("quiz-list");
+      const hudAnsweredEl = document.getElementById("hud-answered");
+      const hudScoreEl = document.getElementById("hud-score");
+      const progressFillEl = document.getElementById("quiz-progress-fill");
+      const resetQuizBtn = document.getElementById("reset-quiz-btn");
+      const summaryBanner = document.getElementById("quiz-summary");
+      const summaryTitle = document.getElementById("summary-title");
+      const summaryText = document.getElementById("summary-text");
+      const summaryResetBtn = document.getElementById("summary-reset-btn");
+
+      let userAnswers = {};
+
+      function updateHud() {
+        const total = gauntletQuestions.length;
+        const answeredCount = Object.keys(userAnswers).length;
+        let correctCount = 0;
+
+        gauntletQuestions.forEach(function (q) {
+          if (userAnswers[q.id] === q.correctIndex) {
+            correctCount++;
+          }
+        });
+
+        hudAnsweredEl.textContent = answeredCount + " / " + total;
+        const pct = answeredCount === 0 ? 0 : Math.round((correctCount / total) * 100);
+        hudScoreEl.textContent = pct + "%";
+        progressFillEl.style.width = Math.round((answeredCount / total) * 100) + "%";
+
+        if (answeredCount === total) {
+          summaryBanner.classList.add("visible");
+          summaryTitle.textContent = "Night-Shift Gauntlet Complete: " + correctCount + " / " + total + " (" + pct + "%)";
+          if (correctCount >= 9) {
+            summaryText.textContent = "Commanding performance. You separated Layer 2 FCoE from Layer 3 iSCSI, nailed block vs. file access, and mastered every table trap. Her Excellency the Emergency Goose salutes your night-shift discipline.";
+          } else if (correctCount >= 7) {
+            summaryText.textContent = "Solid pass-ready run. Review the distractor notes on any missed items, then upload this module straight to your SER-V6-VLAN hub.";
+          } else {
+            summaryText.textContent = "Good tactical diagnostic. Re-check Tab 1 (Architecture Matrix) and Tab 2 (Figure 4.15 Frame Inspector), then run the gauntlet again.";
+          }
+        } else {
+          summaryBanner.classList.remove("visible");
+        }
+      }
+
+      function renderQuiz() {
+        quizListEl.innerHTML = "";
+        const letters = ["A", "B", "C", "D"];
+
+        gauntletQuestions.forEach(function (q, index) {
+          const card = document.createElement("article");
+          card.className = "question-card";
+
+          const header = document.createElement("div");
+          header.className = "q-header";
+          header.innerHTML =
+            '<span class="badge badge-sky">Question ' + (index + 1) + ' of ' + gauntletQuestions.length + '</span>' +
+            '<span class="badge badge-cyan">' + q.tag + '</span>';
+
+          const prompt = document.createElement("p");
+          prompt.className = "q-prompt";
+          prompt.textContent = q.prompt;
+
+          const optionsStack = document.createElement("div");
+          optionsStack.className = "options-stack";
+
+          const rationaleBox = document.createElement("div");
+          rationaleBox.className = "rationale-box";
+
+          q.options.forEach(function (optText, optIdx) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "option-btn";
+            btn.innerHTML =
+              '<span class="option-letter">' + letters[optIdx] + '</span>' +
+              '<span>' + optText + '</span>';
+
+            btn.addEventListener("click", function () {
+              if (Object.prototype.hasOwnProperty.call(userAnswers, q.id)) {
+                return;
+              }
+              userAnswers[q.id] = optIdx;
+
+              const allBtns = Array.from(optionsStack.querySelectorAll(".option-btn"));
+              allBtns.forEach(function (b, bIdx) {
+                b.disabled = true;
+                if (bIdx === q.correctIndex) {
+                  b.classList.add("correct");
+                } else if (bIdx === optIdx) {
+                  b.classList.add("incorrect");
+                } else {
+                  b.classList.add("dimmed");
+                }
+              });
+
+              const isRight = optIdx === q.correctIndex;
+              rationaleBox.innerHTML =
+                '<span class="rationale-status ' + (isRight ? 'pass' : 'fail') + '">' +
+                (isRight ? '&#10003; Correct // Protocol &amp; Fabric Logic Verified' : '&#10007; Trap Triggered // Correct Answer: ' + letters[q.correctIndex]) +
+                '</span>' +
+                '<p><strong>Why it wins:</strong> ' + q.explanation + '</p>' +
+                '<p><strong>Why distractors fail:</strong> ' + q.distractors + '</p>';
+              rationaleBox.classList.add("visible");
+
+              updateHud();
+            });
+
+            optionsStack.appendChild(btn);
+          });
+
+          card.appendChild(header);
+          card.appendChild(prompt);
+          card.appendChild(optionsStack);
+          card.appendChild(rationaleBox);
+          quizListEl.appendChild(card);
+        });
+
+        updateHud();
+      }
+
+      function resetQuiz() {
+        userAnswers = {};
+        renderQuiz();
+      }
+
+      resetQuizBtn.addEventListener("click", resetQuiz);
+      summaryResetBtn.addEventListener("click", resetQuiz);
+
+      // Initial render
+      renderQuiz();
+    })();
+  </script>
+</body>
+</html>

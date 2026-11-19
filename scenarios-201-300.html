@@ -1,0 +1,2025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SK1-006 Scenario Vault — Batch 201–300 (Hardcore Datacenter &amp; CLI Edition)</title>
+  <style>
+    /* ==========================================================================
+       EMERGENCY GOOSE TACTICAL DESIGN TOKENS (Zero External Dependencies)
+       ========================================================================== */
+    :root {
+      --bg-base: #080f1e;
+      --bg-surface: #0f1b33;
+      --bg-elevated: #162442;
+      --bg-inset: #050a14;
+      --border-subtle: #1e293b;
+      --border-strong: #2d426b;
+      --accent-sky: #38bdf8;
+      --accent-sky-dim: rgba(56, 189, 248, 0.14);
+      --accent-cyan: #22d3ee;
+      --accent-cyan-dim: rgba(34, 211, 238, 0.14);
+      --accent-emerald: #34d399;
+      --accent-emerald-dim: rgba(52, 211, 153, 0.15);
+      --accent-amber: #fbbf24;
+      --accent-amber-dim: rgba(251, 191, 36, 0.15);
+      --accent-rose: #f87171;
+      --accent-rose-dim: rgba(248, 113, 113, 0.15);
+      --text-primary: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+      --shadow-card: 0 10px 26px -6px rgba(0, 0, 0, 0.55);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.56;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ==========================================================================
+       APP SHELL & HEADER
+       ========================================================================== */
+    .app-shell {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 1.15rem 1rem 4rem;
+    }
+
+    .tactical-header {
+      background: linear-gradient(145deg, var(--bg-surface) 0%, #0a1428 100%);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.35rem 1.5rem;
+      margin-bottom: 1.15rem;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tactical-header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-sky), var(--accent-cyan), var(--accent-emerald));
+    }
+
+    .header-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.71rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.24rem 0.6rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+    }
+
+    .badge-sky { color: var(--accent-sky); background: var(--accent-sky-dim); border-color: rgba(56, 189, 248, 0.3); }
+    .badge-cyan { color: var(--accent-cyan); background: var(--accent-cyan-dim); border-color: rgba(34, 211, 238, 0.3); }
+    .badge-emerald { color: var(--accent-emerald); background: var(--accent-emerald-dim); border-color: rgba(52, 211, 153, 0.3); }
+    .badge-amber { color: var(--accent-amber); background: var(--accent-amber-dim); border-color: rgba(251, 191, 36, 0.3); }
+    .badge-rose { color: var(--accent-rose); background: var(--accent-rose-dim); border-color: rgba(248, 113, 113, 0.3); }
+
+    .tactical-header h1 {
+      margin: 0 0 0.35rem;
+      font-size: clamp(1.25rem, 3.4vw, 1.78rem);
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      color: #f8fafc;
+    }
+
+    .tactical-header p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.91rem;
+    }
+
+    /* ==========================================================================
+       STICKY TACTICAL COMMAND HUD
+       ========================================================================== */
+    .command-hud {
+      position: sticky;
+      top: 0.5rem;
+      z-index: 40;
+      background: rgba(15, 27, 51, 0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
+    }
+
+    .hud-row-primary {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .hud-stats {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1.15rem;
+    }
+
+    .stat-cell {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.67rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .stat-val {
+      font-family: var(--font-mono);
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: var(--accent-sky);
+    }
+
+    .stat-val.emerald { color: var(--accent-emerald); }
+    .stat-val.amber { color: var(--accent-amber); }
+
+    .hud-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .ctrl-btn {
+      appearance: none;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.52rem 0.78rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .ctrl-btn:hover {
+      border-color: var(--accent-sky);
+      color: var(--accent-sky);
+    }
+
+    .ctrl-btn.active-mode {
+      background: var(--accent-cyan-dim);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    .ctrl-btn.active-reveal {
+      background: var(--accent-emerald-dim);
+      border-color: var(--accent-emerald);
+      color: var(--accent-emerald);
+    }
+
+    .ctrl-btn.danger:hover {
+      border-color: var(--accent-rose);
+      color: var(--accent-rose);
+    }
+
+    .hud-row-filters {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    @media (min-width: 860px) {
+      .hud-row-filters {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    .domain-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.38rem;
+    }
+
+    .filter-pill {
+      appearance: none;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.42rem 0.68rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      min-height: 36px;
+    }
+
+    .filter-pill:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+    }
+
+    .filter-pill.active {
+      background: var(--accent-sky-dim);
+      border-color: var(--accent-sky);
+      color: var(--accent-sky);
+    }
+
+    .filter-pill.flagged-pill.active {
+      background: var(--accent-amber-dim);
+      border-color: var(--accent-amber);
+      color: var(--accent-amber);
+    }
+
+    .search-wrap {
+      flex: 1;
+      max-width: 100%;
+    }
+
+    @media (min-width: 860px) {
+      .search-wrap {
+        max-width: 260px;
+      }
+    }
+
+    .search-wrap input {
+      width: 100%;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      padding: 0.46rem 0.78rem;
+      border-radius: var(--radius-sm);
+      outline: none;
+      min-height: 36px;
+    }
+
+    .search-wrap input:focus {
+      border-color: var(--accent-cyan);
+    }
+
+    .search-wrap input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 5px;
+      background: var(--bg-inset);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 0.65rem;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-sky), var(--accent-cyan), var(--accent-emerald));
+      transition: width 0.25s ease;
+    }
+
+    /* ==========================================================================
+       SCENARIO CARDS (#201–#300)
+       ========================================================================== */
+    .scenario-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .scenario-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.2rem 1.25rem;
+      box-shadow: var(--shadow-card);
+      transition: border-color 0.15s ease;
+    }
+
+    .scenario-card.flagged {
+      border-color: rgba(251, 191, 36, 0.55);
+    }
+
+    .card-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-badges {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.42rem;
+    }
+
+    .flag-btn {
+      appearance: none;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.35rem 0.65rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      min-height: 34px;
+      transition: all 0.15s ease;
+    }
+
+    .flag-btn:hover {
+      border-color: var(--accent-amber);
+      color: var(--accent-amber);
+    }
+
+    .flag-btn.active {
+      background: var(--accent-amber-dim);
+      border-color: var(--accent-amber);
+      color: var(--accent-amber);
+    }
+
+    .scenario-prompt {
+      margin: 0 0 0.95rem;
+      font-size: 0.97rem;
+      font-weight: 600;
+      color: #f8fafc;
+      line-height: 1.56;
+    }
+
+    .scenario-prompt code,
+    .option-text code,
+    .explanation-box code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      color: var(--accent-cyan);
+      padding: 0.1rem 0.36rem;
+      border-radius: 4px;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .opt-btn {
+      width: 100%;
+      appearance: none;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.8rem 0.95rem;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.72rem;
+      transition: all 0.14s ease;
+      min-height: 46px;
+    }
+
+    .opt-btn:hover:not(:disabled) {
+      border-color: var(--accent-sky);
+      background: #1b2c50;
+    }
+
+    .opt-btn:disabled {
+      cursor: default;
+    }
+
+    .opt-letter {
+      flex-shrink: 0;
+      width: 25px;
+      height: 25px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-inset);
+      border: 1px solid var(--border-strong);
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-sky);
+      margin-top: 0.05rem;
+    }
+
+    .opt-btn.correct {
+      background: var(--accent-emerald-dim);
+      border-color: var(--accent-emerald);
+      color: #f8fafc;
+    }
+
+    .opt-btn.correct .opt-letter {
+      background: var(--accent-emerald);
+      border-color: var(--accent-emerald);
+      color: #041b11;
+    }
+
+    .opt-btn.incorrect {
+      background: var(--accent-rose-dim);
+      border-color: var(--accent-rose);
+      color: #ffe4e6;
+    }
+
+    .opt-btn.incorrect .opt-letter {
+      background: var(--accent-rose);
+      border-color: var(--accent-rose);
+      color: #210409;
+    }
+
+    .opt-btn.dimmed {
+      opacity: 0.56;
+    }
+
+    .explanation-box {
+      display: none;
+      margin-top: 0.95rem;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-strong);
+      border-left: 3px solid var(--accent-emerald);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 0.9rem 1rem;
+      font-size: 0.88rem;
+    }
+
+    .explanation-box.visible {
+      display: block;
+    }
+
+    .explanation-box.wrong-border {
+      border-left-color: var(--accent-rose);
+    }
+
+    .explanation-box.study-border {
+      border-left-color: var(--accent-cyan);
+    }
+
+    .exp-header {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.35rem;
+      display: block;
+    }
+
+    .exp-header.pass { color: var(--accent-emerald); }
+    .exp-header.fail { color: var(--accent-rose); }
+    .exp-header.study { color: var(--accent-cyan); }
+
+    .explanation-box p {
+      margin: 0;
+      color: var(--text-primary);
+      line-height: 1.55;
+    }
+
+    .empty-banner {
+      display: none;
+      text-align: center;
+      padding: 2.5rem 1rem;
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius-lg);
+      color: var(--text-secondary);
+    }
+
+    .footer-note {
+      margin-top: 2.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.73rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- TACTICAL HEADER -->
+    <header class="tactical-header">
+      <div class="header-top">
+        <span class="badge badge-sky">SK1-006 // SK0-006 SCENARIO VAULT</span>
+        <span class="badge badge-cyan">BATCH #201&ndash;#300 // HARDCORE DATACENTER &amp; CLI EDITION</span>
+      </div>
+      <h1>SK1-006 Scenario Vault &mdash; Batch 201&ndash;300 (Hardcore Datacenter &amp; CLI Edition)</h1>
+      <p>100 production-grade incident scenarios covering RAID rebuild math &amp; storage fabrics, 2N power &amp; thermal containment, Linux/Windows CLI forensics, and NUMA/hardware/security hardening.</p>
+    </header>
+
+    <!-- STICKY COMMAND HUD -->
+    <section class="command-hud" aria-label="Exam Controls and Telemetry">
+      <div class="hud-row-primary">
+        <div class="hud-stats">
+          <div class="stat-cell">
+            <span class="stat-label">Answered</span>
+            <span class="stat-val" id="stat-answered">0 / 100</span>
+          </div>
+          <div class="stat-cell">
+            <span class="stat-label">Accuracy</span>
+            <span class="stat-val emerald" id="stat-accuracy">0%</span>
+          </div>
+          <div class="stat-cell">
+            <span class="stat-label">Flagged</span>
+            <span class="stat-val amber" id="stat-flagged">0</span>
+          </div>
+          <div class="stat-cell">
+            <span class="stat-label">Visible</span>
+            <span class="stat-val" id="stat-visible">100</span>
+          </div>
+        </div>
+
+        <div class="hud-actions">
+          <button type="button" class="ctrl-btn active-mode" id="btn-mode-toggle" title="Switch between interactive Quiz Mode and Study Mode">
+            Mode: Quiz
+          </button>
+          <button type="button" class="ctrl-btn" id="btn-reveal-all" title="Toggle all answers and explanations">
+            Reveal All Answers
+          </button>
+          <button type="button" class="ctrl-btn danger" id="btn-reset" title="Clear all answers and reset score">
+            &#8635; Reset
+          </button>
+        </div>
+      </div>
+
+      <div class="hud-row-filters">
+        <div class="domain-pills" role="group" aria-label="Domain Filters">
+          <button type="button" class="filter-pill active" data-domain="all">All (100)</button>
+          <button type="button" class="filter-pill" data-domain="storage">1. Storage &amp; RAID (#201&ndash;225)</button>
+          <button type="button" class="filter-pill" data-domain="power">2. Power &amp; Thermal (#226&ndash;245)</button>
+          <button type="button" class="filter-pill" data-domain="cli">3. Linux &amp; Win CLI (#246&ndash;275)</button>
+          <button type="button" class="filter-pill" data-domain="infra">4. HW, Virt &amp; Sec (#276&ndash;300)</button>
+          <button type="button" class="filter-pill flagged-pill" data-domain="flagged">&#9733; Flagged</button>
+        </div>
+
+        <div class="search-wrap">
+          <input type="search" id="search-input" placeholder="Search #ID, CLI command, RAID, UPS..." aria-label="Search scenarios" />
+        </div>
+      </div>
+
+      <div class="progress-bar" aria-hidden="true">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </section>
+
+    <!-- SCENARIO FEED -->
+    <main class="scenario-feed" id="scenario-feed"></main>
+
+    <div class="empty-banner" id="empty-banner">
+      No scenarios match the active domain filter or keyword query. Reset filters to view all 100 items (#201&ndash;#300).
+    </div>
+
+    <footer class="footer-note">
+      <span>SER-V6-VLAN // SK1-006 SCENARIO VAULT #201&ndash;#300</span>
+      <span>ZERO-DEPENDENCY OFFLINE ARTIFACT // EMERGENCY GOOSE TACTICAL EDITION</span>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      /* ========================================================================
+         100 HARDCORE DATACENTER SCENARIOS (#201–#300)
+         Format: [id, domainKey, topicTag, prompt, [A, B, C, D], correctIdx, whyAndSolution]
+         ======================================================================== */
+      const RAW_SCENARIOS = [
+        // ======================================================================
+        // DOMAIN 1: RAID MATH, REBUILD FAILURES, URES & STORAGE FABRICS (#201–#225)
+        // ======================================================================
+        [201, "storage", "RAID Capacity Math",
+          "A storage engineer builds a new database datastore using eight 6 TB enterprise SAS drives configured in RAID 10 (1+0). Assuming base-10 vendor capacities and zero hot spares, what is the exact usable capacity and maximum simultaneous drive failure tolerance of this array?",
+          [
+            "24 TB usable; survives up to 4 drive failures if each occurs in a separate mirrored pair",
+            "36 TB usable; survives up to 2 drive failures anywhere in the array",
+            "42 TB usable; survives 1 drive failure across the entire stripe set",
+            "24 TB usable; survives any 4 simultaneous drive failures regardless of slot position"
+          ],
+          0,
+          "Why & Solution: RAID 10 stripes across mirrored pairs, giving (N / 2) * Drive_Size = (8 / 2) * 6 TB = 24 TB usable capacity (50% efficiency). It tolerates up to one disk failure per mirrored pair (up to 4 total if distributed across separate pairs), but losing both disks in the same mirror pair destroys the array."
+        ],
+        [202, "storage", "RAID 5 URE Rebuild Trap",
+          "During a multi-hour RAID 5 rebuild on an array of six 12 TB SATA HDDs after Disk 2 failed, the RAID controller aborts the rebuild and marks the entire virtual disk offline after encountering an Unrecoverable Read Error (URE) on Disk 4. Which architectural change prevents this failure mode on future multi-terabyte HDD pools?",
+          [
+            "Migrate to RAID 6 so dual distributed parity tolerates a second disk error during rebuild",
+            "Convert the array to RAID 0 to eliminate parity calculation stalls during sector reads",
+            "Disable SMART background patrol reads so the controller ignores unreadable sectors",
+            "Enable write-through caching without a BBU so parity stripes flush synchronously"
+          ],
+          0,
+          "Why & Solution: On large multi-terabyte HDDs, the statistical probability of hitting a 10^-14 URE while reading 60+ TB of surviving blocks during a RAID 5 rebuild is high. RAID 6 stores two independent parity syndromes (N - 2 usable capacity), allowing the controller to reconstruct data even when a second drive fails or hits a URE mid-rebuild."
+        ],
+        [203, "storage", "RAID 5 Write Hole",
+          "A rack server running a software RAID 5 array experiences an abrupt utility power loss mid-write without a battery-backed write cache (BBWC) or flash-backed write cache (FBWC). Upon reboot, silent data corruption appears in a newly written stripe because data blocks updated on disk without their corresponding parity block. What is this phenomenon called, and what mitigates it?",
+          [
+            "The RAID 5 write hole; mitigated by a capacitor/battery-backed controller cache or copy-on-write filesystems like ZFS",
+            "Split-brain quorum drift; mitigated by increasing SCSI command queue depth",
+            "Amplified wear-leveling; mitigated by running fstrim on the raw block device",
+            "LUN masking inversion; mitigated by enabling persistent binding on the HBA"
+          ],
+          0,
+          "Why & Solution: Standard RAID 5 updates data and parity in separate non-atomic operations. A sudden power outage leaves parity out of sync with data (the 'write hole'). Hardware RAID controllers solve this with non-volatile BBWC/FBWC cache memory, while ZFS (RAID-Z) eliminates it via atomic copy-on-write variable-width stripes."
+        ],
+        [204, "storage", "Dedicated vs. Global Hot Spare",
+          "A 24-bay storage shelf hosts three separate RAID 6 virtual disks: Array A (6x 4 TB SAS), Array B (6x 8 TB SAS), and Array C (10x 4 TB SAS). The administrator wants a single standby disk in Bay 24 to automatically initiate a rebuild if a drive fails in ANY of the three arrays. How must Bay 24 be configured?",
+          [
+            "Assign an 8 TB SAS drive as a Global Hot Spare",
+            "Assign a 4 TB SAS drive as a Dedicated Hot Spare for Array A",
+            "Configure Bay 24 as a RAID 0 passthrough JBOD volume",
+            "Assign an 8 TB SATA drive as a Dedicated Hot Spare for all three arrays"
+          ],
+          0,
+          "Why & Solution: A Global Hot Spare floats across the controller to protect any logical array, whereas a Dedicated Hot Spare serves only one specific array. Because Array B uses 8 TB drives, the global spare must be at least 8 TB (equal to or larger than the largest drive it may replace) and match the SAS interface."
+        ],
+        [205, "storage", "SAS vs. SATA Backplane Keying",
+          "A technician tries to insert four spare 12 Gbps SAS HDDs into a 1U server's front drive bays, but the carriers stop short and cannot mate with the backplane connectors. Inspecting the server specs reveals an onboard SATA-only backplane. What physical and protocol barrier prevents this installation?",
+          [
+            "SAS drive connectors have a solid plastic key bridge between power and data pins that physically blocks insertion into SATA receptacles, and SATA controllers lack SCSI command support",
+            "SAS drives use 40-pin IDE ribbon headers that require an active voltage step-down bridge",
+            "SATA backplanes reverse the 3.3V and 12V power pins, tripping over-current protection on SAS spindles",
+            "SAS drives are 3.5-inch LFF exclusively and cannot fit into 1U SFF drive trays"
+          ],
+          0,
+          "Why & Solution: Compatibility between SAS and SATA is strictly one-way. SATA drives have a notch between power and data segments and fit into SAS backplanes, but SAS drives have a solid plastic bridge (carrying dual-port lanes) that physically blocks insertion into SATA ports."
+        ],
+        [206, "storage", "Mixing SAS & SATA in RAID",
+          "A storage enclosure with a universal SAS backplane currently runs a healthy 4-drive RAID 5 array of 4 TB SAS HDDs. A drive fails, and a night-shift operator inserts a 4 TB SATA HDD into the bay. Even though the SATA drive physically fits the SAS backplane, the controller refuses to rebuild the array. Why?",
+          [
+            "Enterprise RAID controllers prohibit mixing SAS and SATA drives within the same virtual disk",
+            "SATA drives cannot operate on a SAS backplane under any circumstances",
+            "A 4 TB SATA drive uses 512e sectors while SAS drives strictly use 4Kn sectors",
+            "SATA drives lack SMART telemetry required for RAID 5 parity calculation"
+          ],
+          0,
+          "Why & Solution: While a SAS backplane can host both SAS and SATA drives in separate arrays, RAID controllers enforce interface uniformity within a single virtual disk because SAS and SATA differ in command sets, duplex signaling, and error recovery timeouts."
+        ],
+        [207, "storage", "Multipath I/O (MPIO) Failover",
+          "A Linux database host connects to an iSCSI SAN over two separate NICs (`eth1` and `eth2`) on distinct storage VLANs. During routine switch firmware upgrades on Storage Switch A, the database stalls for 45 seconds and logs I/O errors despite Switch B remaining online. Checking `multipath -ll` shows only one active path configured. What must the engineer configure?",
+          [
+            "Install and configure MPIO (`device-mapper-multipath`) with Active/Active or ALUA path policies across both storage subnets",
+            "Bond `eth1` and `eth2` into a single LACP trunk spanning both separate SAN switches without MLAG",
+            "Enable Spanning Tree PortFast on the iSCSI SAN targets to accelerate MAC table flushing",
+            "Change the filesystem mount option from `defaults` to `noatime,nodiratime`"
+          ],
+          0,
+          "Why & Solution: Storage fabrics should use separate, non-bonded subnets with Multipath I/O (MPIO) rather than LACP teaming across independent switches. MPIO aggregates redundant paths and automatically fails over I/O to the surviving path within milliseconds."
+        ],
+        [208, "storage", "iSCSI MTU / Jumbo Frames Mismatch",
+          "After enabling Jumbo Frames (`MTU 9000`) on a new ESXi host's iSCSI VMkernel ports to boost throughput, the host discovers the iSCSI target IQN on TCP port 3260, but large read/write datastore operations hang and time out. Ping tests with `vmkping -I vmk1 -d -s 8972 10.10.50.10` fail with 100% packet loss. What is the root cause?",
+          [
+            "An intermediate storage switch port or the SAN target interface is still configured at the default MTU 1500, dropping unfragmented 9000-byte frames",
+            "iSCSI CHAP mutual authentication is blocking frames larger than 1500 bytes",
+            "TCP port 3260 only supports standard Ethernet frames unless FCoE is enabled",
+            "The DF (Don't Fragment) bit is stripped by Layer 2 switches when VLAN tagging is active"
+          ],
+          0,
+          "Why & Solution: Jumbo frames require end-to-end MTU consistency across the initiator NIC, every switch port in the path, and the SAN target interface. The `-d` flag sets the IP Don't Fragment bit; failure at 8972 bytes (+28 bytes ICMP/IP headers = 9000) proves an interface in the path is still at MTU 1500."
+        ],
+        [209, "storage", "iSCSI CHAP Authentication Failure",
+          "A Windows Server iSCSI initiator attempts to connect to a newly provisioned SAN target, and the target status remains stuck at 'Reconnecting' with an authentication failure event in the System log. The SAN admin confirms one-way CHAP is enabled on the target with a 14-character secret. What is the most likely configuration error on the initiator?",
+          [
+            "The CHAP secret entered on the initiator does not match the target's secret or fails the 12-to-16-byte CHAP secret length rule",
+            "The initiator's IQN must match the target's IQN character-for-character",
+            "One-way CHAP requires an active Kerberos KDC ticket on the storage VLAN",
+            "CHAP authentication requires UDP port 3260 to be opened alongside TCP 3260"
+          ],
+          0,
+          "Why & Solution: Standard iSCSI CHAP secrets must be 12 to 16 characters (96 to 128 bits) long and match identically on both initiator and target. In Mutual CHAP, two distinct secrets are configured (one for target-to-initiator and one for initiator-to-target)."
+        ],
+        [210, "storage", "FCoE Lossless Ethernet (PFC)",
+          "A datacenter team connects Converged Network Adapters (CNAs) carrying FCoE traffic into a standard Layer 2 top-of-rack Ethernet switch. Under heavy backup loads, storage frames drop silently and SCSI commands reset repeatedly. Which Ethernet enhancement is missing on the switch?",
+          [
+            "Data Center Bridging (DCB) with Priority Flow Control (PFC / IEEE 802.1Qbb) to provide lossless Layer 2 transport",
+            "OSPF dynamic routing to load-balance FCoE packets across multiple IP gateways",
+            "DHCP Option 66/67 to assign World Wide Names dynamically to the CNAs",
+            "IGMP snooping to prevent Fibre Channel multicast flooding"
+          ],
+          0,
+          "Why & Solution: Native Fibre Channel uses buffer-to-buffer credits so frames never drop due to congestion. Traditional Ethernet is best-effort and drops frames when buffers fill. FCoE requires Data Center Bridging (DCB) and Priority Flow Control (PFC) to pause the FCoE traffic class without stalling normal LAN traffic."
+        ],
+        [211, "storage", "Fibre Channel Zoning & LUN Masking",
+          "Two Windows Server hosts on the same Fibre Channel SAN fabric accidentally mount the same NTFS-formatted LUN simultaneously, resulting in severe filesystem metadata corruption. Which two fabric and array controls should have isolated that LUN to a single authorized host?",
+          [
+            "Soft/Hard WWPN Zoning on the Fibre Channel switch and LUN Masking on the storage array",
+            "VLAN 1 native tagging on the switch and SMB signing on the storage array",
+            "CHAP secret rotation on the HBA and port security MAC sticky learning",
+            "RAID 10 mirroring on the array and Spanning Tree Root Guard on the switch"
+          ],
+          0,
+          "Why & Solution: Fibre Channel switches use Zoning (grouping initiator WWPNs with target WWPNs) to restrict which devices can see each other on the fabric, while storage arrays use LUN Masking to bind specific LUNs exclusively to authorized initiator WWPNs. Non-clustered filesystems like NTFS/ext4 cannot be mounted read/write by multiple hosts concurrently."
+        ],
+        [212, "storage", "ZFS Copy-on-Write & ARC Cache",
+          "A Linux storage server hosting a ZFS RAID-Z2 pool reports 92% RAM utilization under normal operation (`free -h`), leading a junior technician to worry about a memory leak. Checking `/proc/spl/kstat/zfs/arcstats` reveals the Adaptive Replacement Cache (ARC) is consuming 80% of system RAM. How should the engineer respond?",
+          [
+            "Take no emergency action—ZFS dynamically caches hot blocks in RAM via ARC and automatically releases memory when applications request it",
+            "Immediately reboot the server to flush the leaked kernel slab memory",
+            "Disable ZFS checksumming (`zfs set checksum=off`) to free the ARC memory pool",
+            "Create a 64 GB swap file on the RAID-Z2 pool to offload ARC pages"
+          ],
+          0,
+          "Why & Solution: ZFS uses free system RAM as an intelligent read cache (ARC) to accelerate IOPS and avoid disk reads. Unlike a memory leak, ARC automatically shrinks and yields RAM back to the OS kernel whenever user processes allocate memory."
+        ],
+        [213, "storage", "Thin Provisioning Pool Exhaustion",
+          "A storage array hosts ten 2 TB thin-provisioned LUNs backed by an 8 TB physical storage pool. After rapid database growth fills the physical pool to 100%, all ten virtual machines pause simultaneously in an I/O-suspended state even though each VM OS still reports free disk space inside its guest filesystem. What is the immediate remediation?",
+          [
+            "Add physical drives/capacity to the underlying storage pool (or delete old snapshots/reclaim unmapped blocks via UNMAP/TRIM) so the LUNs can resume writes",
+            "Run `fsck` inside each paused VM to shrink the guest partition table",
+            "Increase the vCPU count on each paused VM to clear the SCSI queue",
+            "Change the hypervisor virtual NIC adapter from E1000 to VMXNET3"
+          ],
+          0,
+          "Why & Solution: Thin provisioning overcommits physical storage (20 TB allocated vs. 8 TB physical). When physical blocks hit 100%, the array freezes writes across all thin LUNs sharing that pool to prevent corruption. Expanding the physical pool or reclaiming freed blocks with `fstrim`/SCSI UNMAP immediately restores I/O."
+        ],
+        [214, "storage", "RAID 6 Capacity & Fault Math",
+          "A backup repository requires at least 45 TB of usable storage and must survive any two simultaneous drive failures without data loss. Using 10 TB enterprise SAS drives, what is the minimum number of drives required in a single RAID 6 array, and what will its usable capacity be?",
+          [
+            "7 drives minimum; 50 TB usable capacity",
+            "6 drives minimum; 40 TB usable capacity",
+            "8 drives minimum; 40 TB usable capacity",
+            "5 drives minimum; 45 TB usable capacity"
+          ],
+          0,
+          "Why & Solution: RAID 6 usable capacity is (N - 2) * Drive_Size. With 6 drives: (6 - 2) * 10 TB = 40 TB (short of the 45 TB requirement). Stepping up to 7 drives yields (7 - 2) * 10 TB = 50 TB usable while surviving any 2 simultaneous drive failures."
+        ],
+        [215, "storage", "Tri-Mode U.3 vs. U.2 Backplane",
+          "A datacenter team orders 2.5-inch hot-swappable NVMe SSDs for a 2U server whose front bays are wired to a legacy SAS-3 backplane and RAID controller. Although the 2.5-inch caddies slide in physically, none of the NVMe drives are detected. Which backplane and controller architecture is required to support SAS, SATA, and NVMe drives interchangeably in the same bay?",
+          [
+            "A Tri-Mode U.3 backplane paired with a Tri-Mode HBA/RAID controller",
+            "An eSATA passive backplane with USB Attached SCSI (UAS) bridging",
+            "A parallel Ultra-640 SCSI backplane with active LVD termination",
+            "An M.2 SATA-only riser card"
+          ],
+          0,
+          "Why & Solution: Legacy SAS/SATA backplanes lack PCIe lanes. U.3 (Tri-Mode) backplanes and controllers route both SAS/SATA signals and PCIe NVMe lanes to the same SFF-8639 receptacle, allowing SAS, SATA, and NVMe drives to operate in the same drive bay."
+        ],
+        [216, "storage", "SSD Wear-Leveling & Write Endurance (DWPD)",
+          "An analytics workload writes 18 TB of telemetry logs per day onto a single 1.92 TB read-intensive enterprise SSD rated at 1 DWPD (Drive Writes Per Day). Within four months, SMART telemetry reports 0% media wearout indicator remaining and switches the SSD to read-only mode. Which specification was violated?",
+          [
+            "The daily write workload (~9.4 DWPD) exceeded the drive's 1 DWPD endurance rating, exhausting NAND program/erase cycles",
+            "The SSD's 5,400 RPM spindle motor overheated due to insufficient cold-aisle airflow",
+            "Magnetic interference from an adjacent PSU erased the NAND floating-gate cells",
+            "The SSD ran out of NVRAM CMOS battery voltage"
+          ],
+          0,
+          "Why & Solution: 1 DWPD on a 1.92 TB SSD means it is engineered for ~1.92 TB of writes per day over its 5-year warranty. Writing 18 TB/day (~9.4 DWPD) burns through NAND flash program/erase cycles almost 10x faster, forcing the controller into read-only mode to preserve existing data. High-write workloads require Mixed-Use (3 DWPD) or Write-Intensive (10 DWPD) SSDs."
+        ],
+        [217, "storage", "SAN vs. NAS Protocol Isolation",
+          "A storage engineer notices that an iSCSI SAN target has been accidentally placed on the same flat VLAN 1 subnet as user workstations, VoIP phones, and Windows SMB file shares. During morning login storms, database latencies spike to 300 ms. What is the best-practice remediation?",
+          [
+            "Isolate iSCSI storage traffic onto dedicated, non-routed storage VLANs/switches with flow control enabled",
+            "Convert all iSCSI LUNs to NFSv4 shares over TCP port 2049 on VLAN 1",
+            "Enable Spanning Tree PortFast on the user workstation switch ports",
+            "Lower the iSCSI NIC MTU from 1500 to 576 bytes"
+          ],
+          0,
+          "Why & Solution: Block storage traffic (iSCSI) is highly latency-sensitive and should always be segmented onto dedicated storage VLANs or physically isolated switches so workstation broadcast storms and file transfers cannot cause packet drops or queuing delays."
+        ],
+        [218, "storage", "Fibre Channel vs. iSCSI vs. FCoE Protocol Stack",
+          "During a certification architecture review, a candidate is asked to match three SAN transport protocols to their exact encapsulation layers: Protocol X uses TCP/IP packets; Protocol Y encapsulates Fibre Channel directly into Layer 2 Ethernet frames without IP; Protocol Z uses dedicated optical switches with World Wide Names (WWNs). Which mapping is correct?",
+          [
+            "X = iSCSI; Y = FCoE; Z = Native Fibre Channel",
+            "X = FCoE; Y = iSCSI; Z = NFSv4",
+            "X = CIFS; Y = Native Fibre Channel; Z = iSCSI",
+            "X = iSCSI; Y = SAS-4; Z = eSATA"
+          ],
+          0,
+          "Why & Solution: iSCSI encapsulates SCSI inside TCP/IP (Layer 3/4 routable); FCoE encapsulates Fibre Channel directly inside Layer 2 Ethernet frames without IP; Native Fibre Channel operates over dedicated FC switches using 64-bit WWNs."
+        ],
+        [219, "storage", "RAID 50 (5+0) Architecture",
+          "An enterprise deploys twelve 4 TB drives in a RAID 50 array configured as two 6-drive RAID 5 spans striped together. What is the usable capacity of this RAID 50 volume, and what happens if two drives fail simultaneously?",
+          [
+            "40 TB usable; survives if the two failed drives are in different RAID 5 spans, but fails if both are in the same span",
+            "44 TB usable; survives any two drive failures anywhere in the 12-drive chassis",
+            "24 TB usable; survives up to six simultaneous drive failures",
+            "48 TB usable; zero fault tolerance because RAID 0 striping removes parity"
+          ],
+          0,
+          "Why & Solution: In RAID 50, each span loses 1 drive to parity: two 6-drive RAID 5 spans give (5 + 5) * 4 TB = 40 TB usable. Each span independently tolerates 1 drive failure, so 2 simultaneous failures survive ONLY if they occur in separate spans."
+        ],
+        [220, "storage", "TRIM / SCSI UNMAP Reclamation",
+          "After deleting 1.5 TB of obsolete virtual machine backups from a thin-provisioned VMFS datastore backed by an all-flash SAN array, the SAN management console still shows the underlying physical storage pool at 95% capacity. Which storage mechanism must be triggered so the array reclaims the freed blocks?",
+          [
+            "SCSI UNMAP / TRIM space reclamation from the host OS/hypervisor down to the thin-provisioned LUN",
+            "Magnetic degaussing of the flash controller cache",
+            "Converting the VMFS datastore from GPT to MBR",
+            "Disabling write-back caching on the SAN controller"
+          ],
+          0,
+          "Why & Solution: Deleting files in a guest OS or hypervisor only updates filesystem metadata pointers—the SAN array still sees those physical NAND blocks as allocated until the host sends SCSI UNMAP (or ATA TRIM) commands notifying the array which LBAs are now free."
+        ],
+        [221, "storage", "HBA IT-Mode vs. Hardware RAID Controller",
+          "An engineer is building a TrueNAS / ZFS storage server and must connect 16 SAS drives to the motherboard. Why should the engineer install a SAS Host Bus Adapter (HBA) flashed to Initiator-Target (IT) mode rather than configuring individual RAID 0 volumes behind a hardware RAID controller?",
+          [
+            "IT-mode HBAs pass raw disks and direct SMART telemetry straight to ZFS so ZFS can manage copy-on-write parity and self-healing without controller abstraction",
+            "Hardware RAID controllers physically block SAS drives from spinning above 5,400 RPM",
+            "IT-mode HBAs convert SAS drives into Layer 3 IP targets automatically",
+            "Hardware RAID controllers cannot address drives larger than 2 TB"
+          ],
+          0,
+          "Why & Solution: Software-defined storage engines like ZFS and Ceph require direct, unmediated access to raw block devices and SMART health data. Placing a hardware RAID controller in between hides physical disk failures and interferes with ZFS's end-to-end checksums and self-healing."
+        ],
+        [222, "storage", "External SAS Cabling (SFF-8470)",
+          "A technician needs to connect an external 4-lane SAS JBOD expansion shelf to a rack server's external SAS HBA port using a heavy-duty copper cable secured with thumbscrews/jackscrews. Which connector type is described?",
+          [
+            "SFF-8470 (4-lane external InfiniBand-style SAS connector with jackscrews)",
+            "SFF-8482 (internal individual drive data+power receptacle)",
+            "MD50-M (legacy 50-pin parallel SCSI micro-D connector)",
+            "RJ-45 (8P8C unshielded twisted-pair Ethernet jack)"
+          ],
+          0,
+          "Why & Solution: SFF-8470 is the classic 4-lane external SAS cable connector secured with jackscrews, whereas SFF-8484 is the internal 4-lane HBA connector and SFF-8482 is the internal individual drive plug."
+        ],
+        [223, "storage", "Carrier LED Diagnostics (Do Not Remove)",
+          "A 2U server running a 4-drive RAID 5 array suffers a failure on Bay 1 (Drive Status LED Solid Amber). While preparing to hot-swap Bay 1, a technician notices Bay 2 has its 'Do Not Remove' LED (#3) lit Solid White. What does this Solid White LED signify?",
+          [
+            "Pulling Bay 2 will permanently crash the logical volume because Bay 1 is already offline and the RAID 5 array has zero remaining redundancy",
+            "Bay 2 is the faulty drive identified by the iDRAC Locate utility and should be pulled first",
+            "Bay 2 is an unconfigured hot spare waiting to be initialized",
+            "Bay 2 is powered down and safe for immediate removal"
+          ],
+          0,
+          "Why & Solution: On enterprise drive carriers, a Solid White 'Do Not Remove' indicator warns that removing that member drive will cause one or more logical drives to fail—because the RAID 5 array has already lost its single parity tolerance on Bay 1."
+        ],
+        [224, "storage", "NAS Protocol Encryption & Ports",
+          "During a security audit of a legacy Unix environment, an auditor flags unencrypted NFSv3 mounts running over TCP port 2049 and requests confidentiality protection using the built-in Secure NFS (SNFS) mechanism referenced in CompTIA Server+ study materials. Which cipher does SNFS use, and what is the modern NFS version?",
+          [
+            "Data Encryption Standard (DES) for SNFS confidentiality; NFSv4 is the current version over TCP 2049",
+            "AES-256-GCM over TCP port 445; CIFS 1.0 is the current version",
+            "RC4 over UDP port 69; TFTP is the current version",
+            "3DES over TCP port 3260; iSCSI 2.0 is the current version"
+          ],
+          0,
+          "Why & Solution: Per the CompTIA Server+ Sybex specification, NFS operates over TCP port 2049, NFSv4 is the current major standard, and Secure NFS (SNFS) provides confidentiality using DES."
+        ],
+        [225, "storage", "SSD Sanitization vs. HDD Degaussing",
+          "A compliance officer requires certified data destruction for 20 decommissioned servers containing a mix of 10k RPM SAS HDDs and U.2 NVMe SSDs before off-site disposal. Which sanitization workflow satisfies security requirements for BOTH media types?",
+          [
+            "Degauss (or shred) the magnetic SAS HDDs, and perform Cryptographic Erase / ATA Secure Erase followed by physical shredding on the NVMe SSDs",
+            "Pass both the SAS HDDs and NVMe SSDs through a high-gauss magnetic degausser",
+            "Run a quick NTFS format on all drives and clear the server CMOS battery",
+            "Overwrite both HDDs and SSDs with a single pass of zeroes using `dd` and skip physical verification"
+          ],
+          0,
+          "Why & Solution: Magnetic degaussing destroys magnetic domains on spinning HDDs (and ruins their servo tracks), but has zero effect on electrical charges stored in SSD NAND flash cells. SSDs require Cryptographic Erase / firmware Sanitize commands and/or physical shredding/disintegration."
+        ],
+
+        // ======================================================================
+        // DOMAIN 2: ENTERPRISE POWER, THERMAL & RACK INFRASTRUCTURE (#226–#245)
+        // ======================================================================
+        [226, "power", "2N Dual-Feed Load Balancing Rule",
+          "A dual-corded 2U database server has PSU-1 plugged into Rack PDU-A (Feed A) and PSU-2 plugged into Rack PDU-B (Feed B) in a 2N redundant power topology. Each PDU is rated for 20A at 120V. Currently, PDU-A is loaded to 68% and PDU-B is loaded to 65%. What severe operational hazard exists during a utility outage on Feed A?",
+          [
+            "All dual-corded servers will immediately shift 100% of their load onto PDU-B, pushing PDU-B to ~133% and tripping its circuit breaker—causing a total rack blackout",
+            "PSU-2 will enter standby sleep mode because 2N power requires Feed A to act as master clock",
+            "The server's UEFI firmware will throttle CPU frequencies to 800 MHz permanently",
+            "A phase mismatch between Feed A and Feed B will destroy the motherboard VRM"
+          ],
+          0,
+          "Why & Solution: In a 2N (A/B) dual-feed rack, neither PDU may ever exceed 50% of its continuous safe capacity (40% when factoring in the 80% electrical derating rule). If both feeds run at >50%, losing one feed doubles the load on the surviving feed and trips its breaker."
+        ],
+        [227, "power", "80% PDU Continuous Load & VA-to-Watts Math",
+          "A datacenter engineer is provisioning a new rack fed by a single 208V, 30A circuit. Applying the mandatory 80% continuous load derating rule (NEC) and assuming a server Power Factor (PF) of 0.95, what is the maximum safe continuous real power (Watts) this circuit can support?",
+          [
+            "4,742 Watts (208V * 30A * 0.80 * 0.95)",
+            "6,240 Watts (208V * 30A * 1.00)",
+            "3,600 Watts (120V * 30A)",
+            "5,928 Watts (208V * 30A * 0.95)"
+          ],
+          0,
+          "Why & Solution: Apparent power (VA) = Volts * Amps = 208V * 30A = 6,240 VA. Applying the 80% continuous load limit gives 6,240 * 0.80 = 4,992 VA (24A max continuous). Multiplying by Power Factor (0.95) yields 4,742.4 Watts of real usable power."
+        ],
+        [228, "power", "Online Double-Conversion UPS Topology",
+          "A financial trading floor's core servers suffer brief reboots whenever utility voltage sags occur during local grid switching, even though the rack is protected by an older standby UPS. Which UPS topology eliminates transfer time completely (0 ms) and isolates sensitive server PSUs from all voltage sags, swells, and frequency drift?",
+          [
+            "Online Double-Conversion UPS (AC -> DC -> AC continuous inverter path)",
+            "Offline / Standby UPS with mechanical relay transfer",
+            "Basic surge-suppressor PDU with MOV clamping",
+            "Passive flywheel capacitor bank without battery strings"
+          ],
+          0,
+          "Why & Solution: An Online Double-Conversion UPS continuously rectifies incoming AC to DC (charging the batteries) and inverts DC back to clean, regulated AC 100% of the time. Because the inverter is always feeding the load, there is 0 ms transfer time when utility power fails."
+        ],
+        [229, "power", "ATS (Automatic Transfer Switch) for Single-Corded Gear",
+          "A rack contains twenty dual-corded servers plus four legacy top-of-rack appliances that each have only a single non-redundant power supply. How should the engineer provide redundant A/B power feed protection to those four single-corded devices?",
+          [
+            "Connect both Feed A and Feed B into a rack-mounted Automatic Transfer Switch (ATS), and plug the single-corded appliances into the ATS outlets",
+            "Use a passive Y-splitter cable to tie Feed A and Feed B directly into each appliance's single IEC C13 inlet",
+            "Plug two appliances into Feed A and two into Feed B without an ATS",
+            "Daisy-chain the single-corded devices off a dual-corded server's management port"
+          ],
+          0,
+          "Why & Solution: Never wire two independent AC feeds together with a passive Y-cable (which causes a phase-to-phase short). A rack ATS takes dual A/B power inputs and switches the output bus to the secondary feed within milliseconds if the primary feed fails."
+        ],
+        [230, "power", "Hot-Aisle / Cold-Aisle Containment & Blanking Panels",
+          "Thermal sensors at the top of a 42U server rack show intake temperatures hitting 34°C (93°F) even though the CRAC unit is blowing 18°C (64°F) air through the perforated floor tiles. Inspection reveals 12U of empty open rack spaces between servers and missing side baffles. What is happening, and how is it fixed?",
+          [
+            "Hot rear exhaust air is recirculating through the empty U spaces back into the cold front intake; install tool-less blanking panels across all empty U slots",
+            "The CRAC unit's chilled water loop is frozen; reverse the server fans to exhaust out the front",
+            "The rack PDU is over-volting the servers; reduce cold-aisle supply air to 5°C (41°F)",
+            "Perforated tiles should be moved into the hot aisle to equalize static pressure"
+          ],
+          0,
+          "Why & Solution: Without blanking panels covering unused rack units, negative pressure at the server front intakes pulls hot exhaust air right back through the empty gaps (recirculation), drastically raising intake temperatures. Blanking panels block recirculation and restore cold-aisle containment."
+        ],
+        [231, "power", "Datacenter Humidity Thresholds (ESD vs. Condensation)",
+          "During a dry winter cold snap, a server room's relative humidity drops to 18% RH, causing technicians to experience static shocks when touching rack rails. Conversely, the following summer a faulty humidifier pushes the room to 84% RH. What are the two distinct hardware hazards caused by these extremes?",
+          [
+            "Low humidity (<20–30% RH) triggers Electrostatic Discharge (ESD) damage to circuits; high humidity (>80% RH) causes condensation and corrosion on PCBs",
+            "Low humidity causes lithium CMOS batteries to swell; high humidity demagnetizes SAS platters",
+            "Low humidity trips GFCI PDU breakers; high humidity increases copper wire resistance by 50%",
+            "Low humidity slows 15,000 RPM disk rotation; high humidity corrupts UEFI EEPROM firmware"
+          ],
+          0,
+          "Why & Solution: ASHRAE guidelines target roughly 40%–60% RH (acceptable ~20%–80% depending on dew point). Too dry (<20%) builds static charge leading to ESD component failure; too humid (>80%) risks moisture condensation and metallic corrosion on motherboards."
+        ],
+        [232, "power", "CRAC vs. CRAH Cooling Architecture",
+          "A datacenter facilities manager is comparing two perimeter cooling units: Unit 1 uses a self-contained DX refrigerant compressor cycle to cool air, while Unit 2 uses a chilled-water coil fed by an external chiller plant and variable-speed fans. Which labels correctly identify these two systems?",
+          [
+            "Unit 1 = CRAC (Computer Room Air Conditioner); Unit 2 = CRAH (Computer Room Air Handler)",
+            "Unit 1 = CRAH (Computer Room Air Handler); Unit 2 = CRAC (Computer Room Air Conditioner)",
+            "Unit 1 = Evaporative Swamp Cooler; Unit 2 = Liquid Immersion Tank",
+            "Unit 1 = ATS; Unit 2 = PDU"
+          ],
+          0,
+          "Why & Solution: A CRAC (Computer Room Air Conditioner) uses direct-expansion (DX) refrigerant compressors like a traditional AC unit. A CRAH (Computer Room Air Handler) has no internal refrigerant compressor—it passes warm room air over chilled-water coils supplied by a central building chiller plant."
+        ],
+        [233, "power", "Clean-Agent Fire Suppression vs. Sprinklers",
+          "An architect is specifying fire suppression for an occupied Tier III server room housing high-density racks. Water sprinklers risk catastrophic hardware damage upon accidental discharge, while Halon 1301 is banned under environmental treaties. Which clean-agent suppression system extinguishes fire rapidly without leaving conductive residue or harming personnel?",
+          [
+            "FM-200 (HFC-227ea) or Novec 1230 (FK-5-1-12) clean-agent chemical suppression (paired with a dry-pipe pre-action sprinkler backup)",
+            "CO2 total-flooding suppression without oxygen-depletion alarms",
+            "Wet-pipe water sprinkler heads rated at 57°C directly above every rack",
+            "Dry-chemical ABC powder nozzles integrated into the cold aisle"
+          ],
+          0,
+          "Why & Solution: Clean agents like FM-200, Novec 1230, and Inergen suppress fire via heat absorption or safe oxygen reduction without leaving residue, damaging electronics, or asphyxiating occupants (unlike lethal CO2 flooding). Wet-pipe sprinklers keep water pressurized above racks, whereas pre-action dry-pipe sprinklers require two independent triggers before water enters the pipes."
+        ],
+        [234, "power", "N+1 PSU Redundancy Failure Analysis",
+          "A 4U enterprise server is equipped with four 800W hot-swappable power supplies configured in N+1 redundancy. Under peak compute load, the server draws 2,100W total. If two of the four PSUs fail simultaneously during a surge, what will happen?",
+          [
+            "The server will immediately shut down or brown out because the remaining two PSUs provide only 1,600W against a 2,100W load",
+            "The server will continue running at 100% load because N+1 survives any two PSU failures",
+            "The two surviving PSUs will automatically overdrive to 1,200W each indefinitely",
+            "The server will drop half its DIMM slots offline to stay under 1,600W"
+          ],
+          0,
+          "Why & Solution: N+1 redundancy means the system requires N power supplies to carry the load plus 1 spare (here, N=3 PSUs = 2,400W needed for a 2,100W load, plus 1 spare = 4 PSUs). Losing 2 PSUs leaves only 2 * 800W = 1,600W, causing an immediate overload shutdown. Surviving 2 PSU failures requires N+2."
+        ],
+        [235, "power", "Rack Weight Distribution & Seismic Stability",
+          "A technician is populating an empty 42U server cabinet with four 4U 48-bay storage JBODs (85 lbs each), six 1U compute nodes (32 lbs each), and two 2U rackmount UPS units (110 lbs each). Where must the two heavy 2U UPS units and 4U storage shelves be mounted?",
+          [
+            "At the very bottom of the rack (U1–U12) to keep the center of gravity low and prevent the cabinet from tipping forward when rails extend",
+            "At the very top of the rack (U35–U42) so heat rises directly into the ceiling plenum",
+            "Alternated evenly every 6U to balance airflow impedance",
+            "Mounted vertically along the rear cable-management zero-U channels"
+          ],
+          0,
+          "Why & Solution: Heavy battery UPS chassis and dense multi-drive storage shelves must always be installed at the bottom of the rack (lowest U positions) to maintain a low center of gravity and prevent cabinet tip-over hazards when upper servers are slid out on service rails."
+        ],
+        [236, "power", "Single-Phase vs. Three-Phase Power Distribution",
+          "A high-density AI/virtualization rack requires 14 kW of continuous power. Why do datacenters deliver three-phase power (e.g., 208V/400V 3-phase) to high-density rack PDUs rather than running multiple 120V single-phase circuits?",
+          [
+            "Three-phase power delivers significantly higher wattage per circuit with smaller copper conductors, lower current draw per phase, and higher efficiency",
+            "Single-phase AC cannot be rectified by server switching power supplies",
+            "Three-phase power eliminates the need for circuit breakers or UPS battery backups",
+            "Three-phase PDUs run on DC voltage directly from solar arrays"
+          ],
+          0,
+          "Why & Solution: Three-phase power multiplies voltage and current by √3 (1.732), delivering ~73% more power than single-phase at the same amperage and wire gauge while allowing balanced load distribution across phases L1, L2, and L3."
+        ],
+        [237, "power", "PDU Metering & Outlet Switching",
+          "A remote branch server locks up completely—including its out-of-band management controller—and requires a cold hard power cycle at 2:00 AM. Which class of rack PDU allows the on-call engineer to remotely power-cycle the individual outlet powering that server over HTTPS/SNMPv3?",
+          [
+            "Switched (and Metered-by-Outlet) Intelligent Rack PDU",
+            "Basic unmonitored power strip PDU",
+            "Passive Metered-Input-Only PDU",
+            "Inline surge-arrestor whip"
+          ],
+          0,
+          "Why & Solution: A Basic PDU provides power distribution only; a Metered PDU displays local/network amperage; a Switched PDU adds remote per-outlet relay control so administrators can remotely turn individual outlets off and on to hard-reboot hung equipment."
+        ],
+        [238, "power", "Galvanic Corrosion & Raised-Floor Zinc Whiskers",
+          "Several servers in an older raised-floor datacenter suffer sudden, unexplained power supply shorts after floor tiles are lifted for cable pulls. Maintenance discovers microscopic metallic filaments growing from the electroplated underside of the steel floor tiles and sucked into server intakes. What is this hazard?",
+          [
+            "Zinc whiskers—conductive metallic filaments shed from electroplated zinc coatings that cause short circuits on PCBs and PSUs",
+            "Copper oxidation caused by Cat6A PoE++ voltage leakage",
+            "Fiber-optic glass splinters shedding from OM4 multimode patch cords",
+            "Carbon dust generated by 15,000 RPM SAS drive bearings"
+          ],
+          0,
+          "Why & Solution: Electroplated zinc-coated steel floor tiles and rack hardware can grow conductive microscopic 'zinc whiskers' over time. When disturbed during maintenance, they become airborne, enter server cooling intakes, and bridge circuit traces—causing fatal shorts."
+        ],
+        [239, "power", "UPS Battery Runtime & Temperature Degradation",
+          "A datacenter facilities audit notes that the sealed VRLA (Valve-Regulated Lead-Acid) battery room is running at 32°C (90°F) instead of the recommended 20°C–25°C (68°F–77°F). What is the long-term consequence on the UPS battery strings?",
+          [
+            "Elevated ambient temperature accelerates chemical degradation, cutting VRLA battery service life roughly in half for every 8°C–10°C (15°F–18°F) above 25°C",
+            "Higher room temperature permanently doubles battery amp-hour capacity without side effects",
+            "VRLA batteries automatically switch to lithium-ion chemistry above 30°C",
+            "The UPS inverter shuts down permanently until ambient temperature drops below 10°C"
+          ],
+          0,
+          "Why & Solution: Heat is the primary enemy of lead-acid UPS batteries. Per the Arrhenius rule, every 8°C–10°C (15°F–18°F) sustained increase above 25°C (77°F) cuts expected VRLA battery lifespan by ~50% and risks thermal runaway."
+        ],
+        [240, "power", "In-Row / Rear-Door Heat Exchanger Cooling",
+          "A colocation pod deploys 25 kW high-density compute racks that overwhelm traditional raised-floor perimeter CRAC airflow. Which targeted cooling architecture captures heat directly at the rack exhaust before it enters the room air?",
+          [
+            "Rear-Door Heat Exchangers (RDHx) or Close-Coupled In-Row Liquid/Chilled-Water Coolers",
+            "Installing additional perforated floor tiles in the hot aisle",
+            "Removing all rack doors and side panels to let heat diffuse naturally",
+            "Replacing dual server PSUs with single high-wattage PSUs"
+          ],
+          0,
+          "Why & Solution: Above ~10–15 kW per rack, perimeter room cooling struggles to move enough CFM through floor tiles. Close-coupled In-Row coolers and Rear-Door Heat Exchangers (RDHx) neutralize thermal load immediately at the rack exhaust."
+        ],
+        [241, "power", "EPO (Emergency Power Off) Button Protection",
+          "During a routine tour of a server room, a contractor accidentally bumps an unguarded wall switch, immediately dropping utility and UPS power to every rack in the facility. Which physical safeguard is required on Emergency Power Off (EPO) switches to prevent accidental activation?",
+          [
+            "A hinged protective lift-cover (and/or two-stage key/break-glass guard) clearly labeled EPO",
+            "Wiring the EPO switch in series with the cold-aisle humidity sensor",
+            "Relocating the EPO button inside a locked server cabinet",
+            "Disconnecting the EPO circuit from the UPS shunt-trip breaker"
+          ],
+          0,
+          "Why & Solution: Life-safety fire codes require EPO switches at exit doors to de-energize the room for firefighters, so they cannot be locked away or disconnected—but they must be fitted with a hinged protective cover/shield to prevent accidental bumps."
+        ],
+        [242, "power", "Generator Transfer & UPS Bridging",
+          "When utility grid power fails, a facility's diesel standby generator takes 18 seconds to crank, reach stable voltage/frequency, and close its Automatic Transfer Switch (ATS). What keeps the servers running uninterrupted during that 18-second startup window?",
+          [
+            "The datacenter's battery-backed UPS system, which bridges the gap until generator power stabilizes",
+            "The servers' internal CMOS coin-cell batteries",
+            "Capacitors inside the rack's passive patch panels",
+            "Power over Ethernet (PoE) back-feeding from core switches"
+          ],
+          0,
+          "Why & Solution: Standby generators provide long-term runtime (hours/days with fuel refilling) but take 10–30 seconds to spin up. Batteries in the UPS provide instantaneous bridging power during that startup window."
+        ],
+        [243, "power", "NEMA L6-30P vs. IEC 60309 Locking Plugs",
+          "A technician installing a new 208V 30A rack PDU notices the power cord uses a twist-lock plug rather than a straight-blade household plug. Why do enterprise rack PDUs use twist-lock plugs (such as NEMA L6-30P or IEC 60309)?",
+          [
+            "To mechanically lock the plug into the receptacle so vibration or accidental cable pulls cannot unplug a live rack circuit",
+            "To convert single-phase 120V into three-phase 480V inside the plug housing",
+            "To provide built-in AES hardware encryption over powerline networking",
+            "To allow hot-swapping 30A circuits under full load without arcing"
+          ],
+          0,
+          "Why & Solution: Twist-lock receptacles (NEMA L-series and IEC 60309 pin-and-sleeve) physically lock when rotated, preventing accidental disconnection caused by rack vibration or technicians working in overhead/underfloor trays."
+        ],
+        [244, "power", "Airflow Pressure Differential (Positive vs. Negative)",
+          "To prevent dust and unfiltered outdoor air from infiltrating a server room whenever entry doors open, how should the HVAC system maintain room air pressure relative to adjacent hallways?",
+          [
+            "Maintain slight positive air pressure inside the server room so clean conditioned air pushes outward when doors open",
+            "Maintain strong negative air pressure inside the server room to pull hallway air inward",
+            "Keep HVAC fans off whenever the server room door is unlocked",
+            "Exhaust hot aisle air directly into the adjacent office lobby"
+          ],
+          0,
+          "Why & Solution: Maintaining slight positive pressure inside a datacenter or cleanroom ensures that opening a door pushes filtered, conditioned air outward rather than drawing dust and unconditioned humid air inward."
+        ],
+        [245, "power", "Dual-Bus Grounding & Bonding (SRG)",
+          "A server room experiences intermittent serial/console noise and premature NIC transceiver failures between two rows of racks. Electrical inspection shows a 4-volt potential difference between the metal frames of Row A and Row B. What is missing?",
+          [
+            "A common Signal Reference Grid (SRG) / equipotential grounding and bonding strap connecting all racks and metallic raceways to a single master ground bus",
+            "Additional surge strips plugged in series between Row A and Row B",
+            "Insulated rubber boots on the fiber-optic LC patch cords",
+            "Higher amperage fuses in the overhead busway"
+          ],
+          0,
+          "Why & Solution: All metallic racks, raised-floor pedestals, and cable trays must be bonded together into an equipotential Signal Reference Grid (SRG) tied to the building's main electrical ground so voltage differentials (ground loops) cannot form between cabinets."
+        ],
+
+        // ======================================================================
+        // DOMAIN 3: LINUX & WINDOWS CLI, SCRIPTING & OS TROUBLESHOOTING (#246–#275)
+        // ======================================================================
+        [246, "cli", "Linux Inode Exhaustion (df -i)",
+          "An application on a Linux web server fails with `No space left on device` when trying to create session files in `/var/www/sessions`. Running `df -h` shows `/var/www` is only 34% full with 180 GB free. Which diagnostic command immediately reveals the true bottleneck?",
+          [
+            "Run `df -i` to check inode usage—millions of tiny session files have exhausted 100% of available filesystem inodes",
+            "Run `free -m` to verify whether swap space is 100% full",
+            "Run `ulimit -a` to increase the maximum TCP socket buffer size",
+            "Run `lsmod` to check if the ext4 kernel module was unloaded"
+          ],
+          0,
+          "Why & Solution: Every file/directory in ext4/XFS consumes one inode metadata structure. Millions of tiny 1-byte files can exhaust 100% of a partition's inodes while leaving gigabytes of data blocks free (`df -h`). `df -i` exposes 100% `IUse%` immediately."
+        ],
+        [247, "cli", "Deleted Open Files Holding Disk Space (lsof +L1)",
+          "A Linux application server's `/var` partition hits 100% full (`df -h` shows 50G used of 50G). An operator deletes a 35 GB runaway log file (`/var/log/app.log`) with `rm -f`, yet `df -h` STILL reports 100% full and services continue failing. Which command locates the process holding the deleted file descriptor open?",
+          [
+            "Run `lsof +L1` (or `lsof | grep deleted`) to identify the PID keeping the unlinked file handle open, then restart/reload that service",
+            "Run `sync && echo 3 > /proc/sys/vm/drop_caches` to force ext4 to delete the inode",
+            "Run `chmod 000 /var/log` to revoke write permissions from the kernel",
+            "Run `fsck -y /dev/sda2` on the mounted live root filesystem"
+          ],
+          0,
+          "Why & Solution: In Linux, `rm` unlinks the directory entry, but the kernel does not free the underlying disk blocks until the last process holding an open file descriptor closes it. `lsof +L1` lists unlinked open files with their PIDs; restarting the owning daemon (or truncating `/proc/<PID>/fd/<FD>`) immediately frees the space."
+        ],
+        [248, "cli", "LVM Online Extension (lvextend -r & xfs_growfs)",
+          "A Linux administrator adds a new 100 GB virtual disk (`/dev/sdb`) to an RHEL server, creates a physical volume (`pvcreate /dev/sdb`), extends the volume group (`vgextend vg_data /dev/sdb`), and extends the logical volume (`lvextend -L +100G /dev/vg_data/lv_app`). However, `df -h` still shows the old filesystem size. What step was missed?",
+          [
+            "Extend the filesystem itself using `xfs_growfs /mountpoint` (for XFS) or `resize2fs /dev/vg_data/lv_app` (for ext4)—or pass `-r` to `lvextend`",
+            "Reboot into single-user rescue mode and run `mkfs.xfs /dev/vg_data/lv_app`",
+            "Run `partprobe` to overwrite the GPT partition table on `/dev/sda`",
+            "Remount the volume with `-o ro,remount` to update the superblock"
+          ],
+          0,
+          "Why & Solution: `lvextend` enlarges the underlying block volume container, not the filesystem inside it (unless `-r` / `--resizefs` is passed). XFS filesystems expand online via `xfs_growfs <mountpoint>`, while ext3/ext4 use `resize2fs <device>`. Never run `mkfs` on an existing volume—that wipes all data."
+        ],
+        [249, "cli", "Systemd Masked Service & Unit Reload",
+          "After editing `/etc/systemd/system/worker.service` to adjust memory limits, an engineer runs `systemctl restart worker.service` and sees a warning that the unit file changed on disk, followed by `Failed to restart worker.service: Unit worker.service is masked.` Which command sequence resolves both issues?",
+          [
+            "Run `systemctl unmask worker.service`, then `systemctl daemon-reload`, then `systemctl restart worker.service`",
+            "Run `systemctl kill -9 worker.service` and delete `/etc/systemd/system/worker.service`",
+            "Run `chkconfig worker on` and reboot the server",
+            "Run `journalctl --vacuum-time=1d` to clear the systemd lock file"
+          ],
+          0,
+          "Why & Solution: A masked unit is symlinked to `/dev/null` so it cannot be started manually or by dependencies (`systemctl unmask` removes that symlink). Whenever unit files are modified on disk, `systemctl daemon-reload` must be executed so systemd re-parses the updated configuration."
+        ],
+        [250, "cli", "Filtering Critical Errors with journalctl",
+          "A production Ubuntu Server's `postgresql` service crashed overnight. Which `journalctl` command efficiently filters the systemd journal for ONLY error-level (and higher) messages from the `postgresql` unit since the last boot?",
+          [
+            "journalctl -u postgresql -p err -b",
+            "journalctl -f -n 100 /var/log/syslog",
+            "journalctl --list-boots | grep postgres",
+            "dmesg -T | grep -i eth0"
+          ],
+          0,
+          "Why & Solution: `-u postgresql` filters by the specific systemd unit, `-p err` filters by syslog priority `err` (3) and above (`crit`, `alert`, `emerg`), and `-b` restricts output to the current boot session."
+        ],
+        [251, "cli", "Socket & Process Forensics (ss -tulpn)",
+          "A security engineer suspects an unauthorized rogue service is listening on TCP port 8443 on a Linux jump host. Which modern command displays all listening TCP and UDP sockets along with the exact numeric ports and owning Process IDs (PIDs)?",
+          [
+            "ss -tulpn",
+            "ip addr show scope global",
+            "arp -an",
+            "ethtool -S eth0"
+          ],
+          0,
+          "Why & Solution: `ss -tulpn` (`-t` TCP, `-u` UDP, `-l` listening, `-p` process name/PID, `-n` numeric ports) is the modern iproute2 replacement for `netstat -tulpn` and immediately identifies which PID owns any listening port."
+        ],
+        [252, "cli", "Live Packet Capture on iSCSI Port (tcpdump)",
+          "An engineer needs to verify whether TCP SYN packets from a Linux initiator are actually reaching an iSCSI SAN target on interface `ens192` over port 3260 without performing DNS lookups that slow down capture output. Which command is exact?",
+          [
+            "tcpdump -i ens192 -nn port 3260",
+            "tcpdump -i lo -c 10 icmp",
+            "traceroute -I 10.10.50.10",
+            "dig +trace @10.10.50.10 iscsi.local"
+          ],
+          0,
+          "Why & Solution: `-i ens192` binds capture to the storage interface, `-nn` disables both hostname and port-name resolution (preventing DNS stalls), and `port 3260` filters strictly for iSCSI traffic."
+        ],
+        [253, "cli", "Kerberos 5-Minute Clock Skew (chronyc & w32tm)",
+          "Windows and Linux servers joined to an Active Directory domain suddenly begin failing Kerberos authentication (`KRB_AP_ERR_SKEW`) and SMB logins after an NTP server outage. Checking time shows the affected servers are 7 minutes ahead of the Domain Controllers. Which commands force immediate time resynchronization on Linux (chrony) and Windows?",
+          [
+            "Linux: `chronyc makestep` (after checking `chronyc sources -v`); Windows: `w32tm /resync /force`",
+            "Linux: `hwclock --systohc`; Windows: `ipconfig /flushdns`",
+            "Linux: `timedatectl set-timezone UTC`; Windows: `gpupdate /force`",
+            "Linux: `ntpdate -q 127.0.0.1`; Windows: `netsh int ip reset`"
+          ],
+          0,
+          "Why & Solution: Kerberos rejects tickets when clock skew exceeds 5 minutes (300 seconds) to prevent replay attacks. On Linux systems running chronyd, `chronyc makestep` forces an immediate clock step instead of slow slewing; on Windows, `w32tm /resync /force` forces immediate NTP sync against the domain hierarchy."
+        ],
+        [254, "cli", "SELinux Context Denial (getenforce & restorecon)",
+          "An administrator moves a web application directory from `/tmp/site` into `/var/www/html/site` using `mv`. Standard Unix permissions (`chmod 755`, `chown apache:apache`) are completely valid, yet Apache returns `403 Forbidden` and `/var/log/audit/audit.log` logs `avc: denied { read }`. What happened, and how is it fixed properly?",
+          [
+            "`mv` preserved the `tmp_t` SELinux security context instead of `httpd_sys_content_t`; run `restorecon -Rv /var/www/html/site`",
+            "SELinux is in Permissive mode; run `setenforce 0` permanently in `/etc/selinux/config`",
+            "The filesystem lacks POSIX ACLs; run `setfacl -b /var/www/html/site`",
+            "Apache cannot read files owned by the `apache` user; run `chown root:root`"
+          ],
+          0,
+          "Why & Solution: Unlike `cp` (which inherits destination contexts), `mv` preserves the source file's extended SELinux label (`tmp_t`). In Enforcing mode (`getenforce`), SELinux blocks Apache from reading `tmp_t` files. `restorecon -Rv` resets the labels to the policy default (`httpd_sys_content_t`) without disabling security."
+        ],
+        [255, "cli", "Linux Load Average vs. I/O Wait (vmstat & iostat)",
+          "A 4-vCPU Linux server shows a `top` load average of `14.80, 12.40, 10.15`, yet user CPU (`%us`) is only 6% and system CPU (`%sy`) is 4%, while `%wa` (I/O wait) is 82%. Running `iostat -xz 1` shows `nvme0n1` at `99.8% util` with `await` at `145 ms`. What is the true bottleneck?",
+          [
+            "Storage disk I/O saturation—threads are blocked in uninterruptible sleep (`D` state) waiting on disk reads/writes, inflating the load average",
+            "CPU compute exhaustion—the server immediately needs 16 more vCPUs",
+            "Memory swap thrashing caused by a 0% swappiness kernel parameter",
+            "NIC ring-buffer drops on the loopback interface"
+          ],
+          0,
+          "Why & Solution: Linux load average counts both runnable CPU threads (`R`) AND threads in uninterruptible disk/NFS sleep (`D`). High load average combined with high `%wa` (`vmstat`/`iostat` `await` > 100 ms, `%util` ~100%) indicates storage subsystem bottlenecking, not CPU starvation."
+        ],
+        [256, "cli", "POSIX ACLs & Sticky Bit Permissions",
+          "A shared project directory `/srv/shared` on Linux must allow all members of the `devops` group to create files inside it, while preventing users from deleting files created by OTHER group members, plus granting read-only access to the `auditors` user without changing group ownership. Which two commands accomplish this?",
+          [
+            "`chmod 1775 /srv/shared` (sets the sticky bit `1` + group rwx) and `setfacl -m u:auditors:rx /srv/shared`",
+            "`chmod 4777 /srv/shared` (sets SUID) and `chattr +i /srv/shared`",
+            "`chmod 2750 /srv/shared` (sets SGID) and `umask 077`",
+            "`chown -R auditors:devops /srv/shared` and `chmod 644 /srv/shared`"
+          ],
+          0,
+          "Why & Solution: Setting the Sticky Bit (`1` in `1775`, shown as `t` in `drwxrwxr-t`) on a shared directory restricts file deletion/renaming to the file's owner or root. `setfacl -m u:auditors:rx` grants granular POSIX ACL read/execute access to a specific user without altering primary user/group ownership."
+        ],
+        [257, "cli", "Windows Server Image Corruption (DISM & SFC)",
+          "After a botched cumulative update on Windows Server 2022, `sfc /scannow` reports: `Windows Resource Protection found corrupt files but was unable to fix some of them.` Which command repairs the underlying Windows Component Store (`WinSxS`) so `sfc /scannow` can subsequently restore the damaged system files?",
+          [
+            "DISM /Online /Cleanup-Image /RestoreHealth",
+            "chkdsk C: /f /r /x",
+            "bcdedit /set {default} safeboot minimal",
+            "netsh winsock reset catalog"
+          ],
+          0,
+          "Why & Solution: `sfc /scannow` relies on the local Component Store (`C:\\Windows\\WinSxS`) for clean replacement copies. When the Component Store itself is damaged, `DISM /Online /Cleanup-Image /RestoreHealth` downloads clean payload files from Windows Update (or a specified `/Source:` WIM) to repair the image first."
+        ],
+        [258, "cli", "Windows VM Cloning SID Duplication (Sysprep)",
+          "An engineer clones a Windows Server 2022 VM template five times without preparing the image first. When joining the clones to Active Directory and registering them with WSUS/KMS, domain trust relationships break and WSUS repeatedly overwrites the same single computer record. Which tool was omitted before capturing the template?",
+          [
+            "sysprep /generalize /oobe /shutdown",
+            "dism /online /enable-feature /featurename:TelnetClient",
+            "gpresult /h report.html",
+            "robocopy C:\\ D:\\ /mir"
+          ],
+          0,
+          "Why & Solution: Cloning an unprepared Windows installation duplicates the machine Security Identifier (SID), WSUS client ID, and KMS CMID. Running `sysprep /generalize /oobe` strips unique machine identifiers so each deployed clone generates fresh SIDs and GUIDs on first boot."
+        ],
+        [259, "cli", "Active Directory Replication Diagnostics",
+          "Password changes made on a branch-office Windows Domain Controller take hours to reach the hub Domain Controllers, and Group Policy edits are inconsistent across sites. Which two built-in Windows Server CLI commands diagnose Domain Controller health and inter-site replication status?",
+          [
+            "`dcdiag` and `repadmin /replsummary`",
+            "`nslookup -type=mx` and `netstat -anob`",
+            "`diskpart` and `manage-bde -status`",
+            "`wevtutil qe Security` and `sc query spooler`"
+          ],
+          0,
+          "Why & Solution: `dcdiag` runs comprehensive diagnostic tests against Domain Controller services (DNS, Netlogon, SYSVOL, RidManager), while `repadmin /replsummary` (and `repadmin /showrepl`) summarizes replication deltas, partner failures, and error codes across all DCs."
+        ],
+        [260, "cli", "PowerShell Storage Health & Physical Disks",
+          "A Windows Server Storage Spaces node raises a degraded pool alert. Which PowerShell cmdlet inspects every attached drive's `FriendlyName`, `MediaType` (HDD vs. SSD), `HealthStatus`, and `OperationalStatus` directly from the CLI?",
+          [
+            "Get-PhysicalDisk | Select-Object FriendlyName, MediaType, HealthStatus, OperationalStatus",
+            "Get-NetAdapterAdvancedProperty -Name *",
+            "Get-CimInstance Win32_BIOS",
+            "Test-WSMan -ComputerName localhost"
+          ],
+          0,
+          "Why & Solution: `Get-PhysicalDisk` queries the Windows Storage Management API to display real-time `HealthStatus` (Healthy, Warning, Unhealthy) and `OperationalStatus` (OK, Predictive Failure, Lost Communication) for all physical drives."
+        ],
+        [261, "cli", "PowerShell Port & Route Diagnostics (Test-NetConnection)",
+          "From a Windows Server Core machine (no GUI), an engineer needs to verify whether TCP port 1433 is reachable on SQL Server `10.20.30.40` and trace the Layer 3 hops taken. Which single PowerShell cmdlet performs both the TCP socket handshake and traceroute?",
+          [
+            "Test-NetConnection -ComputerName 10.20.30.40 -Port 1433 -TraceRoute",
+            "Resolve-DnsName -Name 10.20.30.40 -Type PTR",
+            "Get-SmbOpenFile | Close-SmbOpenFile",
+            "Set-NetFirewallProfile -Profile Domain -Enabled False"
+          ],
+          0,
+          "Why & Solution: `Test-NetConnection` (alias `tnc`) replaces legacy `ping`, `tracert`, and `telnet` port checks in PowerShell, returning `TcpTestSucceeded : True/False` alongside full hop-by-hop latency details."
+        ],
+        [262, "cli", "Bash Exit Codes & Automation Failure Handling",
+          "A nightly Bash backup script runs `tar -czf /backup/db.tar.gz /var/lib/pgsql` followed by `rm -rf /var/lib/pgsql/tmp/*`. One night `/backup` runs out of space so `tar` fails, yet the script blindly executes `rm -rf` anyway because it didn't check the exit status. How should the script verify command success in Bash?",
+          [
+            "Add `set -e` at the top of the script or explicitly check `$? -eq 0` (or chain with `&&`) before executing destructive cleanup",
+            "Check `$LASTEXITCODE -eq True` using `cmd.exe` syntax",
+            "Redirect stderr with `2>/dev/null` so `tar` ignores disk-full errors",
+            "Run the script with `nohup` so exit codes are suppressed"
+          ],
+          0,
+          "Why & Solution: In Bash, `$?` holds the exit code of the last foreground command (`0` = success, `1–255` = error). Using `set -e`, chaining with `&&`, or testing `if [ $? -ne 0 ]; then exit 1; fi` prevents destructive subsequent commands from running after an upstream failure."
+        ],
+        [263, "cli", "DNS Resolution Forensics (dig +trace & NXDOMAIN)",
+          "Clients report they cannot reach `api.corp.internal`, receiving `NXDOMAIN`. Running `dig @10.10.1.5 api.corp.internal` returns `status: NXDOMAIN` with an `AUTHORITY SECTION` pointing to an external public ISP nameserver instead of the internal Active Directory DNS server. What is the root cause?",
+          [
+            "Split-horizon DNS misconfiguration or a rogue public DNS resolver configured on the client, causing queries for an internal zone to hit public root/ISP servers",
+            "TCP port 445 is blocked by Windows Defender Firewall",
+            "The internal DNS server's ARP cache has expired",
+            "HTTPS TLS 1.3 certificate pinning rejected the DNS A record"
+          ],
+          0,
+          "Why & Solution: `dig` displays the exact `SERVER:` queried and the `AUTHORITY SECTION`. When an internal domain query returns `NXDOMAIN` from an external public authority, the client either has a public secondary DNS IP configured (e.g., 8.8.8.8) or internal conditional forwarding is broken."
+        ],
+        [264, "cli", "Linux Kernel Ring Buffer Hardware Errors (dmesg)",
+          "A Linux compute node randomly freezes for several seconds under load. Which command inspects kernel-level hardware and driver messages with human-readable timestamps to catch PCIe AER errors, ECC memory corrections, or SATA/NVMe link resets?",
+          [
+            "dmesg -T -l err,crit,alert,emerg",
+            "crontab -l",
+            "cat /etc/resolv.conf",
+            "hostnamectl status"
+          ],
+          0,
+          "Why & Solution: `dmesg -T` reads the kernel ring buffer with human-readable timestamps (`-T`), and `-l err,crit,alert,emerg` filters out benign boot chatter to highlight hardware bus resets, ECC memory events, and storage driver timeouts."
+        ],
+        [265, "cli", "Linux Symbolic Link vs. Hard Link Behavior",
+          "An engineer creates a backup reference to `/etc/nginx/nginx.conf` using `ln /etc/nginx/nginx.conf /root/nginx.conf.bak` (without `-s`), then later deletes `/etc/nginx/nginx.conf`. Why is the file content still completely intact at `/root/nginx.conf.bak`?",
+          [
+            "`ln` without `-s` created a hard link pointing directly to the same underlying inode; the kernel only frees data blocks when the inode's link count drops to zero",
+            "`ln` automatically copied the file onto a hidden ZFS snapshot partition",
+            "Symbolic links remain readable even after their target path is deleted",
+            "`/etc/nginx` is mounted read-only by systemd"
+          ],
+          0,
+          "Why & Solution: A hard link (`ln`) creates an additional directory entry pointing to the exact same inode on the same filesystem (incrementing the link count). Deleting one filename removes only that pointer; the data persists until all hard links are unlinked. By contrast, a symbolic link (`ln -s`) points to a pathname and becomes a broken/dangling link if the target is deleted."
+        ],
+        [266, "cli", "Windows Event Log Forensics via PowerShell",
+          "A Windows Server rebooted unexpectedly at 03:14 AM. Which PowerShell cmdlet queries the System event log for Kernel-Power critical events (Event ID 41) or unexpected shutdowns (Event ID 6008) over the last 24 hours?",
+          [
+            "Get-WinEvent -FilterHashtable @{LogName='System'; ID=41,6008; StartTime=(Get-Date).AddDays(-1)}",
+            "Get-Process | Where-Object {$_.CPU -gt 100}",
+            "Get-ADUser -Filter * -Properties PasswordLastSet",
+            "Clear-EventLog -LogName System"
+          ],
+          0,
+          "Why & Solution: `Get-WinEvent -FilterHashtable` performs server-side log filtering—far faster than legacy `Get-EventLog`—to isolate Event ID 41 (unexpected power loss/reboot without clean shutdown) and Event ID 6008 (previous shutdown was unexpected)."
+        ],
+        [267, "cli", "Linux Runlevels / Systemd Targets Recovery",
+          "A faulty GPU driver update causes a Linux server's graphical desktop target (`graphical.target`) to loop and crash on boot. Which `systemctl` command switches the default boot target to multi-user CLI networking mode without GUI overhead?",
+          [
+            "systemctl set-default multi-user.target",
+            "systemctl set-default rescue.target",
+            "systemctl isolate poweroff.target",
+            "systemctl enable emergency.target"
+          ],
+          0,
+          "Why & Solution: `multi-user.target` (analogous to legacy Runlevel 3) boots the server with full networking and multi-user services active while disabling the graphical display manager (`graphical.target` / Runlevel 5)."
+        ],
+        [268, "cli", "Linux Block Device & UUID Identification (lsblk & blkid)",
+          "After adding two new NVMe drives to a Linux server, device names shift across reboots (`/dev/nvme0n1` swaps with `/dev/nvme1n1`), causing `/etc/fstab` to mount the wrong data volume. Which command retrieves each filesystem's persistent `UUID` so `/etc/fstab` mounts volumes reliably regardless of kernel enumeration order?",
+          [
+            "blkid (or `lsblk -f`)",
+            "lspci -vvv",
+            "uname -r",
+            "ifconfig -a"
+          ],
+          0,
+          "Why & Solution: Kernel device nodes (`/dev/sdX`, `/dev/nvmeXnY`) can enumerate dynamically across reboots. `blkid` and `lsblk -f` display each partition's immutable filesystem `UUID=`, which should always be used in `/etc/fstab`."
+        ],
+        [269, "cli", "Windows Server Core SConfig & WinRM Management",
+          "An administrator deploys Windows Server 2022 Server Core (no Desktop Experience) and needs to remotely manage it using Server Manager and PowerShell Remoting (`Enter-PSSession`) from a central admin workstation. Which CLI utility/cmdlet enables remote PowerShell management on the Server Core host?",
+          [
+            "Run `Enable-PSRemoting -Force` in PowerShell (or select Remote Management in `sconfig`)",
+            "Install Desktop Experience via `Install-WindowsFeature Server-Gui-Shell`",
+            "Enable Telnet Server on TCP port 23",
+            "Run `net user administrator /active:no`"
+          ],
+          0,
+          "Why & Solution: Server Core provides `sconfig` for baseline IP/domain/update configuration, and `Enable-PSRemoting -Force` configures the WinRM service and firewall rules (TCP 5985/5986) for remote PowerShell and Server Manager administration."
+        ],
+        [270, "cli", "SSH Key Permissions & StrictModes Failure",
+          "An engineer copies a private SSH key to `~/.ssh/id_ed25519` on a Linux bastion host, but `ssh` refuses to use it with `WARNING: UNPROTECTED PRIVATE KEY FILE! Permissions 0644 are too open.` Which command fixes the permissions so SSH accepts the key?",
+          [
+            "chmod 600 ~/.ssh/id_ed25519 (and `chmod 700 ~/.ssh`)",
+            "chmod 777 ~/.ssh/id_ed25519",
+            "chmod +x ~/.ssh/id_ed25519",
+            "chown nobody:nogroup ~/.ssh/id_ed25519"
+          ],
+          0,
+          "Why & Solution: OpenSSH's `StrictModes` rejects private keys readable by group or other users. Setting `chmod 600` (`-rw-------`) on the private key and `chmod 700` (`drwx------`) on `~/.ssh` resolves the error immediately."
+        ],
+        [271, "cli", "Linux Network Routing & Interface Diagnostics (ip route)",
+          "A multi-homed Linux server has `eth0` on the corporate VLAN (`10.10.10.50/24`) and `eth1` on an isolated backup VLAN (`10.10.99.50/24`). After adding `eth1`, external internet/management traffic breaks because two default gateways were configured. Which command inspects and removes the conflicting default route?",
+          [
+            "Inspect with `ip route show` and remove the unwanted gateway with `ip route del default via 10.10.99.1 dev eth1`",
+            "Inspect with `cat /etc/hosts` and flush with `ip link set eth0 down`",
+            "Run `iptables -F` to clear the BGP routing table",
+            "Run `dig +short myip.opendns.com` to reset the kernel metric"
+          ],
+          0,
+          "Why & Solution: A host should only have a single default gateway (`0.0.0.0/0` via the management/public interface); secondary storage/backup interfaces should use static subnet routes only. `ip route show` and `ip route del` display and remove conflicting default gateways cleanly."
+        ],
+        [272, "cli", "Linux Cron Environment Path Trap",
+          "A backup shell script runs flawlessly when executed manually as `root` in an interactive terminal, but fails every night when triggered by `cron` with `pg_dump: command not found`. Why does it fail under `cron`?",
+          [
+            "`cron` runs jobs with a minimal default `PATH` (typically `/usr/bin:/bin`) that excludes `/usr/local/bin` or custom database binary paths; specify full binary paths or export `PATH` inside the script",
+            "`cron` executes all scripts in read-only chroot mode without network access",
+            "`cron` requires every script to be compiled into a C binary first",
+            "`cron` only runs commands owned by the `nobody` system account"
+          ],
+          0,
+          "Why & Solution: Non-interactive `cron` subshells do not source `/etc/profile` or `~/.bashrc`, leaving `PATH` restricted to `/usr/bin:/bin`. Always declare full paths (e.g., `/usr/pgsql-16/bin/pg_dump`) or explicitly define `PATH=` at the top of the crontab/script."
+        ],
+        [273, "cli", "Windows Certificate Store & TLS Binding Forensics",
+          "An internal HTTPS web portal hosted on Windows Server IIS begins displaying `NET::ERR_CERT_DATE_INVALID` in browsers. Which PowerShell command inspects the local machine's Personal certificate store (`Cert:\\LocalMachine\\My`) to identify expired certificates by `Thumbprint` and `NotAfter` date?",
+          [
+            "Get-ChildItem -Path Cert:\\LocalMachine\\My | Select-Object Subject, Thumbprint, NotAfter",
+            "Get-Acl -Path C:\\inetpub\\wwwroot",
+            "Get-WindowsFeature -Name Web-Server",
+            "certutil -shutdown"
+          ],
+          0,
+          "Why & Solution: PowerShell's Certificate provider mounts the Windows certificate stores as a navigable drive (`Cert:\\LocalMachine\\My`). Querying `Subject`, `Thumbprint`, and `NotAfter` immediately reveals expired TLS certificates."
+        ],
+        [274, "cli", "Linux Process Signal Escalation (SIGTERM vs. SIGKILL)",
+          "A hung Java microservice on Linux ignores a standard `kill 4812` (`SIGTERM` / signal 15) command because its main thread is deadlocked. Which signal forces the kernel to immediately terminate the process without allowing the application to trap or ignore the signal?",
+          [
+            "`kill -9 4812` (`SIGKILL` / signal 9)",
+            "`kill -1 4812` (`SIGHUP` / signal 1)",
+            "`kill -15 4812` (`SIGTERM` / signal 15)",
+            "`kill -19 4812` (`SIGSTOP` / signal 19)"
+          ],
+          0,
+          "Why & Solution: `SIGTERM` (15) politely asks a process to clean up and exit, which deadlocked processes can ignore. `SIGKILL` (9) is handled directly by the Linux kernel scheduler and cannot be caught, blocked, or ignored by user-space code."
+        ],
+        [275, "cli", "Windows Boot Configuration Data (BCD) Recovery",
+          "After cloning an OS disk to a new NVMe drive on a UEFI Windows Server, the system fails to boot with `Winload.efi missing or corrupt (0xc000000e)`. Booting into Windows Recovery Environment (WinRE) command prompt, which command rebuilds the UEFI boot files on the EFI System Partition?",
+          [
+            "`bcdboot C:\\Windows /s S: /f UEFI` (after assigning drive letter `S:` to the FAT32 EFI partition in `diskpart`)",
+            "`fdisk /mbr`",
+            "`gpupdate /target:computer /force`",
+            "`net use Z: \\\\localhost\\C$`"
+          ],
+          0,
+          "Why & Solution: On UEFI/GPT Windows systems, `bcdboot C:\\Windows /s S: /f UEFI` copies fresh UEFI boot binaries (`bootmgfw.efi`) and generates a clean BCD store on the FAT32 EFI System Partition (`S:`). Legacy `fdisk /mbr` applies only to MBR BIOS systems."
+        ],
+
+        // ======================================================================
+        // DOMAIN 4: HARDWARE, VIRTUALIZATION, NETWORKING & SECURITY (#276–#300)
+        // ======================================================================
+        [276, "infra", "NUMA Node Locality & vCPU Sizing",
+          "A dual-socket ESXi host has two physical CPUs, each with 16 cores and 128 GB of local DDR5 RAM (256 GB total across two NUMA nodes). An administrator creates a massive SQL VM configured with 24 vCPUs and 160 GB of RAM. Database query latency degrades noticeably compared to a 16-vCPU / 112 GB VM. Why?",
+          [
+            "The VM spans across two NUMA nodes, forcing cross-socket UPI/Infinity Fabric remote memory accesses that incur higher memory latency",
+            "Hypervisors limit all virtual machines to a maximum of 16 vCPUs per host",
+            "DDR5 memory automatically disables ECC error correction when allocations exceed 128 GB",
+            "24 vCPUs disable hardware-assisted virtualization (Intel VT-x / AMD-V)"
+          ],
+          0,
+          "Why & Solution: Each physical CPU socket owns its local memory controller (a NUMA node). When a VM's vCPUs or RAM exceed a single NUMA node's capacity (16 cores / 128 GB here), it becomes a 'wide VM' spanning two nodes—forcing remote cross-socket memory fetches over the interconnect bus and increasing latency."
+        ],
+        [277, "infra", "VMware CPU Ready Time (%RDY) Overcommitment",
+          "An ESXi host with 32 physical cores hosts 25 VMs allocated a combined total of 128 vCPUs (4:1 vCPU-to-pCPU overcommitment). Inside `esxtop`, several 8-vCPU VMs show `%RDY` (CPU Ready Time) at 18% while physical host CPU utilization is only 65%. What is causing the sluggish VM performance?",
+          [
+            "High vCPU-to-pCPU overcommitment combined with wide 8-vCPU VMs forces the hypervisor scheduler to delay VM execution while waiting for 8 simultaneous physical cores to become free",
+            "The VMs have exhausted their thin-provisioned SAN LUN storage space",
+            "LACP NIC teaming is dropping ICMP echo replies",
+            "The host's CMOS battery has failed, resetting the CPU multiplier"
+          ],
+          0,
+          "Why & Solution: CPU Ready (`%RDY`) measures the percentage of time a VM has threads ready to run in the queue but is waiting for the hypervisor to schedule physical cores. Right-sizing oversized 8-vCPU VMs down to 2 or 4 vCPUs dramatically lowers `%RDY`."
+        ],
+        [278, "infra", "SR-IOV vs. Paravirtualized NICs (VMXNET3 / VirtIO)",
+          "A network-intensive packet-inspection virtual appliance requires near-bare-metal line-rate 25GbE throughput and sub-10-microsecond latency by bypassing the hypervisor's virtual switch software layer entirely. Which virtualization feature enables the VM to talk directly to physical NIC hardware queues?",
+          [
+            "SR-IOV (Single Root I/O Virtualization) assigning Virtual Functions (VFs) directly to the guest VM",
+            "Legacy Intel E1000 emulated NIC adapter",
+            "USB 2.0 host passthrough",
+            "Standard NAT virtual network port forwarding"
+          ],
+          0,
+          "Why & Solution: Emulated NICs (E1000) have high CPU overhead; paravirtualized NICs (VMXNET3/VirtIO) optimize hypervisor vSwitch calls; SR-IOV partitions a physical PCIe NIC into hardware Virtual Functions (VFs) passed directly into the guest OS—bypassing the vSwitch for near-native latency (at the trade-off of complicating live vMotion migration)."
+        ],
+        [279, "infra", "Live Migration (vMotion) & CPU EVC Compatibility",
+          "An administrator attempts to live-migrate a running VM from an older Intel Xeon host to a newer Intel Xeon host in the same cluster. Both hosts share the same SAN datastore and VMkernel vMotion network, yet migration fails with a CPU instruction set mismatch error. Which cluster feature resolves this across mixed CPU generations?",
+          [
+            "Enable Enhanced vMotion Compatibility (EVC) to mask newer CPU instruction flags down to a common baseline supported by all hosts in the cluster",
+            "Convert the VM's virtual disks from thick-provisioned to thin-provisioned",
+            "Disable UEFI Secure Boot inside the guest operating system",
+            "Change the management VLAN from tagged to native VLAN 1"
+          ],
+          0,
+          "Why & Solution: Live migration transfers live CPU register states. If a VM starts on a newer CPU using AVX-512 instructions and migrates to an older CPU lacking them, the guest OS crashes. EVC (Enhanced vMotion Compatibility) baselines CPU feature flags across all cluster hosts so live migration succeeds seamlessly."
+        ],
+        [280, "infra", "ECC Memory: Single-Bit vs. Multi-Bit Uncorrectable Errors",
+          "A rack server's iDRAC/iLO health log reports 4,200 'Correctable Single-Bit ECC Memory Errors' on DIMM slot `A2` over the past 48 hours, and today the server suddenly suffered a fatal kernel panic / NMI hardware halt with an 'Uncorrectable Multi-Bit Memory Error' on `A2`. Why did ECC fail to prevent the crash?",
+          [
+            "Standard SECDED ECC memory corrects 1-bit errors per word and detects 2-bit errors, but cannot correct multi-bit corruption—requiring physical replacement of the degrading DIMM",
+            "ECC memory only protects L1/L2 CPU cache and never checks DDR4/DDR5 DIMMs",
+            "Single-bit ECC errors automatically disable the server's RAID controller battery",
+            "ECC correction is disabled whenever dual-channel memory is populated"
+          ],
+          0,
+          "Why & Solution: Server ECC uses SECDED (Single Error Correction, Double Error Detection). While it silently repairs single-bit flips on the fly, a spiking rate of correctable errors on a specific DIMM (`A2`) is a classic predictive warning of imminent module failure leading to an uncorrectable multi-bit crash."
+        ],
+        [281, "infra", "Memory Channel Population (2DPC) & RDIMM vs. LRDIMM",
+          "A technician upgrades a server that currently has eight 32 GB RDIMMs (Registered DIMMs) by installing eight 64 GB LRDIMMs (Load-Reduced DIMMs) into the open second-slots-per-channel (2DPC). Upon powering on, the server halts during POST with a memory configuration error. Why?",
+          [
+            "RDIMMs and LRDIMMs use incompatible electrical buffering architectures and cannot be mixed inside the same server",
+            "Populating 2 DIMMs per channel (2DPC) is physically unsupported on all dual-socket motherboards",
+            "64 GB DIMMs require a 15,000 RPM SAS scratch drive to initialize",
+            "LRDIMMs only function when the CMOS battery is removed"
+          ],
+          0,
+          "Why & Solution: Server memory rules strictly prohibit mixing UDIMMs, RDIMMs, and LRDIMMs in the same system because they differ in register/data-buffer signaling. Additionally, populating 2DPC (2 DIMMs per channel) is valid with matching DIMM types, though it often steps down maximum memory bus clock speed slightly."
+        ],
+        [282, "infra", "Out-of-Band Management (iDRAC/iLO/IPMI) Isolation",
+          "During a penetration test, an auditor discovers that several Dell iDRAC and HPE iLO BMC interfaces are assigned routable IP addresses directly on the corporate user LAN, allowing attackers on user workstations to brute-force BMC logins and mount virtual ISO media. What is the mandatory architectural fix?",
+          [
+            "Place all BMC/IPMI/iDRAC/iLO interfaces on a dedicated, isolated Out-of-Band (OOB) management VLAN accessible only via hardened bastion/VPN jump hosts with MFA",
+            "Disable SSH and HTTPS on the BMC and manage servers exclusively over unencrypted Telnet",
+            "Bridge the iDRAC NIC directly into the public DMZ firewall interface",
+            "Remove the dedicated BMC NIC and share VLAN 1 with guest VMs"
+          ],
+          0,
+          "Why & Solution: Baseboard Management Controllers (BMCs) have full hardware-level power, virtual console, and virtual media control independent of the host OS. They must never sit on user or public VLANs—always isolate them onto a dedicated OOB management network behind jump hosts and strict firewall ACLs."
+        ],
+        [283, "infra", "LACP (802.3ad) NIC Teaming & Switch Hash Mismatch",
+          "An engineer configures a 2x 10GbE LACP (`802.3ad`) NIC team on a Linux file server connected to a top-of-rack switch, expecting 20 Gbps aggregate throughput during a single large NFS backup stream to one backup server. However, throughput caps at 10 Gbps even though both links show `UP` in the bond. Why?",
+          [
+            "LACP hashes traffic per flow (MAC/IP/port tuple) onto a single physical member link—a single TCP stream never exceeds one physical link's 10 Gbps ceiling",
+            "LACP `802.3ad` operates in active/standby mode and keeps the second NIC disabled unless Link 1 fails",
+            "Jumbo frames automatically cut LACP bandwidth in half",
+            "The switch ports are configured as Layer 3 routed interfaces without NAT"
+          ],
+          0,
+          "Why & Solution: LACP (`802.3ad`) aggregates bandwidth across *multiple concurrent flows* using deterministic hashing (Layer 2 MAC or Layer 3/4 IP+Port) to prevent out-of-order packet delivery. Any single TCP/IP session is pinned to one physical member link (max 10 Gbps here)."
+        ],
+        [284, "infra", "802.1Q Trunk Native VLAN Mismatch",
+          "After connecting a new hypervisor host to a trunk port on a core switch, tagged VM VLANs (VLANs 20, 30, 40) pass traffic normally, but the host's untagged management interface cannot reach its gateway and logs `CDP/LLDP Native VLAN mismatch` warnings. What is misconfigured?",
+          [
+            "The switch trunk port has a different untagged Native VLAN ID (e.g., VLAN 99) than the hypervisor's untagged management vSwitch port (e.g., VLAN 1)",
+            "Spanning Tree Loop Guard has blocked all tagged 802.1Q frames",
+            "The hypervisor NIC is set to half-duplex 100 Mbps",
+            "DHCP Option 67 is stripping 802.1Q VLAN headers"
+          ],
+          0,
+          "Why & Solution: On an 802.1Q trunk link, frames belonging to the Native VLAN traverse the wire untagged. If the switch expects untagged traffic on VLAN 99 while the server sends untagged management frames expecting VLAN 1, traffic is blackholed across mismatched VLANs."
+        ],
+        [285, "infra", "PXE Network Boot (DHCP Options 66 & 67)",
+          "A datacenter team is automating bare-metal Linux installations via PXE boot over the network. Newly racked servers obtain an IP address from DHCP, but immediately fail with `PXE-E53: No boot filename received`. Which two DHCP scope options must be configured so PXE clients locate the TFTP server and network bootstrap program?",
+          [
+            "DHCP Option 66 (Boot Server Host Name / TFTP IP) and DHCP Option 67 (Bootfile Name, e.g., `pxelinux.0` or `shimx64.efi`)",
+            "DHCP Option 3 (Default Gateway) and DHCP Option 6 (DNS Servers)",
+            "DHCP Option 42 (NTP Servers) and DHCP Option 15 (Domain Name)",
+            "DHCP Option 150 and SNMPv3 Trap Receiver IP"
+          ],
+          0,
+          "Why & Solution: During PXE boot, the client's NIC firmware relies on DHCP Option 66 (`next-server` / TFTP IP) to find the provisioning host and Option 67 (`filename`) to download the initial bootloader image."
+        ],
+        [286, "infra", "UEFI Secure Boot & Unsigned Kernel Modules",
+          "After enabling UEFI Secure Boot on a hardened Linux server, a third-party proprietary storage driver fails to load during boot with `Required key not available`. What is the cleanest, security-compliant solution?",
+          [
+            "Sign the custom kernel module with a Machine Owner Key (MOK) and enroll the public key into the UEFI firmware via `mokutil --import`",
+            "Downgrade the motherboard from UEFI/GPT back to legacy MBR BIOS boot",
+            "Delete `/boot/efi/EFI` so the kernel skips signature verification",
+            "Set `SELinux=disabled` in `/etc/selinux/config`"
+          ],
+          0,
+          "Why & Solution: UEFI Secure Boot verifies cryptographic signatures on the bootloader, kernel, and kernel modules to block rootkits. Custom/third-party modules must be signed with an enrolled Machine Owner Key (`mokutil`) rather than disabling Secure Boot."
+        ],
+        [287, "infra", "TPM 2.0 BitLocker / LUKS PCR Sealing",
+          "An engineer updates the UEFI motherboard firmware on a BitLocker-encrypted Windows Server without suspending BitLocker protection first. Upon reboot, the server halts at a blue BitLocker Recovery screen demanding the 48-digit recovery key. Why did a benign BIOS/UEFI update trigger this lock?",
+          [
+            "The firmware update altered the cryptographic hash stored in TPM 2.0 Platform Configuration Registers (PCRs), causing the TPM to withhold the unsealed volume encryption key",
+            "Updating UEFI firmware automatically formats the OS partition to exFAT",
+            "TPM 2.0 chips lose all stored keys whenever the server reboots twice within 10 minutes",
+            "BitLocker requires an active internet connection to Microsoft's KDC on every boot"
+          ],
+          0,
+          "Why & Solution: TPM 2.0 seals disk encryption keys (BitLocker / LUKS+Clevis) against specific Platform Configuration Register (PCR) integrity measurements of the firmware and boot path. Modifying UEFI firmware changes those PCR hashes, proving the boot chain changed and triggering recovery mode unless BitLocker was temporarily suspended (`Suspend-BitLocker`)."
+        ],
+        [288, "infra", "SNMPv3 authPriv vs. SNMPv2c Security",
+          "A security audit flags a monitoring server polling 150 rack switches and servers via SNMPv2c using the community string `public` over the management network. Which SNMP version and security level should replace SNMPv2c to provide both cryptographic authentication and payload encryption?",
+          [
+            "SNMPv3 configured with `authPriv` (using SHA-256 authentication and AES-128/256 encryption)",
+            "SNMPv3 configured with `noAuthNoPriv`",
+            "SNMPv1 with a 32-character community string",
+            "SNMPv2c tunneled over unencrypted UDP port 161"
+          ],
+          0,
+          "Why & Solution: SNMPv1 and SNMPv2c transmit community strings in cleartext. SNMPv3 introduces user-based security with three tiers: `noAuthNoPriv`, `authNoPriv` (hashes credentials but leaves data unencrypted), and `authPriv` (encrypts both authentication and SNMP payload via AES)."
+        ],
+        [289, "infra", "Centralized Syslog & Log Integrity",
+          "Following a ransomware intrusion on a web server, incident responders discover the attacker cleared `/var/log/auth.log` and `/var/log/secure` locally to erase their lateral movement trail. Which architectural control preserves forensic logs even when a host OS is compromised?",
+          [
+            "Stream logs in real time over TLS (`rsyslog` / `syslog-ng` TCP 6514) to a centralized, append-only SIEM / Syslog collector",
+            "Increase local `logrotate` retention from 7 days to 365 days on `/var/log`",
+            "Hide `/var/log` by renaming it to `/var/.log`",
+            "Set `umask 000` on all log directories"
+          ],
+          0,
+          "Why & Solution: Local logs can always be wiped or altered by an attacker who gains root/SYSTEM privileges. Real-time remote log forwarding over encrypted TLS syslog to a hardened central SIEM ensures a tamper-resistant audit trail survives local host compromise."
+        ],
+        [290, "infra", "Riser Cards & PCIe Lane Bifurcation",
+          "An engineer installs a dual-M.2 NVMe PCIe adapter card into a 1U rack server's horizontal riser slot, but only the first M.2 drive is detected by the OS while the second slot remains invisible. What UEFI BIOS setting is required on the PCIe riser slot to split a x8/x16 slot into independent x4x4 links?",
+          [
+            "Enable PCIe Bifurcation (e.g., `x4x4` or `x4x4x4x4`) on that riser slot in UEFI setup",
+            "Enable Legacy CSM (Compatibility Support Module) boot",
+            "Disable SR-IOV and VT-d globally",
+            "Switch the riser slot from PCIe Gen 4 down to PCIe Gen 1"
+          ],
+          0,
+          "Why & Solution: Passive multi-NVMe carrier cards lack an onboard PCIe switch chip and rely on the CPU/motherboard to split a single x8 or x16 slot into independent x4 links via PCIe Bifurcation in UEFI firmware."
+        ],
+        [291, "infra", "Blade Server Chassis vs. 1U/2U Rack Form Factors",
+          "A datacenter architect must deploy 32 uniform compute nodes within 10U of rack space while minimizing individual power cords, KVM cables, and top-of-rack switch ports. Which server form factor integrates shared power supplies, cooling fans, midplane networking, and centralized chassis management into a single enclosure?",
+          [
+            "Blade server chassis (e.g., 10U enclosure housing 16 half-height blades with shared PSUs, fans, and interconnect switches)",
+            "Sixteen standalone 2U rackmount servers",
+            "Eight pedestal tower servers placed on sliding rack shelves",
+            "Thirty-two mini-ITX desktop chassis connected via USB hubs"
+          ],
+          0,
+          "Why & Solution: Blade chassis consolidate power distribution, high-efficiency cooling fans, KVM/BMC management, and internal network/SAN switches across a high-speed midplane, delivering maximum compute density and drastically reduced cabling."
+        ],
+        [292, "infra", "Fiber Optic Transceivers (SR vs. LR & OM4 vs. OS2)",
+          "A technician connects two 25GbE SFP28 transceivers between a top-of-rack switch and a core switch 450 meters away in another building using `25GBASE-SR` (850 nm) optics over OM4 multimode fiber, and the link fails to come up. Why?",
+          [
+            "`25GBASE-SR` over OM4 multimode fiber maxes out at ~100 meters; a 450-meter inter-building run requires `25GBASE-LR` (1310 nm) transceivers over OS2 single-mode fiber",
+            "OM4 multimode fiber cannot carry speeds faster than 1 Gbps",
+            "SFP28 transceivers require crossover fiber polarity only on runs under 10 meters",
+            "Single-mode OS2 fiber uses copper twisted pairs for distances over 300 meters"
+          ],
+          0,
+          "Why & Solution: Short-Range (`SR`, 850 nm) multimode optics are engineered for intra-row/datacenter runs up to 70–100m at 10G/25G. Distances of 450m+ require Long-Range (`LR`, 1310 nm) single-mode optics over yellow OS2 single-mode fiber (good up to 10 km)."
+        ],
+        [293, "infra", "Split-Brain Syndrome in High-Availability Clusters",
+          "A two-node active/passive database failover cluster loses its private heartbeat crossover cable while both nodes remain reachable on the public client network. Both Node A and Node B assume the peer has died and attempt to mount the shared SAN LUN simultaneously. Which cluster mechanism prevents this 'split-brain' corruption?",
+          [
+            "Quorum witness (file-share/disk/cloud witness) combined with STONITH / fencing to power off the losing node via BMC/PDU before storage takeover",
+            "Disabling NTP time synchronization on both cluster nodes",
+            "Changing the shared SAN LUN from NTFS to FAT32",
+            "Removing the public network default gateway from Node B"
+          ],
+          0,
+          "Why & Solution: In a 2-node cluster, losing the heartbeat without a 3rd tie-breaker causes 'split-brain' where both nodes claim ownership. Adding a Quorum Witness (creating 3 votes) and hardware Fencing / STONITH ('Shoot The Other Node In The Head' via iDRAC/iLO/PDU) guarantees only one active node ever touches shared storage."
+        ],
+        [294, "infra", "Licensing Trap: True-Up & Per-Core Virtual OSE Math",
+          "An enterprise runs a single dual-socket physical server (16 physical cores total) licensed with one 16-core set of Windows Server Standard edition, which entitles the host to 2 virtual OSEs (VMs). Mid-year under an Enterprise Agreement, the team spins up 4 more Windows Server Standard VMs on that same host (6 VMs total). How many additional 16-core Windows Server Standard license sets must be reconciled at the annual True-Up?",
+          [
+            "2 additional 16-core license sets (totaling 3 sets across the host to cover 6 virtual OSEs at 2 VMs per set)",
+            "4 additional 16-core license sets (1 full host set per single VM)",
+            "0 additional licenses because Windows Server Standard grants unlimited VMs per physical socket",
+            "1 additional Node-Locked license tied to the first VM's virtual MAC address"
+          ],
+          0,
+          "Why & Solution: Each full physical core license set of Windows Server Standard (minimum 16 cores per server) covers 2 virtual OSEs. Running 6 VMs requires 6 / 2 = 3 full 16-core license sets (1 existing + 2 net-new reconciled at the annual True-Up)."
+        ],
+        [295, "infra", "Licensing Trap: Copyleft (GPL) vs. Permissive Open Source",
+          "A software vendor embeds an open-source compression library licensed under the GNU General Public License (GPLv3) into its commercial proprietary backup appliance and ships binaries to customers without publishing source code. Why is the vendor in legal license violation?",
+          [
+            "GPLv3 is a Copyleft license requiring any distributed derivative work to release its complete corresponding source code under the same GPL license",
+            "GPLv3 prohibits charging any fee for media or support services",
+            "Open-source libraries require annual per-core True-Up payments to the Free Software Foundation",
+            "GPLv3 code can only execute on Linux kernels older than version 4.0"
+          ],
+          0,
+          "Why & Solution: Copyleft licenses (like GPL) enforce 'share and share alike' terms upon distribution—you cannot wrap modified GPL code into a closed-source proprietary binary. Proprietary commercial products must use Permissive licenses (MIT, BSD, Apache 2.0)."
+        ],
+        [296, "infra", "Out-of-Band Virtual Media & BIOS Recovery",
+          "A remote datacenter server's OS bootloader is completely corrupted and the server cannot boot from disk or PXE. With no local technician on-site for 12 hours, how can the administrator mount a rescue ISO image and reinstall the OS from 500 miles away?",
+          [
+            "Connect to the server's iDRAC/iLO web console, attach the local rescue `.iso` via Virtual Media, and set the next boot device to Virtual CD/DVD",
+            "Send the ISO file over ICMP echo packets using `ping -l 65500`",
+            "Use `ssh` into the crashed OS kernel to mount an NFS share",
+            "Trigger an SNMPv3 coldStart trap to automatically format C:"
+          ],
+          0,
+          "Why & Solution: Out-of-band BMC controllers (iDRAC, iLO, IMM, IPMI) operate independently of the host CPU/OS and provide Virtual Media redirection, emulating a physical USB/DVD drive over HTTPS so engineers can boot rescue ISOs remotely."
+        ],
+        [297, "infra", "KVM-over-IP vs. Serial Console Concentrator",
+          "A datacenter rack contains 20 Linux servers, 4 top-of-rack switches, and 2 hardware firewalls. Network engineers need out-of-band CLI access to the switches/firewalls during BGP outages, while server admins need graphical BIOS/OS console access. Which two out-of-band console devices provide these capabilities?",
+          [
+            "An IP-based KVM switch (for graphical server video/keyboard/mouse) and a Serial Console Server / Terminal Server (for RS-232/RJ-45 switch & firewall console ports)",
+            "An unshielded USB 2.0 hub and a consumer HDMI splitter",
+            "A Layer 2 unmanaged Ethernet switch and a PoE injector",
+            "An eSATA port multiplier and a Fibre Channel director"
+          ],
+          0,
+          "Why & Solution: KVM-over-IP switches route VGA/DisplayPort video and USB HID signals over the OOB network for servers, whereas Serial Console Servers aggregate RS-232/RJ-45 serial console ports from network switches, routers, and headless appliances."
+        ],
+        [298, "infra", "RAID Write-Back Cache Battery/Supercapacitor Failure",
+          "A hardware RAID controller logs `Cache vault / BBU (Battery Backup Unit) failed — switching logical drives from Write-Back to Write-Through mode`. Immediately afterward, database write IOPS drop by 70%. Why did the controller force this change?",
+          [
+            "Without a healthy battery or supercapacitor to flush volatile DRAM cache to flash during a power outage, Write-Back mode risks catastrophic data loss—so the controller safely reverts to unbuffered Write-Through mode",
+            "A failed BBU physically disconnects half of the SAS lanes on the PCIe bus",
+            "Write-Through mode compresses all blocks using AES-256 before writing",
+            "The controller forces Write-Through mode to cool down 15,000 RPM drives"
+          ],
+          0,
+          "Why & Solution: Write-Back caching acknowledges writes to the OS as soon as they hit fast controller DRAM, delivering high write IOPS. If the BBU/supercapacitor dies, DRAM contents would vanish on power loss, so the controller automatically falls back to Write-Through (waiting for physical disk platter/NAND commits) until the cache module is replaced."
+        ],
+        [299, "infra", "Change Management & Rollback Plan Discipline",
+          "Before applying a major UEFI firmware and RAID controller update across 12 production virtualization hosts during a Sunday maintenance window, which three change-management prerequisites must be verified and documented?",
+          [
+            "Verified full backups/snapshots, a tested step-by-step rollback/backout plan, and formal Change Advisory Board (CAB) approval within an approved maintenance window",
+            "Disabling all monitoring alerts permanently, skipping test-environment validation, and deleting old firmware files",
+            "Running updates simultaneously across all 12 cluster hosts at noon on Monday",
+            "Resetting all iDRAC passwords to factory defaults before starting"
+          ],
+          0,
+          "Why & Solution: Enterprise change management mandates CAB approval, scheduled maintenance windows, validated backups, rolling/canary execution (one host at a time rather than all 12 simultaneously), and a documented backout plan if firmware regressions occur."
+        ],
+        [300, "infra", "Incident Response & Post-Mortem Root Cause Analysis (RCA)",
+          "After resolving a 45-minute storage outage caused by an undocumented firmware bug during a switch upgrade, management asks the engineering team to prevent recurrence across all global datacenters without blaming individual operators. Which formal deliverable documents the timeline, technical root cause, and preventative action items?",
+          [
+            "A blameless Post-Incident Review / Root Cause Analysis (RCA) report updating runbooks, asset documentation, and pre-change verification checklists",
+            "A Service Level Agreement (SLA) penalty invoice sent to the internal helpdesk",
+            "An End-User License Agreement (EULA) True-Up audit",
+            "A magnetic degaussing certificate for the core switches"
+          ],
+          0,
+          "Why & Solution: Lessons Learned / Post-Mortem Root Cause Analysis (RCA) closes the incident lifecycle by identifying systemic gaps (missing runbook steps, firmware compatibility matrices, monitoring thresholds) and turning them into permanent engineering controls."
+        ]
+      ];
+
+      /* ========================================================================
+         STATE MANAGEMENT
+         ======================================================================== */
+      let userAnswers = {};      // { [id]: selectedOptionIndex }
+      let flaggedIds = new Set(); // Set of scenario IDs
+      let activeDomain = "all";
+      let searchQuery = "";
+      let isStudyMode = false;
+      let isRevealAll = false;
+
+      const feedEl = document.getElementById("scenario-feed");
+      const emptyBannerEl = document.getElementById("empty-banner");
+      const statAnsweredEl = document.getElementById("stat-answered");
+      const statAccuracyEl = document.getElementById("stat-accuracy");
+      const statFlaggedEl = document.getElementById("stat-flagged");
+      const statVisibleEl = document.getElementById("stat-visible");
+      const progressFillEl = document.getElementById("progress-fill");
+
+      const btnModeToggle = document.getElementById("btn-mode-toggle");
+      const btnRevealAll = document.getElementById("btn-reveal-all");
+      const btnReset = document.getElementById("btn-reset");
+      const searchInput = document.getElementById("search-input");
+      const filterPills = Array.from(document.querySelectorAll(".filter-pill"));
+
+      const letters = ["A", "B", "C", "D"];
+
+      /* ========================================================================
+         HTML ESCAPE HELPER (Preserves inline <code> tags cleanly)
+         ======================================================================== */
+      function formatTextWithCode(str) {
+        // Escape &, <, > first, then restore intentional `code` backticks
+        const escaped = str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+        return escaped.replace(/`([^`]+)`/g, "<code>$1</code>");
+      }
+
+      /* ========================================================================
+         HUD TELEMETRY UPDATER
+         ======================================================================== */
+      function updateTelemetry() {
+        const total = RAW_SCENARIOS.length;
+        const answeredIds = Object.keys(userAnswers);
+        const answeredCount = answeredIds.length;
+        let correctCount = 0;
+
+        RAW_SCENARIOS.forEach(function (item) {
+          if (userAnswers[item[0]] === item[5]) {
+            correctCount++;
+          }
+        });
+
+        statAnsweredEl.textContent = answeredCount + " / " + total;
+        const accPct = answeredCount === 0 ? 0 : Math.round((correctCount / answeredCount) * 100);
+        statAccuracyEl.textContent = accPct + "%";
+        statFlaggedEl.textContent = String(flaggedIds.size);
+        progressFillEl.style.width = Math.round((answeredCount / total) * 100) + "%";
+      }
+
+      /* ========================================================================
+         RENDER ALL 100 SCENARIO CARDS
+         ======================================================================== */
+      function renderAllScenarios() {
+        const frag = document.createDocumentFragment();
+        const qLower = searchQuery.trim().toLowerCase();
+        let visibleCount = 0;
+
+        RAW_SCENARIOS.forEach(function (item) {
+          const id = item[0];
+          const domainKey = item[1];
+          const topicTag = item[2];
+          const promptText = item[3];
+          const options = item[4];
+          const correctIdx = item[5];
+          const explanation = item[6];
+
+          const isFlagged = flaggedIds.has(id);
+
+          // Domain filter check
+          if (activeDomain === "flagged" && !isFlagged) return;
+          if (activeDomain !== "all" && activeDomain !== "flagged" && domainKey !== activeDomain) return;
+
+          // Keyword search check
+          if (qLower) {
+            const haystack = (
+              "#" + id + " " + id + " " + topicTag + " " + promptText + " " + options.join(" ") + " " + explanation
+            ).toLowerCase();
+            if (!haystack.includes(qLower)) return;
+          }
+
+          visibleCount++;
+
+          const hasAnswered = Object.prototype.hasOwnProperty.call(userAnswers, id);
+          const chosenIdx = hasAnswered ? userAnswers[id] : -1;
+          const showAnswerState = hasAnswered || isStudyMode || isRevealAll;
+
+          const card = document.createElement("article");
+          card.className = "scenario-card" + (isFlagged ? " flagged" : "");
+          card.id = "scenario-" + id;
+
+          // Domain label formatting
+          const domainNames = {
+            storage: "Storage & RAID",
+            power: "Power & Thermal",
+            cli: "Linux & Win CLI",
+            infra: "HW, Virt & Sec"
+          };
+
+          // Header
+          const header = document.createElement("div");
+          header.className = "card-header";
+
+          const badgesWrap = document.createElement("div");
+          badgesWrap.className = "card-badges";
+          badgesWrap.innerHTML =
+            '<span class="badge badge-sky">#' + id + '</span>' +
+            '<span class="badge badge-cyan">' + domainNames[domainKey] + '</span>' +
+            '<span class="badge badge-emerald">' + topicTag + '</span>';
+
+          const flagBtn = document.createElement("button");
+          flagBtn.type = "button";
+          flagBtn.className = "flag-btn" + (isFlagged ? " active" : "");
+          flagBtn.innerHTML = isFlagged ? "&#9733; Flagged" : "&#9734; Flag";
+          flagBtn.addEventListener("click", function () {
+            if (flaggedIds.has(id)) {
+              flaggedIds.delete(id);
+            } else {
+              flaggedIds.add(id);
+            }
+            updateTelemetry();
+            renderAllScenarios();
+          });
+
+          header.appendChild(badgesWrap);
+          header.appendChild(flagBtn);
+
+          // Prompt
+          const promptEl = document.createElement("p");
+          promptEl.className = "scenario-prompt";
+          promptEl.innerHTML = formatTextWithCode(promptText);
+
+          // Options
+          const optsGrid = document.createElement("div");
+          optsGrid.className = "options-grid";
+
+          options.forEach(function (optStr, optIdx) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "opt-btn";
+
+            if (showAnswerState) {
+              if (optIdx === correctIdx) {
+                btn.classList.add("correct");
+              } else if (hasAnswered && optIdx === chosenIdx) {
+                btn.classList.add("incorrect");
+              } else {
+                btn.classList.add("dimmed");
+              }
+            }
+
+            if (hasAnswered || isStudyMode) {
+              btn.disabled = true;
+            }
+
+            btn.innerHTML =
+              '<span class="opt-letter">' + letters[optIdx] + '</span>' +
+              '<span class="option-text">' + formatTextWithCode(optStr) + '</span>';
+
+            btn.addEventListener("click", function () {
+              if (Object.prototype.hasOwnProperty.call(userAnswers, id) || isStudyMode) return;
+              userAnswers[id] = optIdx;
+              updateTelemetry();
+              renderAllScenarios();
+            });
+
+            optsGrid.appendChild(btn);
+          });
+
+          // Explanation Box
+          const expBox = document.createElement("div");
+          expBox.className = "explanation-box";
+
+          if (showAnswerState) {
+            expBox.classList.add("visible");
+            let headerHtml = "";
+            if (hasAnswered) {
+              const isRight = chosenIdx === correctIdx;
+              if (!isRight) expBox.classList.add("wrong-border");
+              headerHtml = isRight
+                ? '<span class="exp-header pass">&#10003; Correct &mdash; Answer: ' + letters[correctIdx] + '</span>'
+                : '<span class="exp-header fail">&#10007; Incorrect (Selected ' + letters[chosenIdx] + ') &mdash; Correct Answer: ' + letters[correctIdx] + '</span>';
+            } else {
+              expBox.classList.add("study-border");
+              headerHtml = '<span class="exp-header study">&#9670; Study Reference &mdash; Correct Answer: ' + letters[correctIdx] + '</span>';
+            }
+            expBox.innerHTML = headerHtml + "<p>" + formatTextWithCode(explanation) + "</p>";
+          }
+
+          card.appendChild(header);
+          card.appendChild(promptEl);
+          card.appendChild(optsGrid);
+          card.appendChild(expBox);
+          frag.appendChild(card);
+        });
+
+        feedEl.innerHTML = "";
+        feedEl.appendChild(frag);
+        statVisibleEl.textContent = String(visibleCount);
+        emptyBannerEl.style.display = visibleCount === 0 ? "block" : "none";
+      }
+
+      /* ========================================================================
+         EVENT LISTENERS
+         ======================================================================== */
+      btnModeToggle.addEventListener("click", function () {
+        isStudyMode = !isStudyMode;
+        btnModeToggle.textContent = isStudyMode ? "Mode: Study" : "Mode: Quiz";
+        btnModeToggle.classList.toggle("active-mode", !isStudyMode);
+        btnModeToggle.classList.toggle("active-reveal", isStudyMode);
+        renderAllScenarios();
+      });
+
+      btnRevealAll.addEventListener("click", function () {
+        isRevealAll = !isRevealAll;
+        btnRevealAll.textContent = isRevealAll ? "Hide Unanswered" : "Reveal All Answers";
+        btnRevealAll.classList.toggle("active-reveal", isRevealAll);
+        renderAllScenarios();
+      });
+
+      btnReset.addEventListener("click", function () {
+        userAnswers = {};
+        isRevealAll = false;
+        btnRevealAll.textContent = "Reveal All Answers";
+        btnRevealAll.classList.remove("active-reveal");
+        updateTelemetry();
+        renderAllScenarios();
+      });
+
+      filterPills.forEach(function (pill) {
+        pill.addEventListener("click", function () {
+          filterPills.forEach(function (p) { p.classList.remove("active"); });
+          pill.classList.add("active");
+          activeDomain = pill.getAttribute("data-domain");
+          renderAllScenarios();
+        });
+      });
+
+      searchInput.addEventListener("input", function () {
+        searchQuery = searchInput.value;
+        renderAllScenarios();
+      });
+
+      // Boot
+      updateTelemetry();
+      renderAllScenarios();
+    })();
+  </script>
+</body>
+</html>

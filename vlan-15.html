@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VLAN 15 — Physical Server Room, Racks & Power Math | Server+ Study Switchboard</title>
+  <style>
+:root {
+  --bg-primary: #0b0f17;
+  --bg-secondary: #131a26;
+  --bg-card: #182132;
+  --bg-card-hover: #1e293e;
+  --border-color: #2a3750;
+  --accent-cyan: #38bdf8;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  --accent-purple: #a855f7;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  padding-bottom: 4rem;
+}
+
+.topbar {
+  background: rgba(19, 26, 38, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0.85rem 1.5rem;
+}
+
+.topbar-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+}
+
+.brand-badge {
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  transition: all 0.15s ease;
+}
+
+.nav-btn:hover:not(.disabled) {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.nav-btn.disabled {
+  opacity: 0.38;
+  pointer-events: none;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1.75rem 1.5rem 0;
+}
+
+.vlan-banner {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(16, 185, 129, 0.08));
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-left: 4px solid var(--accent-cyan);
+  border-radius: 10px;
+  padding: 1.4rem 1.6rem;
+  margin-bottom: 1.75rem;
+}
+
+.vlan-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.vlan-pill {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-cyan);
+  background: rgba(56, 189, 248, 0.14);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+.isolation-pill {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--accent-emerald);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+h1 {
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  margin-bottom: 0.4rem;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 0.96rem;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 1.15rem;
+  margin-bottom: 1.5rem;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1.25rem 1.35rem;
+}
+
+.card h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.card h3 {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0.85rem 0 0.35rem;
+}
+
+.card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.6rem;
+}
+
+ul.clean-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+ul.clean-list li {
+  position: relative;
+  padding-left: 1.15rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+ul.clean-list li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--accent-cyan);
+  font-weight: bold;
+}
+
+ul.clean-list li strong {
+  color: var(--text-primary);
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.83rem;
+  background: rgba(15, 23, 42, 0.85);
+  color: var(--accent-amber);
+  padding: 0.12rem 0.38rem;
+  border-radius: 4px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-card);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+th {
+  background: #101724;
+  color: var(--accent-cyan);
+  font-weight: 700;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(42, 55, 80, 0.6);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+td strong {
+  color: var(--text-primary);
+}
+
+.callout {
+  background: rgba(245, 158, 11, 0.09);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-left: 4px solid var(--accent-amber);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.callout strong {
+  color: var(--accent-amber);
+}
+
+.footer-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-color);
+}
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-badge">SK1-006</span>
+        <span>SERVER+ VLAN SWITCHBOARD</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-btn">⌂ Trunk Index</a>
+        <a href="vlan-14.html" class="nav-btn">← VLAN 14</a>
+        <span class="nav-btn disabled">Next →</span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="vlan-banner">
+      <div class="vlan-tag-row">
+        <span class="vlan-pill">VLAN 15 // ISOLATED DOMAIN</span>
+        <span class="isolation-pill">STRICT DOMAIN BOUNDARY — ZERO CROSS-VLAN LEAKAGE</span>
+      </div>
+      <h1>Physical Server Room, Racks & Power Math</h1>
+      <p class="subtitle">Watts = Volts × Amps, 80% continuous load rule, 50% A/B PDU limit, VA vs. Watts, 4-post racks, cage nuts, crash carts, and KVM switches.</p>
+    </section>
+
+    
+<div class="callout">
+  <strong>DOMAIN SCOPE (VLAN 15):</strong> Everything inside this room belongs strictly to <strong>Physical Rack Architecture, Crash Carts &amp; Local KVMs, Cable Management, and CompTIA Electrical Load &amp; UPS Sizing Math</strong>.
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Formula / Rule</th>
+        <th>Equation / Threshold</th>
+        <th>Server+ Exam Application</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Ohm's / Watt's Power Law</strong></td>
+        <td><code>Watts (W) = Volts (V) × Amps (A)</code><br><code>Amps (A) = Watts (W) / Volts (V)</code></td>
+        <td>Calculate total circuit draw or determine whether adding servers will trip a 15A, 20A, or 30A breaker.</td>
+      </tr>
+      <tr>
+        <td><strong>80% Continuous Load Rule</strong></td>
+        <td><code>Safe Load = Circuit Max Watts × 0.80</code></td>
+        <td>A 120V / 20A circuit = 2,400W peak, but continuous server load must NOT exceed <strong>1,920W (16A)</strong>.</td>
+      </tr>
+      <tr>
+        <td><strong>Redundant A/B Feed Rule</strong></td>
+        <td><code>Max Load per PDU ≤ 50%</code></td>
+        <td>Never load either Feed A or Feed B past 50% capacity—if Feed A fails, Feed B instantly absorbs 100% of rack load.</td>
+      </tr>
+      <tr>
+        <td><strong>UPS Real Power (Watts vs. VA)</strong></td>
+        <td><code>Watts = VA × Power Factor (0.8–0.9)</code></td>
+        <td>Always size a UPS using its <strong>Watt</strong> rating, not just VA (e.g., a 1500VA UPS at 0.8 PF supports max 1,200W).</td>
+      </tr>
+      <tr>
+        <td><strong>PSU DC Output Rails</strong></td>
+        <td><code>+12V</code> / <code>+5V</code> / <code>+3.3V</code> / <code>+5VSB</code></td>
+        <td><code>+12V</code> powers CPUs, GPUs, fans, and drive motors; <code>+5V/+3.3V</code> power RAM, logic, and M.2; <code>+5VSB</code> powers BMC standby.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h2>Server Rack Architecture &amp; Mounting Rules</h2>
+    <ul class="clean-list">
+      <li><strong>4-Post vs. 2-Post Racks:</strong> Heavy deep servers require <strong>4-post enclosed cabinets</strong> supporting both front and rear mounting rails; 2-post open-frame relay racks are for lightweight patch panels and network switches only.</li>
+      <li><strong>Rack Hole Types:</strong> <strong>Square holes</strong> (modern enterprise standard—use snap-in <strong>cage nuts</strong>) vs. round threaded/unthreaded holes (older telecom racks).</li>
+      <li><strong>Bottom-Heavy Weight Distribution:</strong> Always install heavy UPS units, disk shelves, and 4U servers at the <strong>bottom of the rack</strong> (`U1–U10`) to lower the center of gravity and prevent tip-over hazards.</li>
+      <li><strong>Sliding Rails &amp; Cable Management Arms (CMA):</strong> Allow a server to slide smoothly forward out of the rack for hot-swap maintenance without unplugging power or network cables.</li>
+      <li><strong>Anti-Tip Stabilizer Feet &amp; Bolt-Down:</strong> Extend front stabilizer feet or bolt cabinets to the slab floor before sliding heavy servers out on rails.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Crash Carts, KVM Switches &amp; Structured Cabling</h2>
+    <ul class="clean-list">
+      <li><strong>Crash Cart:</strong> Mobile rolling cart equipped with a monitor, USB keyboard/mouse, VGA/HDMI/DisplayPort adapters, and serial rollover cables wheeled directly up to a rack when network/OOB access is unavailable.</li>
+      <li><strong>Local Rackmount KVM Switch (1U Console Tray):</strong> Folding LCD screen + keyboard + touchpad mounted inside the rack wired to 8–32 servers so one console switches between local servers at the rack.</li>
+      <li><strong>KVM over IP:</strong> Encapsulates local keyboard, video, and mouse signals over Ethernet/IP for remote BIOS-level control on servers lacking built-in BMC cards.</li>
+      <li><strong>Patch Panels &amp; Bend Radius:</strong> Terminate horizontal structured cabling cleanly at rack patch panels; maintain proper fiber/copper bend radius and velcro ties (avoid over-tightened zip ties that crush CAT6/fiber jackets).</li>
+      <li><strong>Voltage Input Safety:</strong> North America = <code>110–120V / 60Hz</code>; UK/Europe = <code>220–240V / 50Hz</code>; verify auto-switching PSUs before plugging in.</li>
+    </ul>
+  </div>
+</div>
+
+
+    <div class="footer-nav">
+      <a href="vlan-14.html" class="nav-btn">← VLAN 14</a>
+      <a href="index.html" class="nav-btn">⌂ Return to Switchboard</a>
+      <span class="nav-btn disabled">Next →</span>
+    </div>
+  </main>
+</body>
+</html>

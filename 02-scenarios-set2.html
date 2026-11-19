@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompTIA Server+ V6 (SK1-006) — Scenario Master Vault (Set 2: #101–#200)</title>
+<style>
+  :root {
+    --bg-main: #0a0f1c;
+    --bg-card: #111827;
+    --bg-answer: #0d1526;
+    --border-subtle: #1e293b;
+    --accent-cyan: #38bdf8;
+    --accent-teal: #2dd4bf;
+    --accent-amber: #fbbf24;
+    --accent-purple: #c084fc;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    line-height: 1.6;
+    padding: 16px 12px 64px;
+    max-width: 840px;
+    margin: 0 auto;
+  }
+  header {
+    background: linear-gradient(135deg, #0f172a 0%, #172554 100%);
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 20px 18px;
+    margin-bottom: 18px;
+  }
+  header h1 {
+    font-size: 1.32rem;
+    color: var(--accent-cyan);
+    letter-spacing: 0.3px;
+    margin-bottom: 6px;
+  }
+  header p {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+  }
+  .controls {
+    position: sticky;
+    top: 8px;
+    z-index: 100;
+    background: rgba(10, 15, 28, 0.95);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  button.chip {
+    background: #1e293b;
+    color: var(--text-secondary);
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 6px 9px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  button.chip.active {
+    background: var(--accent-cyan);
+    color: #090d16;
+    border-color: var(--accent-cyan);
+  }
+  .search-row {
+    display: flex;
+    gap: 8px;
+  }
+  input#searchBox {
+    flex: 1;
+    background: #0f172a;
+    border: 1px solid #334155;
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.88rem;
+  }
+  input#searchBox:focus {
+    outline: none;
+    border-color: var(--accent-cyan);
+  }
+  button#toggleAllBtn {
+    background: #1e293b;
+    color: var(--accent-teal);
+    border: 1px solid #2dd4bf55;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .stats-bar {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 18px 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .q-num {
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: var(--accent-cyan);
+    background: rgba(56, 189, 248, 0.12);
+    padding: 3px 9px;
+    border-radius: 6px;
+  }
+  .domain-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: #1e293b;
+    color: var(--accent-amber);
+  }
+  .domain-tag.ai-tag {
+    background: rgba(192, 132, 252, 0.15);
+    color: var(--accent-purple);
+    border: 1px solid rgba(192, 132, 252, 0.35);
+  }
+  .scenario-text {
+    font-size: 0.96rem;
+    color: var(--text-primary);
+    margin-bottom: 14px;
+    font-weight: 500;
+  }
+  .options-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 12px;
+  }
+  .opt {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 0.87rem;
+    color: var(--text-secondary);
+  }
+  .opt.correct-highlight {
+    background: rgba(45, 212, 191, 0.12);
+    border-color: var(--accent-teal);
+    color: #ecfdf5;
+    font-weight: 600;
+  }
+  details {
+    background: var(--bg-answer);
+    border: 1px solid #1e3a5f;
+    border-radius: 10px;
+    padding: 10px 13px;
+  }
+  summary {
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--accent-teal);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "▼"; font-size: 0.72rem; opacity: 0.8; }
+  details[open] summary::after { content: "▲"; }
+  .answer-body {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #1e293b;
+    font-size: 0.87rem;
+    color: var(--text-secondary);
+  }
+  .answer-verdict {
+    color: var(--accent-teal);
+    font-weight: 700;
+    margin-bottom: 6px;
+    font-size: 0.91rem;
+  }
+  .mechanism {
+    margin-bottom: 6px;
+  }
+  .mechanism strong { color: var(--text-primary); }
+  .trap-note {
+    color: var(--accent-amber);
+    font-size: 0.82rem;
+    background: rgba(251, 191, 36, 0.08);
+    padding: 6px 9px;
+    border-radius: 6px;
+    border-left: 3px solid var(--accent-amber);
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>CompTIA Server+ V6 (SK1-006) — Scenario Vault Set 2 (#101–#200)</h1>
+  <p>100 Brand-New Scenarios Across All 5 V6 Domains • Blade Chassis, SAN Fabrics, Active Directory, ZFS/Btrfs, Container Security, PBQ Logic &amp; AI Clusters.</p>
+</header>
+
+<div class="controls">
+  <div class="filter-row" id="filterRow">
+    <button class="chip active" data-domain="ALL">All (100)</button>
+    <button class="chip" data-domain="1.0 Hardware & Infrastructure">1.0 Hardware (20)</button>
+    <button class="chip" data-domain="2.0 Server Administration">2.0 Admin &amp; Storage (20)</button>
+    <button class="chip" data-domain="3.0 Security & Disaster Recovery">3.0 Security &amp; DR (20)</button>
+    <button class="chip" data-domain="4.0 Troubleshooting">4.0 Troubleshooting (20)</button>
+    <button class="chip" data-domain="5.0 AI & Accelerated Compute">5.0 AI Infrastructure (20)</button>
+  </div>
+  <div class="search-row">
+    <input type="text" id="searchBox" placeholder="Filter Set 2 (e.g., blade, mezzanine, ZFS, PXE, Ansible, split-brain, LoRA, KV cache)...">
+    <button id="toggleAllBtn">Expand All</button>
+  </div>
+  <div class="stats-bar">
+    <span id="visibleCount">Showing 100 of 100 scenarios</span>
+    <span>Zero overlap with Set 1 (#001–#100)</span>
+  </div>
+</div>
+
+<main id="quizContainer"></main>
+
+<script>
+const scenarios = [
+  // ================= DOMAIN 1.0: HARDWARE & INFRASTRUCTURE (101-120) =================
+  {
+    id: 101, domain: "1.0 Hardware & Infrastructure",
+    q: "A blade server chassis houses 16 half-height compute blades sharing a midplane, six shared power supplies, and redundant chassis management modules. After inserting a new Fibre Channel mezzanine card into Blade 08, the blade cannot communicate with the SAN even though the card is detected in UEFI. What is missing in the rear of the blade enclosure?",
+    opts: ["A. The matching Fibre Channel pass-through or interconnect switch module in the corresponding rear I/O fabric bay", "B. A dedicated 120V power cord plugged directly into Blade 08", "C. An external USB-to-SAS bridge", "D. A local CMOS jumper on the chassis midplane"],
+    ans: "A",
+    why: "Blade mezzanine cards route their signals across the chassis midplane directly to specific rear interconnect bays (Fabric A/B/C). If the matching rear I/O module is empty or populated with an Ethernet module instead of Fibre Channel, the mezzanine ports go nowhere.",
+    trap: "Blade mezzanine card detected + no fabric link = verify matching rear chassis I/O interconnect bay."
+  },
+  {
+    id: 102, domain: "1.0 Hardware & Infrastructure",
+    q: "An administrator configures a server's BIOS Memory Sparing (Rank Sparing) mode on a system populated with dual-rank RDIMMs. When a single-bit ECC error threshold is exceeded on an active memory rank, what does the memory controller do automatically?",
+    opts: ["A. Copies the contents of the failing rank to the reserved spare rank and takes the degraded rank offline before an uncorrectable multi-bit crash occurs", "B. Halves the memory bus clock to 1600 MT/s", "C. Reboots the server and disables ECC", "D. Mirrors all data onto the NVMe boot drive"],
+    ans: "A",
+    why: "Rank Sparing holds one rank per channel in reserve; when telemetry sees rising single-bit errors on an active rank, hardware transparently fails over to the spare rank without OS downtime.",
+    trap: "Memory Mirroring = real-time 50% capacity duplicate; Rank Sparing = proactive hot-spare rank failover."
+  },
+  {
+    id: 103, domain: "1.0 Hardware & Infrastructure",
+    q: "A technician installs a replacement heatsink onto a 250W enterprise server CPU without cleaning off the dried old thermal paste and applies a thick blob of new compound on top. Under sustained load, the CPU hits 98°C and throttles. Why?",
+    opts: ["A. Old crusted paste plus overly thick compound creates air pockets and high thermal resistance instead of filling microscopic metal surface imperfections", "B. Thermal paste conducts electricity and shorts CPU pins", "C. The BMC disables fan PWM when paste is thick", "D. Excess paste blocks PCIe lanes"],
+    ans: "A",
+    why: "Thermal Interface Material (TIM) is only meant to fill microscopic air gaps between the CPU IHS and heatsink base; metal-to-metal contact conducts heat far better than thick paste.",
+    trap: "Always clean old TIM with isopropyl alcohol and apply a thin, even layer."
+  },
+  {
+    id: 104, domain: "1.0 Hardware & Infrastructure",
+    q: "A data center operations team implements hot-aisle containment using chimney ducts routing server rear exhaust directly into the ceiling return plenum. Why does hot-aisle containment typically achieve higher cooling efficiency than uncontained open aisles?",
+    opts: ["A. It completely prevents hot exhaust air from mixing with cold supply air and returns hotter air to the CRAC coils, increasing thermodynamic heat-exchange efficiency", "B. It eliminates the need for server chassis fans", "C. It pressurizes the room with pure nitrogen", "D. It lowers server PSU voltage requirements"],
+    ans: "A",
+    why: "Separating cold supply and hot return streams stops hot spots and delivers a higher temperature differential (delta-T) back to CRAC/CRAH cooling coils, dramatically improving chiller efficiency.",
+    trap: "Containment = zero hot/cold air mixing + higher CRAC return delta-T."
+  },
+  {
+    id: 105, domain: "1.0 Hardware & Infrastructure",
+    q: "A technician pulls a 2U server out on its sliding rack rails to replace a failed internal CMOS battery. Halfway through, the server stops sliding forward and locks with an audible click before clearing the rack posts. Why is this mechanical feature built into enterprise rails?",
+    opts: ["A. Safety service-position latches prevent the heavy chassis from accidentally sliding completely off the rails and falling onto the technician", "B. The rails automatically ground the chassis via spring locks", "C. Cable management arms restrict rail travel to 12 inches", "D. Airflow sensors lock the rails while fans are spinning"],
+    ans: "A",
+    why: "Tool-less enterprise sliding rails feature intermediate service locks so you can safely open the top lid in the aisle without dropping a 60-lb server on your feet.",
+    trap: "Always verify rail safety latches engage before servicing a slid-out server."
+  },
+  {
+    id: 106, domain: "1.0 Hardware & Infrastructure",
+    q: "A server is equipped with a Dual SD Card / Dual M.2 BOSS (Boot Optimized Storage Solution) hardware RAID 1 boot module. Why do enterprise architects boot hypervisors from an internal mirrored M.2/SD module instead of carving a boot partition out of the front 24-bay SAS/NVMe storage pool?",
+    opts: ["A. It isolates the hypervisor OS from data arrays, leaves all 24 front hot-swap bays free for high-speed VM storage, and survives single boot-device failure", "B. SD cards have higher write endurance than enterprise U.3 NVMe drives", "C. Hypervisors cannot boot from SAS controllers", "D. It eliminates the need for UEFI firmware"],
+    ans: "A",
+    why: "Separating OS boot media onto a dedicated internal hardware RAID 1 carrier keeps all front drive bays dedicated to workload storage and simplifies full array rebuilds/migrations.",
+    trap: "Dedicated mirrored internal boot module = OS isolation + maximum front bay capacity."
+  },
+  {
+    id: 107, domain: "1.0 Hardware & Infrastructure",
+    q: "During a generator failover drill, utility power drops, UPS units carry the load cleanly for 45 seconds, and the diesel backup generator starts up. However, when the Automatic Transfer Switch (ATS) connects the generator, several UPS units refuse to accept generator power and stay on battery until depleted. Why?",
+    opts: ["A. Generator output frequency/voltage drifted outside the online UPS's narrow input acceptance window (dirty frequency slew rate)", "B. Diesel generators produce DC power instead of AC", "C. Server PSUs block generator sine waves", "D. The ATS disconnected the neutral ground bond permanently"],
+    ans: "A",
+    why: "Unloaded or poorly governed generators often experience frequency swings (e.g., 57–63 Hz) that double-conversion UPS rectifiers reject as out-of-spec power unless generator governor tuning or wider UPS input tolerances are configured.",
+    trap: "UPS rejects generator power = frequency/voltage waveform out of UPS input tolerance."
+  },
+  {
+    id: 108, domain: "1.0 Hardware & Infrastructure",
+    q: "A colocation facility monitors environmental sensors at the top, middle, and bottom of every server rack. Which placement is the industry standard for measuring server intake compliance against ASHRAE thermal guidelines?",
+    opts: ["A. Front (cold-aisle) intake side at top, middle, and bottom heights—specifically watching the top front intake where warm air tends to stratify", "B. Inside the PSU exhaust stream at the rear", "C. Under the raised floor directly beside the chiller pipe", "D. Inside the cable management tray"],
+    ans: "A",
+    why: "ASHRAE thermal envelopes specify temperature and humidity at the equipment air INLET (front), not the hot exhaust rear.",
+    trap: "ASHRAE specs apply to FRONT cold-aisle intake air."
+  },
+  {
+    id: 109, domain: "1.0 Hardware & Infrastructure",
+    q: "An engineer connects a 100GbE QSFP28 transceiver into a switch uplink port using a multi-mode OM4 fiber patch cable, but the link stays down. Checking the optic label reveals '100GBASE-LR4 (1310nm)'. Why won't the link come up?",
+    opts: ["A. LR4 is a long-range Single-Mode Fiber (SMF) optic requiring OS2 yellow single-mode fiber, not OM4 aqua multi-mode fiber", "B. QSFP28 ports only support copper DAC cables", "C. OM4 fiber requires SC connectors instead of LC", "D. 100GbE requires four separate fiber pairs"],
+    ans: "A",
+    why: "SR (Short Reach, 850nm) optics match Multi-Mode Fiber (OM3/OM4); LR (Long Reach, 1310nm) optics use narrow-core lasers designed strictly for Single-Mode Fiber (OS1/OS2).",
+    trap: "SR = Multi-Mode (OM3/OM4); LR = Single-Mode (OS2). Never mismatch optics and fiber type."
+  },
+  {
+    id: 110, domain: "1.0 Hardware & Infrastructure",
+    q: "A server rack houses 20 1U servers, each requiring two Cat6A network uplinks and two redundant power cords. A technician bundles all 40 Ethernet cables tightly together with plastic zip ties and runs them directly alongside the high-current AC power whips. Intermittent packet CRC errors begin appearing. Why?",
+    opts: ["A. Electromagnetic interference (EMI) from parallel AC power cords and crushed twist geometry from over-tightened zip ties degraded signal integrity", "B. Cat6A cables overheat when bundled in groups larger than 10", "C. Switch ports disable Auto-MDIX when cables are bundled", "D. AC power reverses Ethernet polarity"],
+    ans: "A",
+    why: "Running unshielded twisted-pair copper parallel to AC power introduces EMI crosstalk, and cinching zip ties crushes internal pair twist spacing (hook-and-loop Velcro straps must be used instead).",
+    trap: "Use Velcro straps (never zip ties) on structured cabling and separate data from AC power."
+  },
+  {
+    id: 111, domain: "1.0 Hardware & Infrastructure",
+    q: "A newly installed server fails to boot from a PXE network boot server on a routed enterprise network. Servers on the same subnet as the PXE/WDS server boot fine, while servers on VLAN 50 time out waiting for DHCP/PXE offers. What router/switch setting is missing on VLAN 50?",
+    opts: ["A. IP Helper-Address (DHCP Relay) pointing to the DHCP and PXE/WDS servers", "B. Spanning Tree BPDU Filter", "C. Port Mirroring (SPAN)", "D. BGP Passive Interface"],
+    ans: "A",
+    why: "PXE boot starts with a Layer 2 DHCP Discover broadcast. Routers drop broadcasts at subnet boundaries unless an IP Helper / DHCP Relay forwards them as unicast to the DHCP/PXE server.",
+    trap: "PXE/DHCP works locally + fails across VLANs = configure IP Helper-Address (DHCP Relay)."
+  },
+  {
+    id: 112, domain: "1.0 Hardware & Infrastructure",
+    q: "A server motherboard features two onboard 10GBASE-T RJ45 ports and an OCP 3.0 (Open Compute Project) mezzanine slot. What is the primary operational advantage of using an OCP 3.0 NIC over a standard rear PCIe card?",
+    opts: ["A. Front/rear hot-serviceable pull-tab form factor that can be swapped without opening the server chassis lid and keeps standard PCIe risers free for GPUs/HBAs", "B. OCP 3.0 cards draw power directly from the Ethernet switch via PoE++", "C. OCP 3.0 bypasses the OS network stack automatically", "D. OCP 3.0 requires zero firmware updates"],
+    ans: "A",
+    why: "OCP 3.0 NICs slide into a dedicated chassis bay with an external thumbscrew/pull-tab, preserving full-height PCIe slots for accelerators and storage controllers.",
+    trap: "OCP 3.0 = modular external-access server NIC saving PCIe expansion slots."
+  },
+  {
+    id: 113, domain: "1.0 Hardware & Infrastructure",
+    q: "An administrator configures an out-of-band BMC on a server and notices two options for network connectivity: 'Dedicated NIC' vs. 'Shared LOM (LAN on Motherboard)'. Why do security-conscious data centers mandate using the Dedicated BMC port?",
+    opts: ["A. Physical air-gap isolation: management traffic stays on a physically separate switch/VLAN from production OS traffic, preventing guest compromises from reaching the BMC", "B. Shared LOM ports run at 10 Mbps half-duplex", "C. Dedicated NICs encrypt IPMI traffic without TLS", "D. Shared LOM disables BIOS updates"],
+    ans: "A",
+    why: "Shared LOM shares a single physical port and cable with production OS traffic via VLAN tagging, whereas a Dedicated BMC port provides physical cable-level separation onto the OOB management network.",
+    trap: "Dedicated BMC NIC = true physical out-of-band isolation."
+  },
+  {
+    id: 114, domain: "1.0 Hardware & Infrastructure",
+    q: "A server chassis has redundant hot-swap fans labeled Fan 1 through Fan 6. When Fan 3 fails and is pulled out for replacement, the remaining five fans immediately jump to maximum RPM until the new fan clicks in. Why?",
+    opts: ["A. The BMC compensates for the missing fan's static pressure loss and open bay air bypass by boosting remaining fans to prevent thermal runaway", "B. Pulling a fan shorts the 12V tachometer pin", "C. The OS power plan switches to High Performance", "D. Chassis intrusion alarm forces max fan speed permanently"],
+    ans: "A",
+    why: "N+1 cooling redundancy automatically ramps surviving fans to maintain required CFM airflow across heatsinks while a fan bay is empty or faulted.",
+    trap: "Normal N+1 BMC thermal response during hot-swap fan maintenance."
+  },
+  {
+    id: 115, domain: "1.0 Hardware & Infrastructure",
+    q: "A technician is troubleshooting why a 4U storage server's rear redundant PSUs have amber blinking LEDs after a site relocation. Checking the facility specs reveals the new rack only supplies 110V–120V circuits, whereas the installed high-wattage 2400W PSUs are rated strictly for 200V–240V high-line input. Why won't they power up?",
+    opts: ["A. High-wattage Titanium/Platinum server PSUs (>1600W–2400W) often require 200V–240V AC input and will not output full power or turn on at 120V", "B. 120V circuits run at 50 Hz instead of 60 Hz", "C. The power cords use C13 instead of C19 connectors", "D. The BMC locks PSUs after physical relocation"],
+    ans: "A",
+    why: "Drawing 2400W at 120V would pull over 20A through a single cord; ultra-high-wattage PSUs require 208V/240V circuits (and heavy-duty C19/C20 cords).",
+    trap: "High-wattage server PSUs (>1600W) = require 200V–240V high-line input."
+  },
+  {
+    id: 116, domain: "1.0 Hardware & Infrastructure",
+    q: "A data center installs an FM-200 / Novec 1230 clean-agent fire suppression system instead of wet-pipe water sprinklers in the main server hall. Why?",
+    opts: ["A. Clean-agent gas extinguishes fires rapidly by absorbing heat/interrupting combustion without leaving conductive water or corrosive residue on live electronics", "B. Clean-agent gas cools servers down to -20°C", "C. Water sprinklers are illegal in commercial buildings", "D. Clean-agent gas doubles as UPS backup power"],
+    ans: "A",
+    why: "Clean-agent gaseous systems suppress electrical fires safely without destroying millions of dollars of live server hardware with water damage.",
+    trap: "Server room fire suppression = clean agent (FM-200 / Novec 1230 / inert gas) or pre-action dry-pipe."
+  },
+  {
+    id: 117, domain: "1.0 Hardware & Infrastructure",
+    q: "A server is configured with UEFI Secure Boot enabled. When an administrator installs an unsigned third-party storage HBA kernel driver on Linux, the module fails to load with 'Required key not available'. Why?",
+    opts: ["A. UEFI Secure Boot enforces cryptographic signature verification across the bootloader, kernel, and kernel modules to block rootkits", "B. The HBA card is inserted into a PCIe Gen 3 slot", "C. TPM 2.0 ran out of NVRAM space", "D. SELinux blocked PCIe enumeration"],
+    ans: "A",
+    why: "Secure Boot chains trust from UEFI firmware keys (PK/KEK/db) down into the OS kernel; unsigned drivers are rejected unless signed with a Machine Owner Key (MOK).",
+    trap: "Unsigned kernel driver blocked at boot/load = UEFI Secure Boot (enroll MOK or use signed driver)."
+  },
+  {
+    id: 118, domain: "1.0 Hardware & Infrastructure",
+    q: "An enterprise deploys a single-mode fiber run between Building A and Building B (2.5 km apart) using 10GBASE-LR transceivers. Short patch runs inside the lab work, but the 2.5 km link suffers severe optical signal loss. Inspecting the fiber termination reveals green angled connectors (APC) plugged into blue flat-polished transceiver ports (UPC). What happened?",
+    opts: ["A. Mating an 8-degree angled APC connector into a flat UPC port creates an air gap that causes massive insertion loss and back-reflection", "B. Green connectors are for multi-mode fiber only", "C. 10GBASE-LR maxes out at 300 meters", "D. Single-mode fiber requires copper repeaters every 500 meters"],
+    ans: "A",
+    why: "APC (Angled Physical Contact, green) and UPC (Ultra Physical Contact, blue) ferrules have incompatible end-face angles—mating them leaves an air gap and can chip the glass core.",
+    trap: "Never mate green (APC) fiber connectors into blue (UPC) ports."
+  },
+  {
+    id: 119, domain: "1.0 Hardware & Infrastructure",
+    q: "A server has 8 SAS/SATA front bays connected to a motherboard SATA controller, and an engineer attempts to hot-swap a failed drive while the OS is running. However, the OS does not detect the newly inserted replacement drive until reboot, and 'Hot Plug' is grayed out in BIOS. Why?",
+    opts: ["A. The SATA controller is operating in legacy IDE/compatibility mode instead of AHCI or RAID mode (which are required for hot-swap signaling)", "B. SATA drives cannot physically fit in SAS backplanes", "C. Hot-swapping only works on NVMe drives", "D. The OS lacks UEFI Secure Boot"],
+    ans: "A",
+    why: "AHCI (Advanced Host Controller Interface) or hardware RAID mode enables native hot-plug detection and NCQ; legacy IDE emulation lacks hot-swap support.",
+    trap: "SATA hot-swap requires AHCI or RAID mode enabled in BIOS."
+  },
+  {
+    id: 120, domain: "1.0 Hardware & Infrastructure",
+    q: "A facility engineer reviews a Tier III data center design for a critical financial deployment. What defines a Tier III ('Concurrently Maintainable') data center compared to Tier II?",
+    opts: ["A. Every cooling and power distribution path has redundant components so any single piece of facility equipment can be taken offline for maintenance without interrupting IT load", "B. It requires zero UPS batteries", "C. It guarantees 100% uptime with zero maintenance windows ever needed", "D. It uses single-path power with N+1 servers"],
+    ans: "A",
+    why: "Tier III provides N+1 redundancy plus dual distribution paths so planned maintenance never requires shutting down servers.",
+    trap: "Tier III = Concurrently Maintainable (maintain any power/cooling path with zero downtime)."
+  },
+
+  // ================= DOMAIN 2.0: SERVER ADMINISTRATION & STORAGE (121-140) =================
+  {
+    id: 121, domain: "2.0 Server Administration",
+    q: "A storage engineer builds a ZFS / Btrfs software-defined storage server using 8 enterprise drives in RAIDZ2 (equivalent to RAID 6). Unlike traditional hardware RAID cards, why does ZFS/Btrfs detect and automatically repair 'silent data corruption' (bit rot)?",
+    opts: ["A. It stores cryptographic checksums of every data block in parent metadata pointers and heals corrupted blocks on read using parity/mirror copies", "B. It formats drives with 128 KB clusters", "C. It disables drive write caches permanently", "D. It converts SATA drives into Fibre Channel LUNs"],
+    ans: "A",
+    why: "Traditional RAID trusts disk read responses blindly, whereas Copy-on-Write filesystems like ZFS/Btrfs verify end-to-end block checksums on every read and self-heal silent bit flips.",
+    trap: "Silent bit-rot detection & self-healing = ZFS / Btrfs end-to-end checksums."
+  },
+  {
+    id: 122, domain: "2.0 Server Administration",
+    q: "An administrator manages 150 Linux web and application servers and needs to ensure every server maintains identical /etc/ssh/sshd_config settings, installed packages, and firewall rules—automatically reverting any manual configuration drift without installing agents on target hosts. Which tool fits best?",
+    opts: ["A. Ansible (agentless push-based Infrastructure-as-Code / Configuration Management over SSH)", "B. Windows Deployment Services (WDS)", "C. Clonezilla USB imaging", "D. SNMPv2 polling"],
+    ans: "A",
+    why: "Ansible uses declarative YAML playbooks over standard SSH (agentless) to enforce idempotent desired state and remediate configuration drift across fleets.",
+    trap: "Agentless IaC configuration management over SSH = Ansible."
+  },
+  {
+    id: 123, domain: "2.0 Server Administration",
+    q: "A Windows Server administrator promotes a new Domain Controller in a branch office, but branch users complain logins still authenticate slowly across the WAN to the headquarters DC. What Active Directory configuration was overlooked?",
+    opts: ["A. Creating an Active Directory Site for the branch office, associating its IP subnet with that Site, and moving the branch DC into it", "B. Enabling WINS NetBIOS broadcasts across the WAN", "C. Raising the forest functional level", "D. Installing DHCP Relay on the domain controller"],
+    ans: "A",
+    why: "AD clients locate their nearest DC by matching their client IP subnet to an AD Site object; without a Site/subnet mapping, clients pick DCs randomly across the forest.",
+    trap: "Clients authenticating to distant WAN DCs = missing AD Site & Subnet mapping."
+  },
+  {
+    id: 124, domain: "2.0 Server Administration",
+    q: "An enterprise file server running Windows Server hosts a 20 TB department share where users frequently overwrite or accidentally delete spreadsheets. The admin wants users to self-restore previous versions from yesterday without bothering IT for tape/cloud restores. Which feature enables this?",
+    opts: ["A. Volume Shadow Copy Service (VSS / Previous Versions) scheduled snapshots", "B. BitLocker To Go", "C. NIC Teaming LACP", "D. Windows Defender Application Control"],
+    ans: "A",
+    why: "VSS creates point-in-time block-level shadow copies on NTFS/ReFS volumes, letting users right-click files and restore prior versions directly.",
+    trap: "Self-service file rollback on Windows shares = Volume Shadow Copy (VSS)."
+  },
+  {
+    id: 125, domain: "2.0 Server Administration",
+    q: "A Linux systemd service ('payment-api.service') crashes unexpectedly when an upstream database briefly restarts, and stays dead until an admin manually runs 'systemctl start payment-api'. Which directive in the unit file's [Service] section makes systemd recover it automatically?",
+    opts: ["A. Restart=always (or Restart=on-failure) paired with RestartSec=5", "B. WantedBy=multi-user.target", "C. Type=oneshot", "D. ExecStop=/bin/true"],
+    ans: "A",
+    why: "'systemctl enable' only starts a service at boot; adding 'Restart=on-failure' or 'Restart=always' tells systemd to supervise the PID and respawn it if it crashes.",
+    trap: "'enable' = start at boot; 'Restart=on-failure' = auto-restart after crash."
+  },
+  {
+    id: 126, domain: "2.0 Server Administration",
+    q: "An administrator configures a 2-node Windows Failover Cluster (WSFC) with shared SAN storage. During a network glitch between the two nodes, both nodes remain powered on and attempt to mount and write to the shared cluster disk simultaneously—risking catastrophic filesystem corruption unless prevented. What prevents this 'split-brain' scenario?",
+    opts: ["A. Cluster Quorum with a Witness (Disk Witness, File Share Witness, or Cloud Witness) requiring a strict majority vote before a partition can own resources", "B. Disabling MPIO on both nodes", "C. Setting identical static IP addresses on both nodes", "D. Enabling DHCP on the heartbeat NIC"],
+    ans: "A",
+    why: "In an even 2-node cluster, a Witness casts the tie-breaking 3rd vote; whichever node loses contact with both its peer and the Witness immediately yields ownership so only one side writes to storage.",
+    trap: "Prevent 2-node cluster split-brain = Cluster Quorum + Witness."
+  },
+  {
+    id: 127, domain: "2.0 Server Administration",
+    q: "A storage array uses automated Storage Tiering across NVMe SSDs, 10K SAS HDDs, and 7.2K NL-SAS HDDs. How does automated storage tiering optimize both cost and performance?",
+    opts: ["A. It continuously monitors block access frequency ('heat') and promotes hot active blocks to NVMe while demoting cold archival blocks to high-capacity spinning disks", "B. It stripes RAID 0 across NVMe and NL-SAS simultaneously", "C. It compresses cold files into ZIP archives", "D. It forces all writes to 7.2K HDDs first"],
+    ans: "A",
+    why: "Sub-LUN automated tiering places the 10% of 'hot' active data on expensive flash and the 90% 'cold' data on cheap bulk disks transparently.",
+    trap: "Hot blocks → SSD/NVMe, cold blocks → spinning disk = Automated Storage Tiering."
+  },
+  {
+    id: 128, domain: "2.0 Server Administration",
+    q: "A company provisions 80 identical bare-metal Linux servers in a new data hall. Instead of manually clicking through USB installers, an engineer configures PXE network boot paired with an automated Kickstart (RHEL) / Preseed / Cloud-Init answer file. What is this deployment method called?",
+    opts: ["A. Zero-Touch / Unattended Network Provisioning", "B. Live vMotion migration", "C. P2V (Physical-to-Virtual) conversion", "D. Snapshot consolidation"],
+    ans: "A",
+    why: "PXE boots the kernel/initrd over TFTP/HTTP while Kickstart/Preseed answers every partitioning, package, and network prompt unattended.",
+    trap: "Bare-metal unattended network OS install = PXE + Kickstart / Preseed / WDS."
+  },
+  {
+    id: 129, domain: "2.0 Server Administration",
+    q: "An administrator needs to schedule a maintenance script on a Linux server to run every Sunday at 03:30 AM. Which crontab entry is syntactically correct?",
+    opts: ["A. 30 3 * * 0 /usr/local/bin/cleanup.sh", "B. 3 30 * * 7 /usr/local/bin/cleanup.sh", "C. * * 30 3 0 /usr/local/bin/cleanup.sh", "D. 0 3 30 * * /usr/local/bin/cleanup.sh"],
+    ans: "A",
+    why: "Crontab fields follow: Minute (0-59) Hour (0-23) Day-of-Month (1-31) Month (1-12) Day-of-Week (0 or 7 = Sunday). So '30 3 * * 0' is 03:30 every Sunday.",
+    trap: "Cron order: Minute Hour Day Month Weekday."
+  },
+  {
+    id: 130, domain: "2.0 Server Administration",
+    q: "A company runs a legacy bare-metal Windows Server 2012 R2 ERP box whose physical motherboard is failing and replacement parts are unavailable. The team converts the running OS and disks directly into a virtual machine on a modern hypervisor cluster. What is this process?",
+    opts: ["A. P2V (Physical-to-Virtual) migration", "B. V2V (Virtual-to-Virtual) conversion", "C. Containerization via Dockerfile", "D. Bare-metal PXE re-imaging"],
+    ans: "A",
+    why: "P2V clones the physical OS, registry/drivers, and disk volumes into a virtual disk (VMDK/VHDX) and injects virtual storage/NIC drivers so it boots inside a hypervisor.",
+    trap: "Legacy physical server → VM = P2V migration."
+  },
+  {
+    id: 131, domain: "2.0 Server Administration",
+    q: "An administrator configures an SMB 3.0 file share on Windows Server for a team transferring large CAD assemblies across two 10GbE NICs. Throughput maxes out at 10 Gbps (one NIC) instead of 20 Gbps (both NICs), even without LACP configured on the switch. Which native SMB feature aggregates bandwidth and provides automatic failover across multiple NICs?",
+    opts: ["A. SMB Multichannel", "B. SMBv1 Signing", "C. DFS Replication (DFS-R)", "D. iSNS (Internet Storage Name Service)"],
+    ans: "A",
+    why: "SMB 3.0+ Multichannel automatically discovers multiple NIC paths (especially RSS-capable NICs) between client and server and opens parallel TCP streams across all of them without switch LACP.",
+    trap: "Multi-NIC throughput & failover for SMB 3.0 without switch LACP = SMB Multichannel."
+  },
+  {
+    id: 132, domain: "2.0 Server Administration",
+    q: "An enterprise has file servers in London, New York, and Tokyo and wants users in every office to access files using a single unified namespace (\\\\corp.local\\Engineering) that automatically redirects them to their local regional server while keeping folders synchronized in the background. Which Windows Server role pair provides this?",
+    opts: ["A. DFS Namespaces (DFS-N) and DFS Replication (DFS-R)", "B. WSUS and WDS", "C. NPS and RADIUS", "D. Failover Clustering with CSV"],
+    ans: "A",
+    why: "DFS Namespaces virtualizes share paths into one logical tree and routes clients to their local AD Site target, while DFS Replication uses Remote Differential Compression to sync changes across WAN links.",
+    trap: "Unified UNC path + multi-site WAN file sync = DFS-N + DFS-R."
+  },
+  {
+    id: 133, domain: "2.0 Server Administration",
+    q: "A Linux server uses 'logrotate' to manage /var/log/app.log, which grows by 5 GB per day. After logrotate renames app.log to app.log.1 and creates a fresh empty app.log, 'df -h' shows disk usage is STILL climbing by 5 GB/day and app.log stays 0 bytes! Why?",
+    opts: ["A. The application daemon still holds an open file descriptor pointing to the old deleted/renamed inode and needs a reload/HUP signal (postrotate) or copytruncate", "B. ext4 does not reclaim space until reboot", "C. The file has the immutable (+i) attribute set", "D. NTP clock drift broke logrotate"],
+    ans: "A",
+    why: "In Linux, renaming or unlinking a file does not free its disk blocks or change where a running process writes while that process still holds the old file descriptor open.",
+    trap: "Log rotated but disk still filling + new file stays 0 bytes = process still writing to old open file descriptor."
+  },
+  {
+    id: 134, domain: "2.0 Server Administration",
+    q: "An administrator configures an iSCSI SAN target with multiple IP portals across two subnets (10.10.1.10 and 10.10.2.10) for MPIO redundancy. Why should the two iSCSI NICs on the server and SAN be placed on TWO SEPARATE VLANs/subnets instead of the same subnet?",
+    opts: ["A. Separate subnets prevent OS routing table ambiguity and ARP flux, ensuring each HBA/NIC deterministically uses its own dedicated physical path", "B. iSCSI protocol blocks two targets in the same /24 subnet", "C. Jumbo frames only work across routed subnets", "D. CHAP authentication fails on single subnets"],
+    ans: "A",
+    why: "Putting two unteamed iSCSI NICs on one subnet causes the OS TCP/IP stack to send all traffic out the first matching interface in its routing table; separate subnets force clean path separation.",
+    trap: "MPIO iSCSI best practice = two separate non-routed VLANs/subnets."
+  },
+  {
+    id: 135, domain: "2.0 Server Administration",
+    q: "A database server runs on a 6-drive RAID 10 array. One drive fails, and the technician hot-swaps in a brand-new replacement drive. During the rebuild, overall database query latency increases noticeably. Why?",
+    opts: ["A. The RAID controller is reading the surviving twin drive continuously to copy all blocks onto the new replacement drive, competing with live production I/O", "B. RAID 10 switches to RAID 5 during rebuilds", "C. The controller disables ECC during rebuilds", "D. All writes are paused until rebuild finishes"],
+    ans: "A",
+    why: "Rebuilding a failed mirror requires heavy sequential reads from the surviving partner disk and writes to the new disk, consuming controller and spindle/bus IOPS until complete.",
+    trap: "Array rebuild = degraded performance due to background copy I/O."
+  },
+  {
+    id: 136, domain: "2.0 Server Administration",
+    q: "An administrator wants to restrict a multi-tenant web hosting server so a single runaway customer application cannot consume 100% of host CPU cores or system RAM and starve neighboring processes on the same Linux kernel. Which kernel feature enforces resource quotas for containers and systemd units?",
+    opts: ["A. Linux cgroups (Control Groups)", "B. Linux namespaces (PID/NET/MNT)", "C. SELinux booleans", "D. LVM thin pools"],
+    ans: "A",
+    why: "Linux namespaces isolate what a process can SEE (PIDs, network, mounts), whereas cgroups limit how much hardware resource (CPU, RAM, disk I/O) a process group can USE.",
+    trap: "Namespaces = visibility isolation; cgroups = CPU/RAM/I/O resource limits."
+  },
+  {
+    id: 137, domain: "2.0 Server Administration",
+    q: "A Windows Server administrator runs 'chkdsk /f' on the C: system drive, and Windows asks to schedule the check on the next reboot instead of running immediately. Why?",
+    opts: ["A. chkdsk /f requires an exclusive lock on the volume, which cannot be acquired while the OS kernel and pagefile are actively using C:", "B. NTFS volumes cannot be checked while BitLocker is enabled", "C. chkdsk only runs in Safe Mode", "D. PowerShell blocks chkdsk on GPT disks"],
+    ans: "A",
+    why: "Repairing filesystem metadata structures requires dismounting/locking the volume exclusively so active OS writes don't corrupt pointers mid-repair.",
+    trap: "Online read-only scan = chkdsk /scan; offline repair of C: = requires reboot."
+  },
+  {
+    id: 138, domain: "2.0 Server Administration",
+    q: "An enterprise storage administrator provisions a 10 TB LUN for a Linux server using an MBR partition table, but the OS can only partition the first 2 TB of the drive, leaving 8 TB unallocatable. What is the fix?",
+    opts: ["A. Convert/initialize the disk with a GPT (GUID Partition Table), which supports volumes well beyond 2 TB (up to 9.4 ZB)", "B. Format the partition as FAT32", "C. Enable RAID 0 on the HBA", "D. Lower the sector size to 512 bytes"],
+    ans: "A",
+    why: "Legacy MBR uses 32-bit LBA sector addressing, capping maximum partition size at 2.2 TB (2 TiB). GPT uses 64-bit addressing.",
+    trap: "Disk > 2 TB capped at 2 TB = MBR limit → use GPT."
+  },
+  {
+    id: 139, domain: "2.0 Server Administration",
+    q: "A company sets up a Windows Server Update Services (WSUS) server so internal servers do not download patches directly from the internet. After approving updates in WSUS, 30 servers still fail to check in. Checking Group Policy shows 'Configure Automatic Updates' is enabled, but 'Specify intranet Microsoft update service location' was left unconfigured. Where are the servers trying to connect?",
+    opts: ["A. Directly to public Microsoft Update servers on the internet (which are blocked by the server VLAN firewall)", "B. To the local Domain Controller's SYSVOL share", "C. To the BMC iDRAC port", "D. To port 25 SMTP"],
+    ans: "A",
+    why: "Without the intranet WSUS URL GPO configured, the Windows Update agent defaults to querying public internet endpoints.",
+    trap: "WSUS requires BOTH 'Configure Automatic Updates' AND 'Specify intranet Microsoft update service location'."
+  },
+  {
+    id: 140, domain: "2.0 Server Administration",
+    q: "An administrator runs a hypervisor cluster using shared NFS storage and notices that migrating a VM's storage from one datastore to another ('Storage vMotion' / Live Storage Migration) completes with zero VM downtime. How does the hypervisor keep the VM running while moving multi-terabyte disk files?",
+    opts: ["A. It copies disk blocks in the background while mirroring new ongoing guest writes to both source and destination disks until synchronized, then atomically cuts over", "B. It pauses the VM's CPU for 20 minutes while copying", "C. It stores all disk writes in CPU L3 cache during the move", "D. It converts the VM into a stateless container"],
+    ans: "A",
+    why: "Live storage migration uses block-level dirty-bitmap tracking and write mirroring so the guest OS never loses disk access during cutover.",
+    trap: "Live storage migration = zero-downtime block copy + active write mirroring."
+  },
+
+  // ================= DOMAIN 3.0: SECURITY & DISASTER RECOVERY (141-160) =================
+  {
+    id: 141, domain: "3.0 Security & Disaster Recovery",
+    q: "An enterprise enforces Active Directory Tiering / Privileged Access Workstations (PAWs) so Domain Admins never log into standard member servers or user workstations directly. Which specific credential theft technique does this prevent?",
+    opts: ["A. Credential harvesting from LSASS memory / Kerberos TGT caching on lower-trust compromised servers (Pass-the-Hash / Pass-the-Ticket lateral escalation)", "B. BGP route hijacking", "C. DHCP pool starvation", "D. SSD NAND wearout"],
+    ans: "A",
+    why: "When a Tier 0 Domain Admin logs onto a compromised Tier 2 workstation/server, their NTLM hash or Kerberos TGT remains cached in LSASS memory, allowing an attacker to escalate to full domain compromise.",
+    trap: "Admin tiering / PAWs = stops Tier 0 credential caching & Pass-the-Hash on lower-trust servers."
+  },
+  {
+    id: 142, domain: "3.0 Security & Disaster Recovery",
+    q: "A security team configures SSH on all production Linux servers. Which combination of /etc/ssh/sshd_config directives hardens SSH against brute-force attacks and direct root compromise?",
+    opts: ["A. PermitRootLogin no, PasswordAuthentication no, PubkeyAuthentication yes", "B. PermitRootLogin yes, PermitEmptyPasswords yes", "C. Protocol 1, X11Forwarding yes", "D. AllowUsers root, UsePAM no"],
+    ans: "A",
+    why: "Requiring asymmetric SSH key pairs while disabling password login and direct root SSH forces attackers to compromise a private key AND escalate via sudo with full user attribution.",
+    trap: "SSH hardening = PermitRootLogin no + PasswordAuthentication no (keys only)."
+  },
+  {
+    id: 143, domain: "3.0 Security & Disaster Recovery",
+    q: "An organization implements the 3-2-1-1-0 backup rule to defend against modern ransomware that actively targets online backup repositories. What do the final '1' and '0' represent?",
+    opts: ["A. 1 immutable or air-gapped (offline) copy that cannot be encrypted/deleted, and 0 verified restore/integrity errors", "B. 1 tape drive per rack and 0 cloud accounts", "C. 1 full backup per year and 0 differential backups", "D. 1 RAID controller and 0 hot spares"],
+    ans: "A",
+    why: "3 copies, 2 media types, 1 offsite, 1 immutable/offline (air-gapped/WORM), and 0 errors after automated recovery verification.",
+    trap: "3-2-1-1-0: the extra 1 = immutable/air-gapped; 0 = zero backup verification errors."
+  },
+  {
+    id: 144, domain: "3.0 Security & Disaster Recovery",
+    q: "A company must verify that its Disaster Recovery plan works in real life without disrupting live production systems or taking down the primary data center. Which DR test type executes actual failover onto isolated DR hardware using real restored data?",
+    opts: ["A. Parallel Test (or Simulation / Isolated Sandbox Failover Test)", "B. Tabletop Walkthrough Exercise", "C. Checklist Review", "D. Unannounced Full Interruption Cutover"],
+    ans: "A",
+    why: "Tabletop/checklist tests only review paper plans, whereas a Parallel Test brings up real DR systems in parallel without shutting down production (avoiding the business risk of a Full Interruption test).",
+    trap: "Test real DR systems with zero production downtime = Parallel Test."
+  },
+  {
+    id: 145, domain: "3.0 Security & Disaster Recovery",
+    q: "During a security audit of a container host, an auditor finds several production containers running with the '--privileged' flag and mounting the host's '/var/run/docker.sock'. Why is this a critical vulnerability?",
+    opts: ["A. A compromised privileged container (or one with Docker socket access) can escape container isolation and gain full root control over the underlying host OS", "B. Privileged containers disable ECC RAM", "C. Docker socket slows down DNS lookups", "D. Privileged containers cannot bind to TCP ports above 1024"],
+    ans: "A",
+    why: "Privileged containers drop Linux capability restrictions and access host devices; mounting docker.sock lets a container spawn new root host containers at will.",
+    trap: "Never run production containers with --privileged or mounted docker.sock."
+  },
+  {
+    id: 146, domain: "3.0 Security & Disaster Recovery",
+    q: "A Windows Server administrator enables SMB Signing and SMB Encryption on all internal file servers. What security risks do these two controls mitigate respectively?",
+    opts: ["A. SMB Signing prevents NTLM relay / man-in-the-middle tampering, while SMB Encryption prevents passive network packet sniffing of sensitive files in transit", "B. Both compress files to save SAN storage", "C. SMB Signing replaces Kerberos authentication", "D. SMB Encryption blocks local USB drives"],
+    ans: "A",
+    why: "Signing authenticates every SMB packet header/payload against tampering/relay attacks; Encryption protects confidentiality across the wire.",
+    trap: "Signing = integrity/anti-relay; Encryption = confidentiality in transit."
+  },
+  {
+    id: 147, domain: "3.0 Security & Disaster Recovery",
+    q: "An enterprise deploys an internal Public Key Infrastructure (PKI) with an Offline Root CA and an Online Enterprise Issuing Subordinate CA. Why is the Root CA kept powered off in a secure vault?",
+    opts: ["A. Compromising an online Root CA invalidates the entire organization's trust anchor; keeping it offline protects its private key so only the Subordinate CA can be revoked/reissued if breached", "B. Root CA software crashes if connected to Ethernet for more than 24 hours", "C. Offline Root CAs generate certificates faster", "D. Active Directory blocks online Root CAs"],
+    ans: "A",
+    why: "Two-tier PKI isolates the supreme trust anchor offline while letting the Online Subordinate CA handle daily automated certificate issuance.",
+    trap: "Offline Root CA = protects ultimate PKI trust anchor."
+  },
+  {
+    id: 148, domain: "3.0 Security & Disaster Recovery",
+    q: "A server room requires dual-custody access controls for hardware cryptographic modules (HSMs) and backup tape vaults. How does dual custody (two-person integrity) work?",
+    opts: ["A. Two authorized individuals must be present and authenticate simultaneously before the vault or HSM key ceremony can proceed, preventing unilateral insider abuse", "B. One admin carries two badges", "C. Two firewalls inspect the same packet", "D. Servers require two PSUs"],
+    ans: "A",
+    why: "Dual custody splits authority across two people so no single insider can steal keys, wipe logs, or alter critical security controls undetected.",
+    trap: "Dual custody = two authorized people required simultaneously."
+  },
+  {
+    id: 149, domain: "3.0 Security & Disaster Recovery",
+    q: "An administrator configures a host-based firewall on Windows Server and Linux servers using a 'Default Deny Inbound' policy. After deploying a new custom monitoring agent that listens on TCP 9100, the Prometheus collector cannot scrape metrics from the server. What is required?",
+    opts: ["A. Add a specific inbound host firewall allow rule for TCP 9100 restricted strictly to the Prometheus server's IP address", "B. Disable the host firewall globally", "C. Put the server into the DMZ", "D. Change the server's default gateway"],
+    ans: "A",
+    why: "Under Default Deny Inbound, every legitimate listening port must have an explicit, source-restricted allow rule.",
+    trap: "Default Deny Inbound = open only the exact required port from the exact authorized source IP."
+  },
+  {
+    id: 150, domain: "3.0 Security & Disaster Recovery",
+    q: "A Linux server administrator notices suspicious outbound traffic from a web server to an unknown external IP on port 4444. To contain the server immediately without destroying volatile RAM evidence or interrupting local console troubleshooting, which action is best?",
+    opts: ["A. Shutdown/disable the switch port (or apply an emergency host firewall drop rule) while keeping the server powered on for memory/process capture", "B. Unplug both PSU power cords immediately", "C. Reboot the server into UEFI BIOS", "D. Run 'rm -rf /tmp/*'"],
+    ans: "A",
+    why: "Network containment cuts C2 communication and lateral spread while preserving live RAM state for forensic acquisition.",
+    trap: "Containment = isolate network FIRST, keep power ON until volatile RAM is captured."
+  },
+  {
+    id: 151, domain: "3.0 Security & Disaster Recovery",
+    q: "A company enforces LDAP Channel Binding and LDAPS (port 636) across all Active Directory Domain Controllers. Legacy Linux applications configured for unencrypted LDAP (port 389) immediately fail to authenticate. Why was disabling plain LDAP 389 necessary?",
+    opts: ["A. Plain LDAP transmits bind credentials in cleartext and allows unsigned LDAP relay attacks", "B. Port 389 is reserved for NTP", "C. Plain LDAP only supports IPv6", "D. Plain LDAP corrupts Active Directory SYSVOL"],
+    ans: "A",
+    why: "Simple LDAP binds over TCP 389 send passwords in plaintext; LDAPS (TCP 636) or StartTLS encrypts authentication in transit.",
+    trap: "LDAP 389 = cleartext; LDAPS 636 = TLS encrypted."
+  },
+  {
+    id: 152, domain: "3.0 Security & Disaster Recovery",
+    q: "An organization runs quarterly vulnerability scans using an authenticated credentialed scanner (e.g., Nessus/OpenVAS) rather than unauthenticated network scans alone. Why are credentialed scans far more accurate for server hardening?",
+    opts: ["A. Logging in with read-only audit credentials lets the scanner inspect installed local packages, registry keys, missing OS patches, and insecure local file permissions that aren't visible from network port banners", "B. Credentialed scans automatically patch every vulnerability", "C. Unauthenticated scans crash RAID controllers", "D. Credentialed scans bypass SIEM logging"],
+    ans: "A",
+    why: "Unauthenticated scans only see exposed network ports; authenticated scans inspect internal OS patch levels and configuration compliance.",
+    trap: "Authenticated scans = deep local OS/patch visibility."
+  },
+  {
+    id: 153, domain: "3.0 Security & Disaster Recovery",
+    q: "A server administrator configures Syslog/Windows Event Forwarding to a central SIEM and ensures all servers sync via NTP. Why is accurate NTP synchronization legally and forensically critical during a security breach investigation?",
+    opts: ["A. Correlating attack timelines across firewalls, domain controllers, web servers, and endpoints is impossible if log timestamps drift out of order", "B. SIEM databases refuse to ingest logs with timestamps older than 1 minute", "C. NTP encrypts syslog payloads", "D. Chrony prevents brute-force SSH logins"],
+    ans: "A",
+    why: "Incident reconstruction and legal chain-of-custody depend on accurate, synchronized timestamps across every log source.",
+    trap: "NTP = Kerberos authentication + accurate cross-server SIEM forensic log correlation."
+  },
+  {
+    id: 154, domain: "3.0 Security & Disaster Recovery",
+    q: "An enterprise uses Role-Based Access Control (RBAC) and conducts quarterly User Access Reviews. During a review, an auditor flags an engineer who transferred from Server Operations to Marketing six months ago but still retains Domain Admin privileges. What security failure does this represent?",
+    opts: ["A. Privilege creep / failure to revoke access upon role transfer (violating Principle of Least Privilege)", "B. Split-brain cluster quorum", "C. ARP cache poisoning", "D. Inode exhaustion"],
+    ans: "A",
+    why: "Privilege creep occurs when users accumulate permissions across job changes without de-provisioning old roles.",
+    trap: "Retained permissions after role change = privilege creep."
+  },
+  {
+    id: 155, domain: "3.0 Security & Disaster Recovery",
+    q: "A company signs a contract with a cold-site DR provider after a regional flood knocks out its primary building. Upon arriving at the cold site, why does recovery take several days rather than minutes?",
+    opts: ["A. A cold site provides only empty floor space, power, and cooling—all servers, storage arrays, network gear, OS builds, and backup data must be delivered, racked, configured, and restored from scratch", "B. Cold sites lack electrical power", "C. Cold sites only run Linux", "D. Cold sites prohibit tape restores"],
+    ans: "A",
+    why: "Cold sites have the lowest monthly standby cost but the longest RTO (days/weeks) because zero pre-configured IT hardware is waiting on site.",
+    trap: "Cold Site = space/power/cooling only (days RTO); Warm Site = hardware ready, needs data restore (hours RTO); Hot Site = live synced systems (minutes RTO)."
+  },
+  {
+    id: 156, domain: "3.0 Security & Disaster Recovery",
+    q: "An administrator configures LUKS full-disk encryption on a Linux database server. To allow unattended remote reboots without standing at the physical console typing a passphrase—while still protecting drives if physically stolen from the rack—which mechanism should be deployed?",
+    opts: ["A. Network-Bound Disk Encryption (NBDE via Clevis and Tang) or TPM 2.0 auto-unlock", "B. Storing the LUKS passphrase in /etc/motd", "C. Disabling UEFI passwords", "D. Using FAT32 on /var/lib/mysql"],
+    ans: "A",
+    why: "NBDE (Clevis/Tang) unlocks LUKS volumes automatically only when the server is booted inside the trusted corporate network able to reach the Tang key server; if stolen and booted elsewhere, the disk stays locked.",
+    trap: "Linux unattended boot disk encryption = TPM 2.0 or NBDE (Clevis/Tang)."
+  },
+  {
+    id: 157, domain: "3.0 Security & Disaster Recovery",
+    q: "A Windows Server administrator notices an alert that the Windows Security Event Log stopped recording new login events because the log hit its maximum configured size and was set to 'Do not overwrite events (Clear logs manually)'. What is the security risk and proper setting?",
+    opts: ["A. Attackers can intentionally flood logs to blind auditing once full; configure 'Archive the log when full' (or forward real-time to SIEM + overwrite as needed)", "B. Shrink the log size to 1 MB", "C. Disable the Event Log service", "D. Store logs on a public SMB share"],
+    ans: "A",
+    why: "Halt-on-full logging creates an audit blind spot; real-time SIEM forwarding paired with log archiving/rotation ensures continuous visibility.",
+    trap: "Never leave Security logs set to halt recording when full; stream to SIEM + archive/rotate."
+  },
+  {
+    id: 158, domain: "3.0 Security & Disaster Recovery",
+    q: "A server administrator configures IPsec Transport Mode between an application server and a backend database server on the same internal VLAN. What problem does this solve?",
+    opts: ["A. It authenticates and encrypts all IP traffic directly between the two hosts, protecting unencrypted legacy database protocols against on-LAN packet sniffing and spoofing", "B. It doubles Ethernet link speed from 10 Gbps to 20 Gbps", "C. It replaces DNS name resolution", "D. It provides RAID 1 disk redundancy"],
+    ans: "A",
+    why: "IPsec Transport Mode encrypts and authenticates host-to-host IP payloads end-to-end without needing tunnel gateways.",
+    trap: "Host-to-host encrypted IP traffic = IPsec Transport Mode (site-to-site VPN = Tunnel Mode)."
+  },
+  {
+    id: 159, domain: "3.0 Security & Disaster Recovery",
+    q: "Before decommissioning an old physical database server, the security team requires verified destruction of all data on its 12 magnetic SAS HDDs. Which method permanently destroys magnetic domains on spinning platters in seconds?",
+    opts: ["A. High-energy Degaussing (followed by physical crushing/shredding)", "B. Quick formatting in Windows Disk Management", "C. Deleting the RAID virtual disk in controller BIOS", "D. Changing the NTFS drive letter"],
+    ans: "A",
+    why: "Degaussing blasts spinning magnetic platters with a powerful magnetic field, erasing all magnetic alignment (note: degaussing works ONLY on magnetic HDDs/tapes, NOT SSDs).",
+    trap: "Magnetic HDD/tape destruction = degaussing + shredding; SSD destruction = shredding/disintegration or Cryptographic Erase."
+  },
+  {
+    id: 160, domain: "3.0 Security & Disaster Recovery",
+    q: "An enterprise conducts a Business Impact Analysis (BIA) before designing its server DR architecture. Which metric calculated during the BIA determines the financial cost per hour of an outage and sets the Maximum Tolerable Downtime (MTD)?",
+    opts: ["A. Business Impact Analysis (BIA) criticality tiering (which directly drives RTO and RPO targets)", "B. MTBF (Mean Time Between Failures) of a single cooling fan", "C. Ethernet MTU size", "D. CPU L1 cache hit ratio"],
+    ans: "A",
+    why: "The BIA quantifies operational and financial losses over time for each business process, establishing MTD, RTO, and RPO requirements.",
+    trap: "BIA → determines MTD, RTO, and RPO."
+  },
+
+  // ================= DOMAIN 4.0: TROUBLESHOOTING (161-180) =================
+  {
+    id: 161, domain: "4.0 Troubleshooting",
+    q: "A newly built Linux server boots cleanly, but users complain that every time the server reboots, its Ethernet interface name changes or its static IP disappears. Inspecting NetworkManager / Netplan shows DHCP is still active alongside a manual 'ip addr add' command that was run earlier in bash. Why did the static IP vanish on reboot?",
+    opts: ["A. 'ip addr add' modifies only runtime kernel memory and is non-persistent; static IPs must be saved in Netplan, NetworkManager (nmcli), or /etc/network/interfaces", "B. Linux deletes static IPs every 24 hours by design", "C. UEFI Secure Boot resets NIC settings", "D. ARP cache clearing wipes static IPs"],
+    ans: "A",
+    why: "Runtime commands like 'ip addr add', 'ip route add', and 'sysctl -w' vanish on reboot unless written to persistent configuration files.",
+    trap: "Runtime CLI changes ≠ persistent across reboots."
+  },
+  {
+    id: 162, domain: "4.0 Troubleshooting",
+    q: "A Windows Server administrator troubleshoots why a server cannot access a remote HTTPS API. 'nslookup api.vendor.com' resolves the IP correctly, and 'Test-NetConnection api.vendor.com -Port 443' succeeds, yet the application throws 'certificate has expired or is not yet valid'. Checking 'Get-Date' reveals the server's clock is set to the year 2019 due to a dead CMOS battery and blocked NTP UDP 123. Why did TLS fail?",
+    opts: ["A. X.509 TLS certificates have strict 'Valid From' and 'Valid To' timestamps; a server clock set in the past rejects current certificates as 'not yet valid'", "B. Dead CMOS batteries disable AES-NI encryption", "C. UDP 123 carries TLS handshakes", "D. DNSSEC requires 2026 timestamps"],
+    ans: "A",
+    why: "TLS certificate validation compares the server's local system clock against the certificate's validity period; wrong clocks break TLS, Kerberos, and log correlation.",
+    trap: "Wrong system clock = TLS certificate validation errors + Kerberos failures."
+  },
+  {
+    id: 163, domain: "4.0 Troubleshooting",
+    q: "A Linux server suddenly refuses new SSH logins with 'Permission denied', and local console login shows 'Read-only file system' when trying to touch a file in /var. Checking 'dmesg' shows repeated SCSI I/O bus reset errors on /dev/sda. Why did Linux remount / as read-only?",
+    opts: ["A. The Linux kernel's 'errors=remount-ro' protection triggered upon detecting underlying storage hardware errors to prevent further filesystem corruption", "B. Someone ran 'chmod 444 /'", "C. SELinux entered Permissive mode", "D. NTP synchronized backwards"],
+    ans: "A",
+    why: "When the kernel sees disk/SAN I/O errors on an ext4/XFS root volume, 'errors=remount-ro' freezes writes immediately to protect metadata integrity.",
+    trap: "Sudden 'Read-only file system' + dmesg SCSI/NVMe errors = underlying disk/RAID/SAN fault."
+  },
+  {
+    id: 164, domain: "4.0 Troubleshooting",
+    q: "An administrator adds a new VLAN 250 sub-interface (eth0.250) on a Linux host, assigns IP 10.250.0.10/24, and pings the gateway 10.250.0.1. 'tcpdump -i eth0' shows outbound ARP requests tagged with VLAN 250, but zero replies return. Checking the switch port shows 'switchport mode access' on VLAN 10. Why is it failing?",
+    opts: ["A. An access port drops 802.1Q VLAN-tagged frames; the switch port must be configured as an 802.1Q trunk permitting VLAN 250", "B. Linux sub-interfaces require MTU 1400", "C. ARP does not work on VLANs above 100", "D. The server needs a second physical NIC"],
+    ans: "A",
+    why: "Switch access ports expect untagged frames and discard 802.1Q tagged packets; tagged server sub-interfaces require a trunk port.",
+    trap: "Tagged NIC sub-interfaces (eth0.250) = require switchport mode trunk."
+  },
+  {
+    id: 165, domain: "4.0 Troubleshooting",
+    q: "A Windows Server running IIS hosts an internal web app. Users report intermittent '502 Bad Gateway' or hung page loads during peak traffic, and 'netstat -an' shows 16,000+ sockets stuck in 'TIME_WAIT' state. What is happening?",
+    opts: ["A. Rapid short-lived outbound TCP connections to a backend database/API exhausted the ephemeral source port pool before the 2MSL TIME_WAIT timer expired", "B. The server's MAC address table overflowed", "C. RAID 5 parity is rebuilding", "D. DNS forwarders are looping"],
+    ans: "A",
+    why: "When an app opens and closes thousands of TCP connections per second without connection pooling, ephemeral ports sit in TIME_WAIT (default 120s–240s) until exhausted.",
+    trap: "Thousands of TIME_WAIT sockets + connection failures = ephemeral port exhaustion (enable connection pooling / widen ephemeral port range)."
+  },
+  {
+    id: 166, domain: "4.0 Troubleshooting",
+    q: "A technician replaces a failed hot-swap SAS drive in a hardware RAID 5 array, but the amber fault LED stays solid and the rebuild never starts. Checking the RAID controller utility shows the new drive is listed as 'Foreign' or 'Blocked / Unsupported Drive'. What is the likely cause?",
+    opts: ["A. The replacement drive contains stale RAID metadata from another server (needs Foreign Config Clear) or is an incompatible SATA drive mixed into a SAS-only array", "B. RAID 5 arrays cannot rebuild onto new drives", "C. The drive caddy latch wasn't closed", "D. The server must be powered off to start a rebuild"],
+    ans: "A",
+    why: "Hardware RAID controllers forbid mixing SAS and SATA drives in the same virtual disk and will not auto-rebuild onto a used drive carrying leftover RAID metadata until cleared.",
+    trap: "Rebuild won't start on replacement disk = check SAS/SATA mismatch or clear stale foreign metadata."
+  },
+  {
+    id: 167, domain: "4.0 Troubleshooting",
+    q: "Users in a remote office report that accessing an internal file server takes 45 seconds to open folders, whereas transferring a single 2 GB ISO file achieves near-line-rate 900 Mbps speed. What does 'high throughput on big files + terrible latency on tiny metadata operations' indicate?",
+    opts: ["A. High network round-trip latency (RTT) across a distant WAN/VPN link penalizing chatty request-response protocols (like SMB/NFS metadata), even though raw bandwidth is wide", "B. Duplex mismatch on the server NIC", "C. Failed RAID BBU", "D. Outdated TLS certificates"],
+    ans: "A",
+    why: "Bandwidth (pipe width) and latency (round-trip travel time) are independent; chatty protocols that send hundreds of sequential metadata round-trips stall on high-RTT links despite high Mbps.",
+    trap: "Fast big-file download + slow folder browsing = high WAN latency (RTT), not low bandwidth."
+  },
+  {
+    id: 168, domain: "4.0 Troubleshooting",
+    q: "A Linux server boots slowly, hanging for 90 seconds on 'A start job is running for /dev/disk/by-uuid/8f3a...' before dropping to emergency mode. Checking 'blkid' shows the administrator recently reformatted the swap partition with 'mkswap', generating a new UUID, without updating /etc/fstab. How do you fix it?",
+    opts: ["A. Update the swap UUID in /etc/fstab to match the new UUID shown by 'blkid' and run 'swapon -a'", "B. Delete /etc/fstab", "C. Reinstall GRUB bootloader", "D. Disable systemd-journald"],
+    ans: "A",
+    why: "Formatting a partition (mkfs or mkswap) generates a brand-new UUID; if /etc/fstab still references the old UUID, systemd waits 90s for a device that no longer exists.",
+    trap: "90-second boot hang on UUID = stale UUID in /etc/fstab after reformatting a partition."
+  },
+  {
+    id: 169, domain: "4.0 Troubleshooting",
+    q: "An administrator changes a Windows Server's DNS server settings to point to a new internal DNS server, then immediately tests 'ping intranet.corp.local'—which still resolves to the old decommissioned IP! Why?",
+    opts: ["A. The local Windows DNS Client Resolver Cache still holds the previously resolved entry until its TTL expires or 'ipconfig /flushdns' is run", "B. Windows caches DNS entries in the BIOS", "C. ARP tables override DNS records", "D. NetBIOS broadcasts override active directory DNS"],
+    ans: "A",
+    why: "Operating systems cache positive (and negative) DNS answers locally in memory until TTL expiry unless manually flushed.",
+    trap: "Stale local DNS resolution after record update = ipconfig /flushdns (Windows) or resolvectl flush-caches (Linux)."
+  },
+  {
+    id: 170, domain: "4.0 Troubleshooting",
+    q: "A server has two NICs: NIC1 (10.1.1.10/24, Gateway 10.1.1.1) for production traffic and NIC2 (192.168.50.10/24, Gateway 192.168.50.1) for backup traffic. After configuring NIC2, production users across the WAN can no longer reach NIC1! Why?",
+    opts: ["A. Configuring two default gateways created asymmetric routing where inbound traffic arriving on NIC1 tries to exit via NIC2's default gateway and gets dropped by stateful firewalls", "B. Servers cannot have two IPv4 addresses simultaneously", "C. NIC2 automatically disables NIC1", "D. Subnet /24 masks conflict across private ranges"],
+    ans: "A",
+    why: "A server should have ONLY ONE default gateway (on its primary production NIC); secondary backup/storage NICs should use static routes for their specific subnets—never a second default gateway.",
+    trap: "Never configure two Default Gateways on a multi-homed server."
+  },
+  {
+    id: 171, domain: "4.0 Troubleshooting",
+    q: "An administrator troubleshoots why a scheduled PowerShell backup script fails only when copying files to a remote UNC path (\\\\backup01\\share), throwing 'Access is denied', even though the script runs under an account with Full Control on the NTFS folder. What permission layer was forgotten?",
+    opts: ["A. SMB Share Permissions (which default to Everyone: Read on newly created shares and combine with NTFS permissions using the most restrictive intersection)", "B. Windows Firewall ICMP rules", "C. BitLocker recovery keys", "D. DNS PTR records"],
+    ans: "A",
+    why: "Remote SMB access evaluates BOTH Share permissions and NTFS permissions—taking whichever is MORE restrictive.",
+    trap: "Local access works + remote UNC write fails = check SMB Share Permissions vs. NTFS Permissions."
+  },
+  {
+    id: 172, domain: "4.0 Troubleshooting",
+    q: "A Linux server becomes completely unresponsive to new SSH connections, and console output shows 'fork: retry: Resource temporarily unavailable'. Running 'ps -ef | wc -l' reveals 32,768 zombie/runaway processes spawned by a buggy cron script. What kernel resource was exhausted?",
+    opts: ["A. Process ID (PID) / user process limit (ulimit -u / pid_max) exhausted by a fork bomb / runaway process loop", "B. Physical NVMe storage capacity", "C. IPv4 /24 subnet addresses", "D. BIOS NVRAM variables"],
+    ans: "A",
+    why: "When a runaway script spawns processes without exiting, the OS hits the maximum process/thread table limit (ulimit -u / kernel.pid_max) and cannot fork new shells.",
+    trap: "'fork: Resource temporarily unavailable' = PID / max user processes exhausted."
+  },
+  {
+    id: 173, domain: "4.0 Troubleshooting",
+    q: "A hypervisor host experiences sudden storage disconnects across all VMs every night at 02:00 AM during backups. SAN logs show 'Initiator Logout / Queue Full' errors on the 10GbE iSCSI switch. Inspection reveals the switch has 'Flow Control (IEEE 802.3x)' disabled and shallow port buffers. Why does bursty backup traffic cause iSCSI drops?",
+    opts: ["A. Microbursts of storage traffic overflow shallow switch egress buffers and drop TCP segments, triggering costly TCP retransmission timeouts and SCSI command stalls", "B. iSCSI cannot run after midnight", "C. NTP sync resets TCP sequence numbers", "D. RAID 6 disables read cache at night"],
+    ans: "A",
+    why: "Storage arrays burst data at line rate; switches with tiny buffers drop packets during microbursts unless deep-buffer switches or proper flow control are configured.",
+    trap: "Bursty SAN drops under load = switch buffer congestion / missing flow control."
+  },
+  {
+    id: 174, domain: "4.0 Troubleshooting",
+    q: "A Windows Server administrator notices high memory usage (96% RAM used) in Task Manager, yet the server is running smoothly with zero paging and high responsiveness. Inspecting the Memory tab shows 60 GB is in 'Standby' (Cached) RAM for SQL Server / file caching. Should the admin reboot the server to 'free up RAM'?",
+    opts: ["A. No—unused RAM is wasted RAM; Standby/Cached memory is immediately released back to applications on demand and speeds up disk reads", "B. Yes, 96% RAM always triggers an immediate BSOD", "C. Yes, rebooting clears ECC bit flips", "D. No, but the admin should disable the page file"],
+    ans: "A",
+    why: "Modern OSes (Windows Standby list and Linux page cache) intentionally use free RAM to cache disk blocks and release it instantaneously whenever an app allocates memory.",
+    trap: "High 'Standby/Cached' RAM with zero hard page faults = healthy OS caching, NOT a memory leak."
+  },
+  {
+    id: 175, domain: "4.0 Troubleshooting",
+    q: "A technician installs an SSL/TLS certificate onto an Apache/Nginx reverse proxy, and when restarting the service, it fails with 'SSL: error:0B080074:x509 certificate routines:X509_check_private_key:key values mismatch'. What happened?",
+    opts: ["A. The configured SSLCertificateFile does not match the SSLCertificateKeyFile (the certificate was issued for a different CSR/private key pair)", "B. Port 443 is blocked by UFW", "C. The certificate uses SHA-256 instead of SHA-1", "D. DNS AAAA records are missing"],
+    ans: "A",
+    why: "A public certificate's embedded public key must mathematically match the private key file referenced in the web server config.",
+    trap: "'key values mismatch' = wrong private key paired with the certificate."
+  },
+  {
+    id: 176, domain: "4.0 Troubleshooting",
+    q: "An administrator runs 'traceroute 10.90.40.12' from a server and sees hops 1, 2, and 3 respond, followed by hop 4 bouncing back to hop 3 endlessly (3 → 4 → 3 → 4) until TTL expires. What network fault is occurring?",
+    opts: ["A. A Layer 3 routing loop between two routers with conflicting static or dynamic routes", "B. A Layer 2 switching broadcast storm", "C. DNS cache poisoning", "D. MTU black-hole fragmentation"],
+    ans: "A",
+    why: "Packets ping-ponging between two router hops until IP TTL decrements to 0 is the classic signature of a Layer 3 routing loop.",
+    trap: "Traceroute alternating between two router IPs = Layer 3 routing loop."
+  },
+  {
+    id: 177, domain: "4.0 Troubleshooting",
+    q: "A server running a critical batch job slows down dramatically every afternoon, and 'vmstat 1' on Linux shows high 'si' (swap in) and 'so' (swap out) activity alongside heavy disk I/O. What is happening?",
+    opts: ["A. Memory thrashing: active working-set memory exceeds physical RAM, forcing the kernel to constantly page memory to and from slow swap storage", "B. CPU cores are parked in C6 sleep states", "C. The NIC is dropping VLAN tags", "D. Systemd-journald is rotating logs"],
+    ans: "A",
+    why: "Active swapping ('si'/'so' > 0 continuously) means the server ran out of physical RAM for active processes and is thrashing disk I/O.",
+    trap: "Continuous swap-in/swap-out (si/so) = physical RAM exhaustion / thrashing."
+  },
+  {
+    id: 178, domain: "4.0 Troubleshooting",
+    q: "An administrator configures an alert rule in a monitoring platform to notify on-call staff if a server goes offline, but during a core switch outage that isolates an entire rack of 30 servers, the on-call engineer receives 300 separate alerts instead of 1 root-cause alert. Which monitoring feature solves this alert storm?",
+    opts: ["A. Dependency / Topology-aware alert suppression (parent-child dependency mapping so child server alerts are suppressed when the parent switch is down)", "B. Lowering SNMP polling intervals to 1 second", "C. Switching from TCP to UDP syslog", "D. Disabling ICMP ping checks"],
+    ans: "A",
+    why: "Parent-child topology dependencies tell the monitoring engine that if the Top-of-Rack switch is unreachable, downstream servers shouldn't fire independent alerts.",
+    trap: "Stop alert storms during upstream switch/router outages = parent-child dependency suppression."
+  },
+  {
+    id: 179, domain: "4.0 Troubleshooting",
+    q: "A technician is called to inspect a server that randomly shuts off without logging any OS blue screen or kernel panic, and the BMC SEL log shows 'Critical Power Supply / VR Thermal Trip'. Inspection shows thick dust clogging the front bezel filter and PSU intake vents. Why did it hard-cut power?",
+    opts: ["A. Hardware thermal protection tripped the motherboard/PSU voltage regulators immediately to prevent permanent silicon fire/burnout", "B. Windows Update forced an emergency restart", "C. ECC memory triggered a graceful shutdown", "D. The UPS switched to bypass mode"],
+    ans: "A",
+    why: "Hardware thermal trip circuits cut power instantaneously at the VR/PSU level—bypassing OS shutdown sequences—when air blockage pushes internal components past critical thermal limits.",
+    trap: "Instant power cut with zero OS crash dump + VR/PSU thermal event = clogged airflow / dust blockage."
+  },
+  {
+    id: 180, domain: "4.0 Troubleshooting",
+    q: "After migrating an internal web app behind a reverse proxy/load balancer, backend web server access logs show every single user request originating from the load balancer's internal IP (10.10.1.5) instead of real client IPs, breaking IP-based security auditing. How do you preserve real client IPs?",
+    opts: ["A. Configure the reverse proxy to inject the 'X-Forwarded-For' (or PROXY protocol) header and configure the backend web server to log/trust that header from the proxy IP", "B. Put the load balancer in bridge mode with ARP spoofing", "C. Disable NAT on the edge firewall", "D. Change DNS TTL to 60 seconds"],
+    ans: "A",
+    why: "Because a Layer 7 reverse proxy terminates the client TCP connection and opens a new backend connection, the real client IP must be passed via X-Forwarded-For or PROXY protocol.",
+    trap: "Backend logs show load balancer IP instead of client IP = X-Forwarded-For / PROXY protocol."
+  },
+
+  // ================= DOMAIN 5.0: AI INFRASTRUCTURE & ACCELERATED COMPUTE (181-200) =================
+  {
+    id: 181, domain: "5.0 AI & Accelerated Compute",
+    q: "An enterprise hosts a conversational LLM inference server (vLLM / TensorRT-LLM) serving long-context documents (128k tokens) to hundreds of concurrent users. Even though the model weights only consume 30 GB of VRAM, the 80 GB GPU runs out of memory as concurrent sessions rise. Which memory structure is exhausting VRAM?",
+    opts: ["A. The KV Cache (Key-Value attention cache), which grows dynamically with batch size and context sequence length", "B. The UEFI BIOS shadow ROM", "C. The Linux /tmp tmpfs ramdisk", "D. The NIC ring buffer"],
+    ans: "A",
+    why: "During autoregressive LLM generation, attention Key/Value tensors are cached in GPU HBM for every active user's context window; long contexts × high concurrency rapidly consume tens of GBs of KV cache.",
+    trap: "LLM inference VRAM spikes with concurrency & long context = KV Cache exhaustion (mitigated by PagedAttention / FP8 KV cache)."
+  },
+  {
+    id: 182, domain: "5.0 AI & Accelerated Compute",
+    q: "An organization wants to customize a pre-trained 70B foundation LLM on internal technical manuals using its existing dual-GPU server (2× 48 GB VRAM) rather than renting a 64-GPU cluster for full fine-tuning. Which Parameter-Efficient Fine-Tuning (PEFT) technique freezes the base model weights and trains tiny low-rank adapter matrices inside existing VRAM limits?",
+    opts: ["A. LoRA / QLoRA (Low-Rank Adaptation / Quantized LoRA)", "B. Full backpropagation across all 70B parameters in FP32", "C. RAID 0 striping across NVMe drives", "D. Hypervisor CPU ballooning"],
+    ans: "A",
+    why: "Full fine-tuning requires storing weights, gradients, and optimizer states (~4x–6x model size in VRAM); LoRA/QLoRA freezes quantized base weights and trains <1% adapter parameters.",
+    trap: "Fine-tune large LLMs on limited server GPU VRAM = LoRA / QLoRA."
+  },
+  {
+    id: 183, domain: "5.0 AI & Accelerated Compute",
+    q: "An AI data center deploys Direct-to-Chip (D2C) liquid cooling across 20 high-density GPU racks. Facilities engineers specify propylene glycol/treated water loops operating at a warm supply temperature of 32°C (90°F) rather than chilled 10°C water. Why is warm-water liquid cooling preferred in modern AI facilities?",
+    opts: ["A. Warm supply water eliminates condensation risk inside servers (staying well above room dew point) and allows 'free cooling' dry coolers without power-hungry mechanical chillers", "B. Warm water conducts electricity better", "C. GPUs fail if cooled below 30°C", "D. Warm water prevents copper cold plates from oxidizing"],
+    ans: "A",
+    why: "Because GPU dies run at 65–85°C, 32°C liquid easily extracts hundreds of watts while staying safely above dew point (zero condensation) and slashing facility PUE.",
+    trap: "Warm-water D2C cooling = prevents condensation + eliminates energy-intensive chillers."
+  },
+  {
+    id: 184, domain: "5.0 AI & Accelerated Compute",
+    q: "A multi-node AI training cluster connects 32 GPU servers using 400Gbps InfiniBand / RoCEv2 leaf-spine switches in a 'Rail-Optimized' topology. Why does a rail-optimized network connect GPU 0 of every server to Leaf Switch 0, GPU 1 of every server to Leaf Switch 1, and so on?",
+    opts: ["A. All-Reduce collective communications (NCCL) occur between matching GPU ranks across nodes; rail alignment lets matching GPUs communicate in a single leaf hop without oversubscribing spine uplinks", "B. It reduces power cable length", "C. InfiniBand switches only support 1 port per server", "D. It disables spanning tree automatically"],
+    ans: "A",
+    why: "In tensor/data parallel training, GPU rank 'k' on Server A talks heavily to GPU rank 'k' on Server B; rail alignment keeps those flows local to a single leaf switch.",
+    trap: "Rail-optimized AI fabric = single-hop leaf switching for matching GPU ranks during All-Reduce."
+  },
+  {
+    id: 185, domain: "5.0 AI & Accelerated Compute",
+    q: "An AI server administrator notices that after a routine Linux kernel update ('apt upgrade') on an Ubuntu GPU host, 'nvidia-smi' fails with 'NVIDIA-SMI has failed because it couldn't communicate with the NVIDIA driver'. Why did a kernel update break GPU access?",
+    opts: ["A. The proprietary GPU kernel module was compiled against the previous kernel headers and failed to rebuild for the new kernel version (DKMS missing or failed)", "B. Kernel updates wipe GPU HBM firmware", "C. PCIe slots revert to Gen 1 after kernel updates", "D. Secure Boot deleted /dev/nvidia0"],
+    ans: "A",
+    why: "Linux kernel upgrades change kernel ABI symbols; unless DKMS (Dynamic Kernel Module Support) builds the matching GPU module for the new kernel (and signs it if Secure Boot is on), the driver won't load.",
+    trap: "'nvidia-smi couldn't communicate with driver' after kernel update = DKMS kernel module mismatch (or pin kernel versions on AI nodes)."
+  },
+  {
+    id: 186, domain: "5.0 AI & Accelerated Compute",
+    q: "An enterprise deploys an on-premises RAG (Retrieval-Augmented Generation) pipeline where incoming PDFs, Word docs, and Confluence pages are chunked, converted into numerical embeddings, and stored for semantic similarity search during user queries. Which specialized database engine is required on the AI backend?",
+    opts: ["A. A Vector Database (or vector-indexed store using HNSW/IVF indexes) capable of fast nearest-neighbor similarity search", "B. A legacy WINS NetBIOS name server", "C. A TFTP PXE boot repository", "D. A Syslog UDP collector"],
+    ans: "A",
+    why: "Vector databases index high-dimensional floating-point embeddings so the RAG orchestrator can retrieve semantically relevant context chunks in milliseconds.",
+    trap: "Semantic embedding search for RAG = Vector Database."
+  },
+  {
+    id: 187, domain: "5.0 AI & Accelerated Compute",
+    q: "An AI inference cluster handles unpredictable traffic bursts—quiet overnight, then massive spikes at 09:00 AM. Running 16 GPU nodes 24/7 wastes power, while spinning up cold VMs takes 8 minutes. How do modern cloud-native AI platforms scale inference pods within seconds?",
+    opts: ["A. Kubernetes Horizontal Pod Autoscaling (HPA) / KEDA triggered by custom GPU/queue-depth metrics, pre-caching container images and model weights on local NVMe scratch storage", "B. Manually racking extra servers every morning", "C. Converting models to CPU-only execution", "D. Using cold tape backups"],
+    ans: "A",
+    why: "Pre-pulling large multi-GB AI container images and caching weights on fast local NVMe allows autoscalers to spin up new inference replicas in seconds.",
+    trap: "Fast AI inference autoscaling = K8s HPA/KEDA on queue metrics + local NVMe model caching."
+  },
+  {
+    id: 188, domain: "5.0 AI & Accelerated Compute",
+    q: "During distributed AI training across 16 servers, a single 400GbE transceiver experiences intermittent link flaps, causing NCCL collective timeouts that stall all 128 GPUs simultaneously. Why does one flaky network link halt the entire cluster?",
+    opts: ["A. Synchronous data-parallel training uses blocking barrier collectives (All-Reduce) at every step—all 128 GPUs must finish exchanging gradients before any GPU can proceed to the next batch", "B. InfiniBand disables all switches when one port flaps", "C. NTP sync halts GPUs during packet loss", "D. GPUs run out of HBM capacity during flaps"],
+    ans: "A",
+    why: "Synchronous distributed training moves in lockstep; one straggler node or flapping link stalls the global All-Reduce barrier across the whole cluster.",
+    trap: "Synchronous GPU training = lockstep All-Reduce barrier (one straggler stalls everyone)."
+  },
+  {
+    id: 189, domain: "5.0 AI & Accelerated Compute",
+    q: "An organization runs an internal AI agent granted tool-calling access to query internal SQL databases and execute remediation scripts. To prevent a prompt-injected input from tricking the AI agent into dropping tables or exfiltrating sensitive records, which architectural principle must be enforced?",
+    opts: ["A. Principle of Least Privilege on tool service accounts (read-only scoped DB credentials), strict schema validation, and human-in-the-loop approval for destructive actions", "B. Granting the AI agent Domain Admin and sa database privileges", "C. Disabling TLS on internal APIs", "D. Running the agent in a privileged root container"],
+    ans: "A",
+    why: "AI agents inherit the permissions of their tool credentials; scoping service accounts to read-only least privilege and gating state-changing actions limits blast radius.",
+    trap: "Secure AI tool-calling agents = Least Privilege read-only tool credentials + human approval gates."
+  },
+  {
+    id: 190, domain: "5.0 AI & Accelerated Compute",
+    q: "An AI storage architect designs the storage backend for a 32-node GPU training cluster. Why is a parallel distributed filesystem (such as Lustre, GPFS/Spectrum Scale, or WekaFS) over NVMe-oF chosen over a single-controller traditional NAS?",
+    opts: ["A. Parallel filesystems stripe file I/O simultaneously across dozens of storage nodes and NICs, delivering hundreds of GB/s aggregate throughput without a single-controller bottleneck", "B. Parallel filesystems require zero network switches", "C. Traditional NAS supports only files smaller than 4 GB", "D. Parallel filesystems eliminate the need for backups"],
+    ans: "A",
+    why: "Feeding 256 GPUs concurrently requires massive aggregate read bandwidth during epoch shuffles and massive burst write bandwidth during checkpoints—exceeding any single NAS head.",
+    trap: "Multi-node GPU training storage = parallel distributed filesystem (Lustre / GPFS / WekaFS)."
+  },
+  {
+    id: 191, domain: "5.0 AI & Accelerated Compute",
+    q: "An AI server deploys FP8 (8-bit Floating Point) Transformer Engine hardware acceleration instead of legacy FP32 for LLM training and inference. What are the two primary hardware benefits?",
+    opts: ["A. Roughly doubles/quadruples tensor math throughput (TFLOPS) while halving HBM memory bandwidth and capacity requirements with minimal accuracy loss", "B. Eliminates the need for ECC memory", "C. Doubles PCIe lane count from x16 to x32", "D. Converts GPUs into network switches"],
+    ans: "A",
+    why: "Lower-precision tensor formats (BF16, FP8, INT4) let Tensor Cores execute far more matrix multiply-accumulate operations per clock cycle while reducing HBM bottlenecks.",
+    trap: "FP8 / BF16 / INT4 = higher Tensor Core TFLOPS + lower VRAM bandwidth pressure."
+  },
+  {
+    id: 192, domain: "5.0 AI & Accelerated Compute",
+    q: "A data center facilities team calculates Power Usage Effectiveness (PUE) for a new AI hall. Total facility utility draw is 1.25 MW, and actual IT server/GPU rack load is 1.00 MW. What is the PUE and what does it indicate?",
+    opts: ["A. PUE = 1.25 (1.25 MW total ÷ 1.00 MW IT load), indicating high cooling/power infrastructure efficiency close to the ideal theoretical 1.0", "B. PUE = 0.80, indicating power generation", "C. PUE = 2.25, indicating failing UPS batteries", "D. PUE = 125%, indicating circuit overload"],
+    ans: "A",
+    why: "PUE = Total Facility Power / IT Equipment Power. Lower is better (1.0 = 100% power goes to IT, 0% overhead; 1.1–1.3 is modern efficient data center design).",
+    trap: "PUE = Total Facility Power ÷ IT Equipment Power (closer to 1.0 = more efficient)."
+  },
+  {
+    id: 193, domain: "5.0 AI & Accelerated Compute",
+    q: "An enterprise runs an internal LLM server and wants to cut response latency by 60% for repetitive employee queries (such as HR policy questions and standard code templates) without buying more GPUs. Which caching technique stores and reuses computed LLM responses for semantically identical prompts?",
+    opts: ["A. Semantic Caching (comparing query embeddings in a fast in-memory vector cache like Redis before invoking the GPU)", "B. Browser cookie caching", "C. RAID write-through caching", "D. DNS negative TTL caching"],
+    ans: "A",
+    why: "Exact-string caching misses phrased variations ('How many vacation days do I get?' vs. 'What is our PTO allowance?'); Semantic Caching matches embedding similarity and returns cached answers in milliseconds.",
+    trap: "Avoid redundant GPU inference for similar questions = Semantic Caching."
+  },
+  {
+    id: 194, domain: "5.0 AI & Accelerated Compute",
+    q: "An AI server hosting multiple fine-tuned LoRA adapters for 50 different internal departments needs to serve all 50 customized models on a single GPU without loading 50 full copies of the base 70B model into VRAM. How do modern inference engines (vLLM / LoRAX) solve this?",
+    opts: ["A. Dynamic Multi-LoRA serving: keeping one shared frozen base model in VRAM while dynamically swapping tiny megabyte-sized LoRA adapter weights per request", "B. Rebooting the GPU between user prompts", "C. Storing model weights on an external USB hard drive", "D. Disabling CUDA cores"],
+    ans: "A",
+    why: "Because LoRA adapters are tiny (tens of MBs), a single base model in HBM can serve dozens of tenant-specific adapters concurrently with near-zero memory overhead.",
+    trap: "Serve dozens of fine-tuned models on 1 GPU = Multi-LoRA dynamic adapter serving."
+  },
+  {
+    id: 195, domain: "5.0 AI & Accelerated Compute",
+    q: "During an audit of an on-premises AI training pipeline, security engineers discover that raw training data scraped from internal file shares contained unredacted customer Social Security Numbers and API keys, which the fine-tuned LLM occasionally regurgitates verbatim to users. What preventive pipeline control was missing?",
+    opts: ["A. Automated PII/secret scanning, redaction, and data sanitization prior to dataset ingestion and tokenization", "B. Enabling Jumbo Frames on the storage VLAN", "C. Using RAID 10 instead of RAID 6", "D. Increasing GPU fan curves"],
+    ans: "A",
+    why: "LLMs can memorize and leak sensitive training sequences; PII/credential scrubbing before training is far more reliable than trying to 'unlearn' data afterward.",
+    trap: "Prevent LLM training-data memorization leaks = PII/secret sanitization BEFORE training."
+  },
+  {
+    id: 196, domain: "5.0 AI & Accelerated Compute",
+    q: "An AI server administrator compares PCIe CEM add-in GPU cards versus OAM / SXM baseboard GPU modules when speccing a new 8-GPU training node. Why do SXM/OAM modules deliver significantly higher sustained performance than PCIe cards?",
+    opts: ["A. SXM/OAM modules support higher thermal design power (700W–1000W+ vs. 300W–350W PCIe slot/cable limits) and connect directly into high-bandwidth NVSwitch/UALink mesh traces on the baseboard", "B. PCIe GPUs cannot run Linux", "C. SXM modules run without system CPUs or RAM", "D. PCIe GPUs lack ECC memory"],
+    ans: "A",
+    why: "Mezzanine SXM/OAM sockets deliver far higher power delivery and direct high-speed board-level fabric links than edge-connector PCIe cards.",
+    trap: "Highest TDP & direct NVSwitch mesh = SXM / OAM modules."
+  },
+  {
+    id: 197, domain: "5.0 AI & Accelerated Compute",
+    q: "An enterprise deploys an AI inference cluster where response latency (Time-To-First-Token, TTFT) spikes wildly whenever users submit 30,000-token prompts alongside short 50-token chat prompts. Which scheduling technique splits long prefill prompts into smaller slices so short interactive requests aren't blocked?",
+    opts: ["A. Chunked Prefill and Continuous (In-Flight) Batching", "B. Static batching with fixed 60-second timeouts", "C. Round-robin DNS", "D. Defragmenting the NVMe drive"],
+    ans: "A",
+    why: "Static batching forces fast requests to wait for the slowest sequence in the batch; Continuous Batching + Chunked Prefill interleaves token generation dynamically to keep TTFT low.",
+    trap: "Low-latency LLM serving under mixed prompt lengths = Continuous Batching + Chunked Prefill."
+  },
+  {
+    id: 198, domain: "5.0 AI & Accelerated Compute",
+    q: "An AI server's BMC logs 'PCIe Correctable Receiver Errors' climbing rapidly on a slot housing an 800Gbps InfiniBand HCA connected to an adjacent GPU via PCIe Gen 5. What physical layer issue commonly causes Gen 5 PCIe receiver errors?",
+    opts: ["A. Marginal riser card seating, contaminated gold-finger contacts, or excessive PCIe trace/retimer signal attenuation at high 32 GT/s Gen 5 signaling speeds", "B. Outdated NTP time servers", "C. Insufficient swap file size", "D. Incorrect /etc/hosts entries"],
+    ans: "A",
+    why: "PCIe Gen 5 runs at 32 GT/s with tight signal-integrity margins; slightly unseated risers, dust on contacts, or overheated PCIe retimers trigger physical-layer receiver replays.",
+    trap: "PCIe receiver errors = reseat riser/card, inspect contacts, check retimer temps."
+  },
+  {
+    id: 199, domain: "5.0 AI & Accelerated Compute",
+    q: "An organization wants to verify that open-source AI container images and model weights deployed onto its air-gapped production servers have not been tampered with in transit. Which supply-chain security mechanism cryptographically verifies artifact authenticity before deployment?",
+    opts: ["A. Cryptographic image/artifact signing and verification (e.g., Sigstore Cosign / Notary) paired with SHA-256 digest pinning", "B. Renaming container tags to ':latest'", "C. Disabling TLS certificate checks with '--insecure'", "D. Compressing containers with ZIP"],
+    ans: "A",
+    why: "Mutable tags like ':latest' can be overwritten; verifying cryptographic signatures and immutable SHA-256 digests guarantees exact provenance.",
+    trap: "AI container & model supply-chain integrity = Cosign signature verification + SHA-256 digest pinning."
+  },
+  {
+    id: 200, domain: "5.0 AI & Accelerated Compute",
+    q: "A company builds a hybrid AI architecture: sensitive PII/medical records are processed on local on-premises GPU servers, while non-sensitive public summarization bursts to cloud LLM APIs. Which infrastructure pattern connects on-premises Kubernetes clusters seamlessly to cloud bursts while enforcing unified policy and encryption?",
+    opts: ["A. Hybrid cloud bursting over encrypted IPsec/Dedicated Interconnect tunnels managed by a unified Kubernetes control plane and AI Gateway routing policy", "B. Exposing local GPU servers directly to the public internet without authentication", "C. Shipping physical USB drives between offices", "D. Disabling all local firewalls during cloud bursts"],
+    ans: "A",
+    why: "Hybrid AI architectures keep regulated data on-prem while routing sanitized burst workloads over private encrypted interconnects via policy-driven gateways.",
+    trap: "Regulated data on-prem + elastic cloud burst = Hybrid Cloud + AI Gateway policy routing + encrypted interconnect."
+  }
+];
+
+const container = document.getElementById("quizContainer");
+const filterRow = document.getElementById("filterRow");
+const searchBox = document.getElementById("searchBox");
+const toggleAllBtn = document.getElementById("toggleAllBtn");
+const visibleCount = document.getElementById("visibleCount");
+
+let currentDomain = "ALL";
+let allExpanded = false;
+
+function render() {
+  const query = searchBox.value.trim().toLowerCase();
+  container.innerHTML = "";
+  let shown = 0;
+
+  scenarios.forEach(item => {
+    if (currentDomain !== "ALL" && item.domain !== currentDomain) return;
+    const blob = (item.q + " " + item.opts.join(" ") + " " + item.why + " " + item.trap).toLowerCase();
+    if (query && !blob.includes(query)) return;
+
+    shown++;
+    const card = document.createElement("article");
+    card.className = "card";
+    const isAi = item.domain.startsWith("5.0");
+
+    const optsHtml = item.opts.map(opt => {
+      const isRight = opt.startsWith(item.ans + ".");
+      return `<li class="opt ${isRight ? "correct-highlight" : ""}">${opt}</li>`;
+    }).join("");
+
+    card.innerHTML = `
+      <div class="card-header">
+        <span class="q-num">SCENARIO #${String(item.id).padStart(3, "0")}</span>
+        <span class="domain-tag ${isAi ? "ai-tag" : ""}">${item.domain}</span>
+      </div>
+      <div class="scenario-text">${item.q}</div>
+      <ul class="options-list">${optsHtml}</ul>
+      <details ${allExpanded ? "open" : ""}>
+        <summary>Inspect Root Cause &amp; Exam Logic (Answer: ${item.ans})</summary>
+        <div class="answer-body">
+          <div class="answer-verdict">Correct Answer: ${item.opts.find(o => o.startsWith(item.ans + "."))}</div>
+          <div class="mechanism"><strong>Why it works this way:</strong> ${item.why}</div>
+          <div class="trap-note"><strong>Exam Trap / Trigger:</strong> ${item.trap}</div>
+        </div>
+      </details>
+    `;
+    container.appendChild(card);
+  });
+
+  visibleCount.textContent = `Showing ${shown} of ${scenarios.length} scenarios`;
+}
+
+filterRow.addEventListener("click", e => {
+  if (!e.target.classList.contains("chip")) return;
+  document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+  e.target.classList.add("active");
+  currentDomain = e.target.dataset.domain;
+  render();
+});
+
+searchBox.addEventListener("input", render);
+
+toggleAllBtn.addEventListener("click", () => {
+  allExpanded = !allExpanded;
+  toggleAllBtn.textContent = allExpanded ? "Collapse All" : "Expand All";
+  document.querySelectorAll("details").forEach(d => {
+    if (allExpanded) d.setAttribute("open", "");
+    else d.removeAttribute("open");
+  });
+});
+
+render();
+</script>
+</body>
+</html>

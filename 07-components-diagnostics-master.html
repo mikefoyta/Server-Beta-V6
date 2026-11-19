@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Server+ V6 — Enterprise Server Components &amp; Diagnostics Master</title>
+<style>
+  :root {
+    --bg-main: #0a0f1c;
+    --bg-card: #111827;
+    --bg-panel: #0d1526;
+    --border-subtle: #1e293b;
+    --accent-cyan: #38bdf8;
+    --accent-teal: #2dd4bf;
+    --accent-amber: #fbbf24;
+    --accent-red: #f87171;
+    --accent-purple: #c084fc;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    line-height: 1.6;
+    padding: 16px 12px 64px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 20px 18px;
+    margin-bottom: 18px;
+  }
+  header h1 { font-size: 1.35rem; color: var(--accent-cyan); margin-bottom: 6px; }
+  header p { font-size: 0.9rem; color: var(--text-secondary); }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 18px 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+  }
+  .card h2 {
+    font-size: 1.08rem;
+    color: var(--accent-teal);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .badge {
+    font-size: 0.72rem;
+    background: rgba(56, 189, 248, 0.14);
+    color: var(--accent-cyan);
+    padding: 3px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  p { margin-bottom: 10px; color: var(--text-secondary); font-size: 0.92rem; }
+  strong { color: var(--text-primary); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 0.85rem;
+  }
+  th, td {
+    border: 1px solid #1e293b;
+    padding: 9px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #0f172a;
+    color: var(--accent-cyan);
+    font-weight: 700;
+  }
+  tr:nth-child(even) td { background: rgba(15, 23, 42, 0.5); }
+  .callout {
+    background: var(--bg-panel);
+    border-left: 3px solid var(--accent-amber);
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin: 10px 0;
+    font-size: 0.87rem;
+    color: #fef3c7;
+  }
+  .callout.teal {
+    border-left-color: var(--accent-teal);
+    color: #ccfbf1;
+  }
+  .callout.red {
+    border-left-color: var(--accent-red);
+    color: #fee2e2;
+  }
+  pre {
+    background: #070b14;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 12px;
+    overflow-x: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.82rem;
+    color: #7dd3fc;
+    margin: 10px 0;
+  }
+  code {
+    background: #1e293b;
+    color: #7dd3fc;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.84rem;
+  }
+  ul { padding-left: 18px; margin-bottom: 10px; color: var(--text-secondary); font-size: 0.9rem; }
+  li { margin-bottom: 6px; }
+  .sim-box {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 10px;
+  }
+  .sim-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 10px; }
+  select, input[type=number] {
+    background: #1e293b;
+    color: var(--text-primary);
+    border: 1px solid #475569;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.88rem;
+  }
+  button.btn {
+    background: var(--accent-cyan);
+    color: #090d16;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+  button.btn.danger { background: var(--accent-red); color: #fff; }
+  button.btn.reset { background: #334155; color: var(--text-primary); }
+  .locker-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 12px 0;
+  }
+  .locker {
+    background: #1e293b;
+    border: 2px solid var(--accent-teal);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    transition: 0.15s;
+  }
+  .locker.dead {
+    background: rgba(248, 113, 113, 0.18);
+    border-color: var(--accent-red);
+    color: #fca5a5;
+    text-decoration: line-through;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Server Components, Interfaces &amp; Hardware Diagnostics Vault</h1>
+  <p>CompTIA Server+ V6 (SK1-006) • Visual Component Identification, Memory/Drive/NIC Form Factors, Fiber Optics, TPM/HSM Security &amp; Diagnostic LEDs/Logs.</p>
+</header>
+
+<section class="card">
+  <h2>1. Server Memory Modules (DIMM Comparison) <span class="badge">Memory Hardware</span></h2>
+  <table>
+    <tr><th>Module Type</th><th>Buffering Chip</th><th>Max Capacity / Scaling</th><th>Compatibility</th></tr>
+    <tr><td><strong>UDIMM</strong> (Unbuffered)</td><td>None (direct to CPU memory controller)</td><td>Low (1–2 DIMMs/ch max; entry servers)</td><td>Cannot mix with RDIMM or LRDIMM</td></tr>
+    <tr><td><strong>RDIMM</strong> (Registered)</td><td>Register chip buffers <strong>Command &amp; Address</strong> lines</td><td>High (standard enterprise server RAM)</td><td>Cannot mix with UDIMM or LRDIMM</td></tr>
+    <tr><td><strong>LRDIMM</strong> (Load-Reduced)</td><td>Isolation Memory Buffer (iMB) buffers <strong>Command, Address &amp; Data</strong></td><td>Ultra-high capacity (reduces electrical load)</td><td>Cannot mix with UDIMM or RDIMM</td></tr>
+  </table>
+</section>
+
+<section class="card">
+  <h2>2. Enterprise Storage Interfaces &amp; Form Factors <span class="badge">Drives &amp; Backplanes</span></h2>
+  <table>
+    <tr><th>Interface / Form Factor</th><th>Protocol &amp; Speed</th><th>Key Characteristics</th></tr>
+    <tr><td><strong>SATA III</strong></td><td>SATA (6 Gbps, half-duplex)</td><td>Cost-effective bulk storage; requires <strong>AHCI or RAID mode</strong> in BIOS for hot-swap.</td></tr>
+    <tr><td><strong>SAS (Serial Attached SCSI)</strong></td><td>SCSI over serial (12 / 24 Gbps, full-duplex)</td><td>Dual-ported for MPIO failover; SAS backplanes accept SATA drives, but never mix SAS+SATA in one RAID array.</td></tr>
+    <tr><td><strong>U.2 / U.3 (2.5" NVMe)</strong></td><td>NVMe over PCIe (4 lanes / drive)</td><td>Front hot-swap enterprise SSDs bypassing legacy SAS/SATA bottlenecks.</td></tr>
+    <tr><td><strong>EDSFF (E1.S / E3.S)</strong></td><td>NVMe over PCIe Gen 5</td><td>Ruler-style high-density flash form factor optimized for 1U/2U thermal airflow.</td></tr>
+    <tr><td><strong>M.2 BOSS Module</strong></td><td>NVMe / SATA hardware RAID 1 carrier</td><td>Internal mirrored boot card keeping all 24 front hot-swap bays free for data.</td></tr>
+  </table>
+</section>
+
+<section class="card">
+  <h2>3. Network Adapters, Transceivers &amp; Fiber Cabling <span class="badge">Networking Hardware</span></h2>
+  <table>
+    <tr><th>Component</th><th>Specs &amp; Color Coding</th><th>Critical Exam Rule</th></tr>
+    <tr><td><strong>OCP 3.0 Mezzanine NIC</strong></td><td>Modular pull-tab NIC bay</td><td>Hot-serviceable without opening chassis lid; saves standard PCIe risers for GPUs/HBAs.</td></tr>
+    <tr><td><strong>SFP+ / SFP28 / QSFP28</strong></td><td>10GbE / 25GbE / 100GbE optics</td><td><strong>SR (850nm)</strong> = Multi-Mode Fiber (aqua OM3/OM4) | <strong>LR (1310nm)</strong> = Single-Mode Fiber (yellow OS2).</td></tr>
+    <tr><td><strong>UPC vs. APC Fiber Ends</strong></td><td><strong>Blue = UPC</strong> (flat) | <strong>Green = APC</strong> (8° angled)</td><td>NEVER plug a green APC cable into a blue UPC port (causes air gap &amp; massive signal loss).</td></tr>
+    <tr><td><strong>RS-232 Serial Console</strong></td><td>DB9 / RJ45 management port</td><td>No Auto-MDIX on serial ports—requires a <strong>rollover / null-modem cable</strong> (crosses TX ↔ RX).</td></tr>
+    <tr><td><strong>Structured Cabling Ties</strong></td><td>Hook-and-loop Velcro straps</td><td>Never use tight plastic zip ties (crushes twist geometry) and never run Cat6A parallel to AC power (EMI).</td></tr>
+  </table>
+</section>
+
+<section class="card">
+  <h2>4. Security Chips, Blade Components &amp; AI Accelerators <span class="badge">Specialized Silicon</span></h2>
+  <ul>
+    <li><strong>TPM 2.0 (Trusted Platform Module):</strong> Motherboard crypto chip sealing BitLocker/LUKS keys and UEFI Secure Boot PCR hashes. Replacing a motherboard changes the TPM → triggers BitLocker 48-digit recovery key prompt.</li>
+    <li><strong>Chassis Intrusion Switch:</strong> Physical plunger micro-switch under top cover that trips when opened (even powered off), logging a tamper alert in BMC SEL until cleared.</li>
+    <li><strong>Blade Chassis Mezzanine Cards:</strong> Expansion NIC/HBA cards inside a compute blade route through the midplane to matching rear I/O switch/pass-through bays—both must match protocol (e.g., Fibre Channel).</li>
+    <li><strong>AI GPU Form Factors:</strong>
+      <ul>
+        <li><em>PCIe CEM Cards (e.g., L4/H100 PCIe):</em> 75W slot-powered (L4) or auxiliary 12VHPWR cabled (300–350W).</li>
+        <li><em>SXM / OAM Modules:</em> High-TDP (700W–1000W+) baseboard modules wired directly into NVSwitch / UALink meshes.</li>
+      </ul>
+    </li>
+  </ul>
+</section>
+
+<section class="card">
+  <h2>5. Diagnostic Telemetry &amp; Event Log Cheat Sheet <span class="badge">Fault Isolation</span></h2>
+  <table>
+    <tr><th>Symptom / Log Entry</th><th>Component at Fault</th><th>Immediate Action</th></tr>
+    <tr><td><code>WHEA-Logger Event ID 19</code> under GPU load</td><td>PCIe auxiliary power / 12V rail droop</td><td>Verify PSU wattage headroom &amp; dedicated auxiliary PCIe power cables.</td></tr>
+    <tr><td><code>Chassis Intrusion Detected</code></td><td>Top cover plunger micro-switch</td><td>Verify lid seating &amp; clear intrusion latch in BMC/BIOS.</td></tr>
+    <tr><td><code>GPU Memory Junction 108°C</code> (Core 68°C)</td><td>HBM VRAM stack thermal pads / airflow</td><td>Inspect chassis airflow &amp; memory thermal interface pads.</td></tr>
+    <tr><td><code>PCIe Correctable Receiver Errors</code> (Gen 5)</td><td>PCIe riser seating / retimer / gold fingers</td><td>Reseat riser card, clean contacts, check retimer cooling.</td></tr>
+    <tr><td><code>CDU Leak Detection Rope Alarm</code></td><td>Direct-to-Chip liquid cooling loop</td><td>Auto-close manifold isolation valves &amp; gracefully power down rack.</td></tr>
+  </table>
+</section>
+</body>
+</html>

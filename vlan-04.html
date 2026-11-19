@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VLAN 04 — High Availability (HA), Fault Tolerance (FT) & Clustering | Server+ Study Switchboard</title>
+  <style>
+:root {
+  --bg-primary: #0b0f17;
+  --bg-secondary: #131a26;
+  --bg-card: #182132;
+  --bg-card-hover: #1e293e;
+  --border-color: #2a3750;
+  --accent-cyan: #38bdf8;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  --accent-purple: #a855f7;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  padding-bottom: 4rem;
+}
+
+.topbar {
+  background: rgba(19, 26, 38, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0.85rem 1.5rem;
+}
+
+.topbar-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+}
+
+.brand-badge {
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  transition: all 0.15s ease;
+}
+
+.nav-btn:hover:not(.disabled) {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.nav-btn.disabled {
+  opacity: 0.38;
+  pointer-events: none;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1.75rem 1.5rem 0;
+}
+
+.vlan-banner {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(16, 185, 129, 0.08));
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-left: 4px solid var(--accent-cyan);
+  border-radius: 10px;
+  padding: 1.4rem 1.6rem;
+  margin-bottom: 1.75rem;
+}
+
+.vlan-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.vlan-pill {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-cyan);
+  background: rgba(56, 189, 248, 0.14);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+.isolation-pill {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--accent-emerald);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+h1 {
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  margin-bottom: 0.4rem;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 0.96rem;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 1.15rem;
+  margin-bottom: 1.5rem;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1.25rem 1.35rem;
+}
+
+.card h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.card h3 {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0.85rem 0 0.35rem;
+}
+
+.card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.6rem;
+}
+
+ul.clean-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+ul.clean-list li {
+  position: relative;
+  padding-left: 1.15rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+ul.clean-list li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--accent-cyan);
+  font-weight: bold;
+}
+
+ul.clean-list li strong {
+  color: var(--text-primary);
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.83rem;
+  background: rgba(15, 23, 42, 0.85);
+  color: var(--accent-amber);
+  padding: 0.12rem 0.38rem;
+  border-radius: 4px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-card);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+th {
+  background: #101724;
+  color: var(--accent-cyan);
+  font-weight: 700;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(42, 55, 80, 0.6);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+td strong {
+  color: var(--text-primary);
+}
+
+.callout {
+  background: rgba(245, 158, 11, 0.09);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-left: 4px solid var(--accent-amber);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.callout strong {
+  color: var(--accent-amber);
+}
+
+.footer-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-color);
+}
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-badge">SK1-006</span>
+        <span>SERVER+ VLAN SWITCHBOARD</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-btn">⌂ Trunk Index</a>
+        <a href="vlan-03.html" class="nav-btn">← VLAN 03</a>
+        <a href="vlan-05.html" class="nav-btn">VLAN 05 →</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="vlan-banner">
+      <div class="vlan-tag-row">
+        <span class="vlan-pill">VLAN 04 // ISOLATED DOMAIN</span>
+        <span class="isolation-pill">STRICT DOMAIN BOUNDARY — ZERO CROSS-VLAN LEAKAGE</span>
+      </div>
+      <h1>High Availability (HA), Fault Tolerance (FT) & Clustering</h1>
+      <p class="subtitle">HA automated failover vs. FT synchronous lockstep, Active/Passive vs. Active/Active, quorum witnesses, and STONITH.</p>
+    </section>
+
+    
+<div class="callout">
+  <strong>DOMAIN SCOPE (VLAN 04):</strong> Everything inside this room belongs strictly to <strong>High Availability (HA), Fault Tolerance (FT), Failover Clustering, and Load Balancing</strong>.
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Architecture</th>
+        <th>Downtime on Host Failure</th>
+        <th>Execution Mechanism</th>
+        <th>Resource &amp; Network Overhead</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>High Availability (HA)</strong></td>
+        <td><strong>Brief interruption</strong> (Seconds to minutes while workload restarts)</td>
+        <td>Cluster detects failed node via missed heartbeats and automatically reboots/restarts VMs or services on a surviving node.</td>
+        <td>Low overhead; active TCP sessions drop during failover and clients reconnect.</td>
+      </tr>
+      <tr>
+        <td><strong>Fault Tolerance (FT)</strong></td>
+        <td><strong>Zero downtime</strong> (0 ms interruption; zero dropped packets)</td>
+        <td>Runs a live secondary shadow instance in continuous synchronous lockstep; instant transparent cutover if primary fails.</td>
+        <td>High overhead (2× CPU/RAM consumption + dedicated ultra-low-latency logging link).</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h2>Cluster Topologies: Active/Passive vs. Active/Active</h2>
+    <ul class="clean-list">
+      <li><strong>Active/Passive Cluster:</strong> Node A serves 100% of live traffic while Node B sits idle in standby mode waiting to take over; guarantees full uncontended performance upon failover.</li>
+      <li><strong>Active/Active Cluster:</strong> Both Node A and Node B actively process live workloads simultaneously; maximizes hardware utilization, though surviving nodes must absorb extra load during failover.</li>
+      <li><strong>Shared-Nothing vs. Shared-Storage:</strong> Shared-storage clusters require all nodes to access common backend storage; Shared-nothing clusters replicate local storage asynchronously/synchronously between nodes.</li>
+      <li><strong>Rolling Upgrades:</strong> Draining workloads off Node A onto Node B to patch/reboot Node A without application downtime, then reversing the process.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Heartbeats, Quorum &amp; Split-Brain Prevention</h2>
+    <ul class="clean-list">
+      <li><strong>Heartbeat Network:</strong> Dedicated private NIC link between cluster nodes transmitting continuous "I am alive" keepalive pulses every second.</li>
+      <li><strong>Split-Brain Condition:</strong> Occurs when the heartbeat link breaks while both nodes are still alive; each node assumes the other is dead and attempts to seize ownership of the same resources simultaneously, risking data corruption.</li>
+      <li><strong>Quorum Majority Rule:</strong> A cluster partition must hold <code>&gt; 50%</code> of total votes to remain online; minority partitions automatically shut down cluster services.</li>
+      <li><strong>Quorum Witness (Disk or Cloud):</strong> Tie-breaker vote used in 2-node (even-numbered) clusters so one surviving node + witness = 2 of 3 votes (majority).</li>
+      <li><strong>STONITH (Shoot The Other Node In The Head):</strong> Automated power-fencing mechanism that hard-powers off an unresponsive node so it cannot corrupt shared resources.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Load Balancing Mechanics &amp; Health Checks</h2>
+  <div class="grid-2" style="margin-bottom:0;">
+    <ul class="clean-list">
+      <li><strong>Round Robin / Weighted Round Robin:</strong> Distributes incoming client requests sequentially across pool servers (weighted sends more traffic to higher-capacity servers).</li>
+      <li><strong>Least Connections:</strong> Routes new requests to the backend server currently handling the fewest active sessions.</li>
+      <li><strong>Session Persistence (Sticky Sessions):</strong> Binds a user's session to a specific backend node via cookies or source IP hash so in-memory shopping carts/sessions aren't lost.</li>
+    </ul>
+    <ul class="clean-list">
+      <li><strong>Layer 4 vs. Layer 7 Load Balancing:</strong> Layer 4 routes based on IP and TCP/UDP port (fast, packet-level); Layer 7 inspects HTTP headers, URLs, and cookies (content-aware routing + SSL offloading).</li>
+      <li><strong>Active Health Probes:</strong> Load balancer periodically polls backend servers (HTTP GET, TCP handshake); failed nodes are automatically pulled out of rotation until healthy.</li>
+      <li><strong>VIP (Virtual IP) / Floating IP:</strong> Single front-end IP address presented to clients that dynamically moves to the active node during failover.</li>
+    </ul>
+  </div>
+</div>
+
+
+    <div class="footer-nav">
+      <a href="vlan-03.html" class="nav-btn">← VLAN 03</a>
+      <a href="index.html" class="nav-btn">⌂ Return to Switchboard</a>
+      <a href="vlan-05.html" class="nav-btn">VLAN 05 →</a>
+    </div>
+  </main>
+</body>
+</html>
