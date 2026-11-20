@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Server+ Multi-OS & Infrastructure CLI Switchboard</title>
+  <style>
+    /* ==========================================================================
+       DESIGN TOKENS & DEEP DARK NAVY THEME
+       ========================================================================== */
+    :root {
+      --bg-deep: #070b14;
+      --bg-card: #0f172a;
+      --bg-card-hover: #131f3a;
+      --bg-elevated: #0b1222;
+      --border-slate: #1e293b;
+      --border-active: rgba(56, 189, 248, 0.55);
+
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+
+      --accent-sky: #38bdf8;
+      --accent-sky-soft: rgba(56, 189, 248, 0.14);
+      --accent-amber: #f59e0b;
+      --accent-amber-soft: rgba(245, 158, 11, 0.14);
+      --accent-emerald: #10b981;
+      --accent-emerald-soft: rgba(16, 185, 129, 0.15);
+      --accent-rose: #f43f5e;
+      --accent-rose-soft: rgba(244, 63, 94, 0.15);
+
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow-card: 0 12px 28px -6px rgba(2, 6, 23, 0.7);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-deep);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 8%, rgba(245, 158, 11, 0.06) 0%, transparent 36%),
+        var(--bg-deep);
+      padding-bottom: 5rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0.9rem;
+    }
+
+    /* ==========================================================================
+       HEADER & MNEMONIC DRILL TOGGLE
+       ========================================================================== */
+    header.app-header {
+      background: var(--bg-card);
+      border: 1px solid var(--border-slate);
+      border-radius: var(--radius-lg);
+      padding: 1.15rem;
+      margin-bottom: 0.95rem;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .goose-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(245, 158, 11, 0.2));
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.65rem;
+      flex-shrink: 0;
+    }
+
+    .title-block h1 {
+      font-size: clamp(1.12rem, 3.6vw, 1.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .title-block p {
+      font-size: 0.8rem;
+      color: var(--accent-sky);
+      font-weight: 500;
+      margin-top: 0.2rem;
+    }
+
+    .mnemonic-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.58rem 0.9rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-slate);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 42px;
+      transition: all 0.18s ease;
+    }
+
+    .mnemonic-toggle.visible-mode {
+      border-color: rgba(245, 158, 11, 0.55);
+      background: var(--accent-amber-soft);
+      color: var(--accent-amber);
+    }
+
+    .mnemonic-toggle.drill-mode {
+      border-color: rgba(56, 189, 248, 0.6);
+      background: var(--accent-sky-soft);
+      color: var(--accent-sky);
+    }
+
+    /* ==========================================================================
+       1. TOP OS / SYSTEM SWITCHER TABS
+       ========================================================================== */
+    .os-tabs-bar {
+      display: flex;
+      gap: 0.45rem;
+      overflow-x: auto;
+      padding-bottom: 0.15rem;
+      scrollbar-width: none;
+    }
+
+    .os-tabs-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .os-tab {
+      white-space: nowrap;
+      padding: 0.55rem 0.9rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-slate);
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      font-size: 0.81rem;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 40px;
+      transition: all 0.16s ease;
+    }
+
+    .os-tab:hover {
+      color: var(--text-primary);
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .os-tab.active {
+      background: var(--accent-sky);
+      color: #040914;
+      border-color: var(--accent-sky);
+    }
+
+    .os-tab.twins-tab.active {
+      background: var(--accent-amber);
+      color: #040914;
+      border-color: var(--accent-amber);
+    }
+
+    /* ==========================================================================
+       2. ENDLESS PRACTICE DECK (SPACED-REPETITION DRILL)
+       ========================================================================== */
+    .deck-panel {
+      background: var(--bg-card);
+      border: 1px solid rgba(56, 189, 248, 0.32);
+      border-radius: var(--radius-lg);
+      padding: 1.05rem;
+      margin-bottom: 0.95rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .deck-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+    }
+
+    .deck-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .deck-badge {
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-amber);
+    }
+
+    .deck-stats {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--text-secondary);
+      background: var(--bg-deep);
+      border: 1px solid var(--border-slate);
+      padding: 0.22rem 0.6rem;
+      border-radius: 999px;
+    }
+
+    .deck-controls-top {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    .deck-select {
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      border: 1px solid var(--border-slate);
+      border-radius: var(--radius-sm);
+      padding: 0.42rem 0.65rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      min-height: 36px;
+      outline: none;
+    }
+
+    .deck-select:focus {
+      border-color: var(--accent-sky);
+    }
+
+    .deck-shuffle-btn {
+      background: var(--bg-elevated);
+      color: var(--accent-sky);
+      border: 1px solid rgba(56, 189, 248, 0.38);
+      border-radius: var(--radius-sm);
+      padding: 0.42rem 0.72rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 36px;
+      transition: all 0.15s ease;
+    }
+
+    .deck-shuffle-btn:hover {
+      background: var(--accent-sky-soft);
+    }
+
+    .flashcard-stage {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-slate);
+      border-radius: var(--radius-md);
+      padding: 1.05rem;
+      cursor: pointer;
+      transition: border-color 0.18s ease;
+      position: relative;
+    }
+
+    .flashcard-stage:hover {
+      border-color: var(--accent-sky);
+    }
+
+    .fc-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.45rem;
+    }
+
+    .fc-sys-pill {
+      font-size: 0.69rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-sky);
+      background: var(--accent-sky-soft);
+      padding: 0.18rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    .fc-repeat-tag {
+      font-size: 0.69rem;
+      font-weight: 700;
+      color: var(--accent-rose);
+      background: var(--accent-rose-soft);
+      padding: 0.18rem 0.5rem;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .fc-repeat-tag.show {
+      display: inline-block;
+    }
+
+    .fc-question {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.48;
+    }
+
+    .fc-back {
+      margin-top: 0.85rem;
+      padding-top: 0.85rem;
+      border-top: 1px dashed var(--border-slate);
+      display: none;
+    }
+
+    .fc-back.open {
+      display: block;
+      animation: fadeSlide 0.18s ease;
+    }
+
+    .fc-answer-cmd {
+      font-family: var(--font-mono);
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: var(--accent-sky);
+      margin-bottom: 0.3rem;
+    }
+
+    .fc-answer-giveaway {
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--accent-amber);
+      margin-bottom: 0.35rem;
+    }
+
+    .fc-answer-twin {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .deck-actions-bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .deck-btn {
+      padding: 0.55rem 0.65rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 42px;
+      border: 1px solid var(--border-slate);
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+    }
+
+    .btn-reveal {
+      background: var(--accent-sky-soft);
+      border-color: rgba(56, 189, 248, 0.45);
+      color: var(--accent-sky);
+    }
+
+    .btn-reveal:hover {
+      background: rgba(56, 189, 248, 0.24);
+    }
+
+    .btn-repeat {
+      background: var(--accent-rose-soft);
+      border-color: rgba(244, 63, 94, 0.45);
+      color: var(--accent-rose);
+    }
+
+    .btn-repeat:hover {
+      background: rgba(244, 63, 94, 0.24);
+    }
+
+    .btn-gotit {
+      background: var(--accent-emerald-soft);
+      border-color: rgba(16, 185, 129, 0.45);
+      color: var(--accent-emerald);
+    }
+
+    .btn-gotit:hover {
+      background: rgba(16, 185, 129, 0.24);
+    }
+
+    /* ==========================================================================
+       4. STICKY SEARCH & SYMPTOM / TAG FILTER BAR
+       ========================================================================== */
+    .filter-bar {
+      position: sticky;
+      top: 0.45rem;
+      z-index: 25;
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-slate);
+      border-radius: var(--radius-lg);
+      padding: 0.85rem;
+      margin-bottom: 0.85rem;
+      box-shadow: 0 12px 28px rgba(2, 6, 23, 0.72);
+    }
+
+    .search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.65rem;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      color: var(--accent-sky);
+      font-size: 0.92rem;
+      pointer-events: none;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 0.65rem 2.4rem 0.65rem 2.35rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-slate);
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      font-size: 0.92rem;
+      font-family: var(--font-sans);
+      outline: none;
+      transition: border-color 0.18s ease;
+    }
+
+    #searchInput::placeholder {
+      color: var(--text-muted);
+    }
+
+    #searchInput:focus {
+      border-color: var(--accent-sky);
+    }
+
+    #clearSearchBtn {
+      position: absolute;
+      right: 0.5rem;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      padding: 0.35rem 0.55rem;
+      cursor: pointer;
+      display: none;
+    }
+
+    .symptom-pills {
+      display: flex;
+      gap: 0.42rem;
+      overflow-x: auto;
+      padding-bottom: 0.15rem;
+      scrollbar-width: none;
+    }
+
+    .symptom-pills::-webkit-scrollbar {
+      display: none;
+    }
+
+    .sym-pill {
+      white-space: nowrap;
+      padding: 0.42rem 0.78rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-slate);
+      background: var(--bg-deep);
+      color: var(--text-secondary);
+      font-size: 0.77rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 36px;
+      transition: all 0.15s ease;
+    }
+
+    .sym-pill:hover {
+      color: var(--text-primary);
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .sym-pill.active {
+      background: var(--accent-sky-soft);
+      border-color: var(--accent-sky);
+      color: var(--accent-sky);
+      font-weight: 700;
+    }
+
+    .results-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.77rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+      padding: 0 0.2rem;
+    }
+
+    /* ==========================================================================
+       5. COMMAND CARDS GRID
+       ========================================================================== */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.9rem;
+    }
+
+    @media (min-width: 760px) {
+      .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .cmd-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-slate);
+      border-radius: var(--radius-lg);
+      padding: 1.05rem;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: 0.68rem;
+      transition: border-color 0.18s ease;
+    }
+
+    .cmd-card:hover {
+      border-color: var(--border-active);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.6rem;
+    }
+
+    .card-badges {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .tag-line {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .os-tag {
+      font-size: 0.67rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.15rem 0.48rem;
+      border-radius: 5px;
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent-sky);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    .sym-tag {
+      font-size: 0.67rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .cmd-title {
+      font-family: var(--font-mono);
+      font-size: 1.12rem;
+      font-weight: 800;
+      color: var(--accent-sky);
+      background: var(--bg-deep);
+      border: 1px solid var(--border-slate);
+      padding: 0.28rem 0.62rem;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      width: fit-content;
+    }
+
+    .copy-btn {
+      padding: 0.42rem 0.68rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-slate);
+      background: var(--bg-deep);
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 36px;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    .copy-btn:hover {
+      border-color: var(--accent-sky);
+      color: var(--text-primary);
+    }
+
+    .copy-btn.copied {
+      border-color: var(--accent-emerald);
+      color: var(--accent-emerald);
+      background: var(--accent-emerald-soft);
+    }
+
+    /* Invisible Giveaway Box */
+    .giveaway-box {
+      background: var(--bg-deep);
+      border-left: 3px solid var(--accent-amber);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 0.55rem 0.75rem;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .giveaway-box:hover {
+      background: #090f1d;
+    }
+
+    .giveaway-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.67rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-amber);
+      margin-bottom: 0.18rem;
+    }
+
+    .giveaway-content {
+      font-size: 0.91rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      transition: filter 0.2s ease, opacity 0.2s ease;
+    }
+
+    body.drill-blur .giveaway-box:not(.revealed) .giveaway-content {
+      filter: blur(5.5px);
+      opacity: 0.42;
+      user-select: none;
+    }
+
+    .giveaway-content .hl {
+      color: var(--accent-amber);
+      font-weight: 800;
+      text-decoration: underline;
+      text-decoration-color: rgba(245, 158, 11, 0.45);
+      text-underline-offset: 3px;
+    }
+
+    .plain-desc {
+      font-size: 0.87rem;
+      color: var(--text-primary);
+      line-height: 1.46;
+    }
+
+    .flags-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.38rem;
+    }
+
+    .flag-chip {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      background: rgba(56, 189, 248, 0.09);
+      border: 1px solid rgba(56, 189, 248, 0.22);
+      color: #bae6fd;
+      padding: 0.22rem 0.52rem;
+      border-radius: 6px;
+    }
+
+    .twin-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.24);
+      border-radius: var(--radius-sm);
+      padding: 0.45rem 0.68rem;
+      font-size: 0.79rem;
+    }
+
+    .twin-label {
+      color: var(--accent-emerald);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .twin-val {
+      font-family: var(--font-mono);
+      color: #d1fae5;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .trap-box {
+      margin-top: auto;
+      background: var(--accent-amber-soft);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: var(--radius-sm);
+      padding: 0.56rem 0.72rem;
+      font-size: 0.8rem;
+      color: #fde68a;
+      line-height: 1.42;
+    }
+
+    .trap-box strong {
+      color: var(--accent-amber);
+    }
+
+    /* ==========================================================================
+       LINUX TWINS SIDE-BY-SIDE COMPARISON VIEW
+       ========================================================================== */
+    .twins-view {
+      display: none;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .twins-view.active {
+      display: flex;
+    }
+
+    .twins-intro {
+      background: var(--bg-card);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .twins-intro strong {
+      color: var(--accent-amber);
+    }
+
+    .twin-compare-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-slate);
+      border-radius: var(--radius-md);
+      padding: 0.9rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.65rem;
+    }
+
+    @media (min-width: 680px) {
+      .twin-compare-card {
+        grid-template-columns: 1.1fr 1fr 1fr;
+        align-items: center;
+      }
+    }
+
+    .tc-task {
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--text-primary);
+    }
+
+    .tc-sub {
+      font-size: 0.76rem;
+      color: var(--accent-amber);
+      margin-top: 0.15rem;
+    }
+
+    .tc-box {
+      background: var(--bg-deep);
+      border: 1px solid var(--border-slate);
+      border-radius: var(--radius-sm);
+      padding: 0.55rem 0.7rem;
+    }
+
+    .tc-os {
+      font-size: 0.66rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.2rem;
+    }
+
+    .tc-os.win { color: var(--accent-sky); }
+    .tc-os.lin { color: var(--accent-emerald); }
+
+    .tc-code {
+      font-family: var(--font-mono);
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-slate);
+      border-radius: var(--radius-lg);
+      color: var(--text-secondary);
+      display: none;
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(18px);
+      background: var(--bg-card);
+      color: var(--accent-emerald);
+      border: 1px solid var(--accent-emerald);
+      padding: 0.55rem 1rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.75);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 60;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- ======================================================================
+         HEADER & TOP OS / SYSTEM SWITCHER TABS
+         ====================================================================== -->
+    <header class="app-header">
+      <div class="header-top">
+        <div class="brand-group">
+          <div class="goose-badge" aria-label="Emergency Goose">🪿</div>
+          <div class="title-block">
+            <h1>Server+ Multi-OS &amp; Infrastructure CLI Switchboard</h1>
+            <p>Windows Server • Networking • Storage, Hypervisors &amp; UEFI • Linux Twins</p>
+          </div>
+        </div>
+
+        <button type="button" id="mnemonicToggleBtn" class="mnemonic-toggle visible-mode">
+          <span id="mnemonicIcon">👁️</span>
+          <span id="mnemonicLabel">Giveaways: Visible</span>
+        </button>
+      </div>
+
+      <nav class="os-tabs-bar" id="osTabsBar" aria-label="Operating System Switcher">
+        <button type="button" class="os-tab active" data-os="All Systems">All Systems</button>
+        <button type="button" class="os-tab" data-os="Windows Server">Windows Server (CMD &amp; PowerShell)</button>
+        <button type="button" class="os-tab" data-os="Networking">Networking &amp; Cross-Platform</button>
+        <button type="button" class="os-tab" data-os="Storage & Hypervisors">Storage, Hypervisors &amp; UEFI Shell</button>
+        <button type="button" class="os-tab twins-tab" data-os="Linux Twins">🔁 Linux Twins (Side-by-Side)</button>
+      </nav>
+    </header>
+
+    <!-- ======================================================================
+         ENDLESS PRACTICE DECK (SPACED-REPETITION COMMUTE DRILL)
+         ====================================================================== -->
+    <section class="deck-panel" aria-label="Endless Practice Deck">
+      <div class="deck-header">
+        <div class="deck-title-wrap">
+          <span class="deck-badge">♾️ Endless Practice Deck</span>
+          <span class="deck-stats" id="deckStats">Mastered: 0 • Repeat Queue: 0</span>
+        </div>
+
+        <div class="deck-controls-top">
+          <select id="deckFilterSelect" class="deck-select" aria-label="Practice deck system filter">
+            <option value="All">All Systems Deck</option>
+            <option value="Windows Server">Windows Server Only</option>
+            <option value="Networking">Networking Only</option>
+            <option value="Storage & Hypervisors">Storage, Hypervisors &amp; UEFI</option>
+          </select>
+          <button type="button" id="shuffleDeckBtn" class="deck-shuffle-btn">🔀 Shuffle Infinite Deck</button>
+        </div>
+      </div>
+
+      <div class="flashcard-stage" id="flashcardStage" role="button" tabindex="0" aria-label="Tap to reveal flashcard answer">
+        <div class="fc-meta-row">
+          <span class="fc-sys-pill" id="fcSysPill">Windows Server</span>
+          <span class="fc-repeat-tag" id="fcRepeatTag">🔁 Repeat Queue Card</span>
+        </div>
+        <div class="fc-question" id="fcQuestion">Loading question...</div>
+        <div class="fc-back" id="fcBack">
+          <div class="fc-answer-cmd" id="fcAnswerCmd"></div>
+          <div class="fc-answer-giveaway" id="fcAnswerGiveaway"></div>
+          <div class="fc-answer-twin" id="fcAnswerTwin"></div>
+        </div>
+      </div>
+
+      <div class="deck-actions-bottom">
+        <button type="button" id="btnRepeat" class="deck-btn btn-repeat">🔁 Repeat Later</button>
+        <button type="button" id="btnReveal" class="deck-btn btn-reveal">👁️ Reveal Answer</button>
+        <button type="button" id="btnGotIt" class="deck-btn btn-gotit">✅ Got It</button>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         STICKY SEARCH & SYMPTOM / TAG FILTER BAR
+         ====================================================================== -->
+    <section class="filter-bar" id="filterBar" aria-label="Search and Symptom Filters">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="search"
+          id="searchInput"
+          placeholder="Search command, giveaway, flag, or twin (e.g. sfc, gpupdate, sysprep, esxcli, fsck)..."
+          autocomplete="off"
+        />
+        <button type="button" id="clearSearchBtn" aria-label="Clear search">✕</button>
+      </div>
+
+      <div class="symptom-pills" id="symptomPills">
+        <button type="button" class="sym-pill active" data-sym="All">All Symptoms</button>
+        <button type="button" class="sym-pill" data-sym="Boot Failure">Boot Failure</button>
+        <button type="button" class="sym-pill" data-sym="Disk & RAID">Disk &amp; RAID</button>
+        <button type="button" class="sym-pill" data-sym="Active Directory / GPO">Active Directory / GPO</button>
+        <button type="button" class="sym-pill" data-sym="Network & DNS">Network &amp; DNS</button>
+        <button type="button" class="sym-pill" data-sym="Hypervisor & UEFI">Hypervisor &amp; UEFI</button>
+        <button type="button" class="sym-pill" data-sym="Services & OS Repair">Services &amp; OS Repair</button>
+      </div>
+    </section>
+
+    <div class="results-meta" id="resultsMeta">
+      <span id="countLabel">Showing all commands</span>
+      <span>Tip: Tap any amber box to toggle reveal</span>
+    </div>
+
+    <!-- ======================================================================
+         COMMAND CARDS GRID & LINUX TWINS COMPARISON VIEW
+         ====================================================================== -->
+    <main class="cards-grid" id="cardsGrid"></main>
+
+    <section class="twins-view" id="twinsView" aria-label="Windows vs Linux Side-by-Side Comparison">
+      <div class="twins-intro">
+        <strong>🔁 Linux Twins Rosetta Stone:</strong> CompTIA Server+ loves testing whether you know both sides of the bridge—when a Linux admin runs <code>fsck</code>, what does the Windows admin run? Use this side-by-side matrix to lock in every cross-OS pair.
+      </div>
+      <div id="twinsList" style="display: flex; flex-direction: column; gap: 0.7rem;"></div>
+    </section>
+
+    <div class="empty-state" id="emptyState">
+      <p style="font-size: 1.5rem; margin-bottom: 0.35rem;">🪿</p>
+      <p style="font-weight: 700; color: var(--text-primary);">No matching commands found</p>
+      <p style="font-size: 0.84rem; margin-top: 0.25rem;">Try clearing the search box or switching OS / Symptom filters back to All.</p>
+    </div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite">Copied!</div>
+
+  <script>
+    /* ==========================================================================
+       MASTER SERVER+ MULTI-OS CLI DATASET
+       ========================================================================== */
+    const COMMAND_DB = [
+      // ==================== WINDOWS SERVER (CMD & POWERSHELL) ====================
+      {
+        cmd: "sfc /scannow",
+        os: "Windows Server",
+        symptom: "Services & OS Repair",
+        giveawayHtml: '<span class="hl">S</span>ystem <span class="hl">F</span>ile <span class="hl">C</span>hecker — "S" for System, "F" for File',
+        giveawayPlain: "System File Checker",
+        desc: "Scans all protected Windows system files and replaces corrupted or modified DLL/EXE versions from the cached component store.",
+        flags: ["sfc /scannow", "sfc /verifyonly (scan without repairing)"],
+        twin: "Linux: fsck (filesystem) or rpm -Va / debsums",
+        trap: "Exam Trap: Remember Q48 from your practice exam! sfc repairs Windows OS system files; fsck repairs Linux filesystems. If sfc fails to fix files, run DISM /RestoreHealth first!"
+      },
+      {
+        cmd: "DISM",
+        os: "Windows Server",
+        symptom: "Services & OS Repair",
+        giveawayHtml: '<span class="hl">D</span>eployment <span class="hl">I</span>mage <span class="hl">S</span>ervicing &amp; <span class="hl">M</span>anagement',
+        giveawayPlain: "Deployment Image Servicing & Management",
+        desc: "Repairs the underlying Windows Component Store (WinSxS) image so sfc /scannow can succeed, and services offline WIM/VHD images.",
+        flags: ["DISM /Online /Cleanup-Image /RestoreHealth", "/CheckHealth", "/ScanHealth"],
+        twin: "Linux: apt --fix-broken install / dnf check",
+        trap: "Troubleshooting Order: When Windows system files are corrupt and sfc /scannow errors out, run DISM /RestoreHealth to fix the repair source, then re-run sfc."
+      },
+      {
+        cmd: "chkdsk",
+        os: "Windows Server",
+        symptom: "Disk & RAID",
+        giveawayHtml: '<span class="hl">CH</span>ec<span class="hl">K</span> <span class="hl">D</span>i<span class="hl">SK</span>',
+        giveawayPlain: "CHecK DiSK",
+        desc: "Verifies NTFS/ReFS filesystem integrity, fixes logical file errors, and locates bad physical disk sectors.",
+        flags: ["chkdsk C: /f (fix errors)", "chkdsk C: /r (locate bad sectors & recover data)", "/x (force dismount)"],
+        twin: "Linux: fsck /dev/sda1 (or xfs_repair)",
+        trap: "Exam Trap: chkdsk /f fixes filesystem errors; chkdsk /r includes /f PLUS scans for physical bad sectors (takes much longer)."
+      },
+      {
+        cmd: "diskpart",
+        os: "Windows Server",
+        symptom: "Disk & RAID",
+        giveawayHtml: '<span class="hl">DISK</span> <span class="hl">PART</span>ition',
+        giveawayPlain: "DISK PARTition",
+        desc: "Interactive Windows command-line disk partitioning tool to clean drives, convert MBR/GPT, and create or extend volumes.",
+        flags: ["list disk", "select disk 1", "clean", "convert gpt", "extend"],
+        twin: "Linux: fdisk / parted / gdisk",
+        trap: "Exam Trap: diskpart = partitioning (just like Linux fdisk); chkdsk = filesystem repair (just like Linux fsck)."
+      },
+      {
+        cmd: "robocopy",
+        os: "Windows Server",
+        symptom: "Disk & RAID",
+        giveawayHtml: '<span class="hl">ROBO</span>st File <span class="hl">COPY</span>',
+        giveawayPlain: "ROBOst File COPY",
+        desc: "Enterprise file-replication command that preserves NTFS permissions, timestamps, and resumes interrupted network transfers.",
+        flags: ["robocopy C:\\Src D:\\Dst /MIR (mirror tree)", "/SEC (copy NTFS ACL security)", "/Z (restartable mode)"],
+        twin: "Linux: rsync -avz /src /dst",
+        trap: "Exam Favorite: When migrating a Windows file server and you MUST keep all NTFS permissions intact, robocopy /MIR /SEC is the textbook answer."
+      },
+      {
+        cmd: "sysprep",
+        os: "Windows Server",
+        symptom: "Hypervisor & UEFI",
+        giveawayHtml: '<span class="hl">SYS</span>tem <span class="hl">PREP</span>aration',
+        giveawayPlain: "SYStem PREParation",
+        desc: "Strips unique machine identifiers (SID, hostname, activation state) from a Windows installation before capturing a VM template or golden image.",
+        flags: ["sysprep /generalize /oobe /shutdown", "/audit (audit mode)"],
+        twin: "Linux: cloud-init clean / virt-sysprep",
+        trap: "Classic Server+ Question: You clone a Windows VM and Active Directory domain logins fail due to duplicate SIDs -> you forgot to run sysprep /generalize first!"
+      },
+      {
+        cmd: "gpupdate / gpresult",
+        os: "Windows Server",
+        symptom: "Active Directory / GPO",
+        giveawayHtml: '<span class="hl">G</span>roup <span class="hl">P</span>olicy <span class="hl">UPDATE</span> &amp; <span class="hl">RESULT</span>',
+        giveawayPlain: "Group Policy UPDATE & RESULT",
+        desc: "gpupdate forces an immediate refresh of Active Directory Group Policies; gpresult audits which GPOs actually applied to a server or user.",
+        flags: ["gpupdate /force", "gpresult /r (summary report)", "gpresult /h report.html"],
+        twin: "Linux: Ansible / Puppet / SSSD policy refresh",
+        trap: "Mnemonic: Want to PUSH new policies now? gpupdate /force. Want to SEE why a setting didn't apply? gpresult /r."
+      },
+      {
+        cmd: "bcdedit",
+        os: "Windows Server",
+        symptom: "Boot Failure",
+        giveawayHtml: '<span class="hl">B</span>oot <span class="hl">C</span>onfiguration <span class="hl">D</span>ata <span class="hl">EDIT</span>',
+        giveawayPlain: "Boot Configuration Data EDIT",
+        desc: "Modifies the Windows Boot Configuration Data (BCD) store to fix missing boot entries, dual-boot menus, or Safe Mode flags.",
+        flags: ["bcdedit /enum (view boot entries)", "bootrec /fixmbr", "bootrec /rebuildbcd"],
+        twin: "Linux: grub2-mkconfig / /boot/grub2/grub.cfg",
+        trap: "Boot Failure Clue: If a Windows Server won't boot after disk cloning or partition changes, use Windows Recovery Environment with bootrec /rebuildbcd and bcdedit."
+      },
+      {
+        cmd: "tasklist / taskkill",
+        os: "Windows Server",
+        symptom: "Services & OS Repair",
+        giveawayHtml: '<span class="hl">TASK</span> <span class="hl">LIST</span> &amp; <span class="hl">TASK</span> <span class="hl">KILL</span>',
+        giveawayPlain: "TASK LIST & TASK KILL",
+        desc: "Displays running Windows processes with their PIDs and memory usage, and forcefully terminates hung processes.",
+        flags: ["tasklist /svc (show services inside svchost)", "taskkill /F /PID 1234", "taskkill /F /IM app.exe"],
+        twin: "Linux: ps aux & kill -9 <PID>",
+        trap: "Pro Tip: Use tasklist /svc to see which exact Windows service is hiding inside a bloated svchost.exe process."
+      },
+      {
+        cmd: "sc (Service Control)",
+        os: "Windows Server",
+        symptom: "Services & OS Repair",
+        giveawayHtml: '<span class="hl">S</span>ervice <span class="hl">C</span>ontrol',
+        giveawayPlain: "Service Control",
+        desc: "Queries, starts, stops, configures startup types, or deletes Windows background services from CMD.",
+        flags: ["sc query spooler", "sc stop wuauserv", "sc config <svc> start= auto"],
+        twin: "Linux: systemctl status / start / enable",
+        trap: "PowerShell Equivalent: Get-Service, Restart-Service, Set-Service -StartupType Automatic."
+      },
+      {
+        cmd: "Get-EventLog / wevtutil",
+        os: "Windows Server",
+        symptom: "Services & OS Repair",
+        giveawayHtml: '<span class="hl">W</span>indows <span class="hl">EV</span>en<span class="hl">T</span> <span class="hl">UTIL</span>ity',
+        giveawayPlain: "Windows EVenT UTILity",
+        desc: "Queries, exports, and clears Windows System, Application, and Security event logs via PowerShell or CLI.",
+        flags: ["Get-EventLog -LogName System -Newest 20", "Get-WinEvent", "wevtutil qe Security /c:10"],
+        twin: "Linux: journalctl -xe / tail -f /var/log/syslog",
+        trap: "Exam Clue: When a Server Core machine (no GUI) crashes, Get-WinEvent or wevtutil is how you inspect Event Viewer logs."
+      },
+      {
+        cmd: "dcdiag / repadmin",
+        os: "Windows Server",
+        symptom: "Active Directory / GPO",
+        giveawayHtml: '<span class="hl">D</span>omain <span class="hl">C</span>ontroller <span class="hl">DIAG</span>nostics &amp; <span class="hl">REP</span>lication <span class="hl">ADMIN</span>',
+        giveawayPlain: "Domain Controller DIAGnostics & REPlication ADMIN",
+        desc: "dcdiag tests Domain Controller health (DNS, SYSVOL, Netlogon); repadmin checks Active Directory replication status between DCs.",
+        flags: ["dcdiag /v", "repadmin /replsummary", "repadmin /syncall"],
+        twin: "Linux: ipa-healthcheck / ldapsearch",
+        trap: "Exam Trap: Users created on DC1 aren't appearing on DC2 -> run repadmin /replsummary to spot Active Directory replication failures."
+      },
+
+      // ==================== NETWORKING & CROSS-PLATFORM ====================
+      {
+        cmd: "netstat -ano",
+        os: "Networking",
+        symptom: "Network & DNS",
+        giveawayHtml: '<span class="hl">NET</span>work <span class="hl">STAT</span>istics — All, Numeric, Owning PID',
+        giveawayPlain: "NETwork STATistics",
+        desc: "Displays all active TCP/UDP connections, listening ports, and the exact Process ID (PID) owning each socket.",
+        flags: ["netstat -ano (Windows PID)", "netstat -tulnp (Linux)", "netstat -r (routing table)"],
+        twin: "Linux: ss -tulnp (modern replacement for netstat)",
+        trap: "Mnemonic: 'ano' = All connections, Numeric ports, Owning PID. Match the PID in tasklist to find what is blocking port 80 or 443!"
+      },
+      {
+        cmd: "nslookup / dig",
+        os: "Networking",
+        symptom: "Network & DNS",
+        giveawayHtml: '<span class="hl">N</span>ame <span class="hl">S</span>erver <span class="hl">LOOKUP</span> / <span class="hl">D</span>omain <span class="hl">I</span>nformation <span class="hl">G</span>roper',
+        giveawayPlain: "Name Server LOOKUP / Domain Information Groper",
+        desc: "Queries DNS servers directly to resolve hostnames to IPs (A/AAAA records), mail servers (MX), or reverse lookups (PTR).",
+        flags: ["nslookup server01.corp.local", "nslookup -type=mx domain.com", "dig +short example.com"],
+        twin: "Cross-Platform: nslookup works on both; dig is Linux/macOS",
+        trap: "Troubleshooting Rule: If ping 8.8.8.8 works, but ping google.com fails, your network is fine—it's a DNS issue. Test immediately with nslookup!"
+      },
+      {
+        cmd: "tracert / traceroute",
+        os: "Networking",
+        symptom: "Network & DNS",
+        giveawayHtml: '<span class="hl">TRACE</span> <span class="hl">R</span>ou<span class="hl">T</span>e',
+        giveawayPlain: "TRACE RouTe",
+        desc: "Maps every router hop between your server and a destination by incrementing packet TTL values, pinpointing where traffic drops or slows down.",
+        flags: ["tracert -d 10.20.30.40 (Windows, no DNS delay)", "traceroute -n 10.20.30.40 (Linux)"],
+        twin: "Windows: tracert • Linux: traceroute / mtr",
+        trap: "Exam Clue: '* * * Request timed out' at a specific hop usually means that router blocks ICMP/UDP probe packets, not necessarily that it's dead—unless all hops after it also time out."
+      },
+      {
+        cmd: "ipconfig / ip a",
+        os: "Networking",
+        symptom: "Network & DNS",
+        giveawayHtml: '<span class="hl">IP</span> <span class="hl">CONFIG</span>uration (Windows) vs. <span class="hl">IP</span> <span class="hl">A</span>ddress (Linux)',
+        giveawayPlain: "IP CONFIGuration vs IP Address",
+        desc: "Inspects IPv4/IPv6 addresses, subnet masks, default gateways, DHCP lease status, and flushes local DNS resolver caches.",
+        flags: ["ipconfig /all", "ipconfig /release && ipconfig /renew", "ipconfig /flushdns"],
+        twin: "Linux: ip a (or legacy ifconfig) & resolvectl flush-caches",
+        trap: "Exam Trap: See a 169.254.x.x APIPA address? DHCP failed! Run ipconfig /release then ipconfig /renew (or dhclient -r && dhclient on Linux)."
+      },
+      {
+        cmd: "ping / Test-NetConnection",
+        os: "Networking",
+        symptom: "Network & DNS",
+        giveawayHtml: '<span class="hl">P</span>acket <span class="hl">IN</span>ternet <span class="hl">G</span>roper / <span class="hl">TEST</span> <span class="hl">NET</span>work <span class="hl">CONNECTION</span>',
+        giveawayPlain: "Packet INternet Groper / TEST NETwork CONNECTION",
+        desc: "ping checks basic Layer 3 ICMP reachability; PowerShell's Test-NetConnection (tnc) tests whether a specific TCP port (like 443 or 3389) is open.",
+        flags: ["ping -t 10.0.0.1 (continuous)", "Test-NetConnection server01 -Port 3389", "nc -zv server01 443 (Linux)"],
+        twin: "Linux: ping & nc -zv (netcat port test)",
+        trap: "Server+ Gold: ICMP ping is often blocked by firewalls, so ping fails even when a web server is up. Use Test-NetConnection -Port 443 to test the actual application port!"
+      },
+      {
+        cmd: "arp -a",
+        os: "Networking",
+        symptom: "Network & DNS",
+        giveawayHtml: '<span class="hl">A</span>ddress <span class="hl">R</span>esolution <span class="hl">P</span>rotocol — <span class="hl">A</span>ll entries',
+        giveawayPlain: "Address Resolution Protocol",
+        desc: "Displays and clears the local Layer 2 MAC-address-to-IP-address translation cache.",
+        flags: ["arp -a (view MAC cache)", "arp -d * (clear ARP cache)"],
+        twin: "Linux: ip neigh show (or arp -n)",
+        trap: "Exam Clue: Just replaced a faulty firewall/router keeping the same IP, and local servers can't reach it? Clear the stale MAC entry with arp -d *!"
+      },
+      {
+        cmd: "route / ip route",
+        os: "Networking",
+        symptom: "Network & DNS",
+        giveawayHtml: '<span class="hl">ROUTE</span> table print / add',
+        giveawayPlain: "ROUTE table",
+        desc: "Displays and modifies the local OS static routing table and default gateway.",
+        flags: ["route print (Windows)", "route add 192.168.50.0 mask 255.255.255.0 10.0.0.1 -p", "ip r (Linux)"],
+        twin: "Linux: ip route show (ip r)",
+        trap: "Flag Alert: On Windows, the -p flag makes a static route Persistent across server reboots."
+      },
+      {
+        cmd: "netsh",
+        os: "Networking",
+        symptom: "Network & DNS",
+        giveawayHtml: '<span class="hl">NET</span>work <span class="hl">SH</span>ell',
+        giveawayPlain: "NETwork SHell",
+        desc: "Windows CLI utility to configure NIC IP settings, Windows Defender Firewall rules, and reset corrupted TCP/IP stacks.",
+        flags: ["netsh int ip reset", "netsh advfirewall set allprofiles state on"],
+        twin: "Linux: nmcli / iptables / ufw",
+        trap: "PowerShell Equivalent: New-NetIPAddress and New-NetFirewallRule are the modern PowerShell replacements."
+      },
+
+      // ==================== STORAGE, HYPERVISORS & UEFI SHELL ====================
+      {
+        cmd: "esxcli",
+        os: "Storage & Hypervisors",
+        symptom: "Hypervisor & UEFI",
+        giveawayHtml: '<span class="hl">ESX</span>i <span class="hl">C</span>ommand <span class="hl">L</span>ine <span class="hl">I</span>nterface',
+        giveawayPlain: "ESXi Command Line Interface",
+        desc: "Primary administrative CLI inside VMware ESXi host shells for managing storage adapters, virtual switches, NICs, and stuck VMs.",
+        flags: ["esxcli vm process list", "esxcli vm process kill -t=force -w=<WorldID>", "esxcli storage core device list"],
+        twin: "Hyper-V (PowerShell): Get-VM / Stop-VM -Force",
+        trap: "Exam Scenario: A VM on a VMware ESXi host is completely frozen and ignores GUI shutdown -> SSH into ESXi and run esxcli vm process list + kill!"
+      },
+      {
+        cmd: "Get-VM / New-VM (Hyper-V)",
+        os: "Storage & Hypervisors",
+        symptom: "Hypervisor & UEFI",
+        giveawayHtml: '<span class="hl">GET</span>-<span class="hl">V</span>irtual <span class="hl">M</span>achine / <span class="hl">NEW</span>-<span class="hl">V</span>irtual <span class="hl">M</span>achine',
+        giveawayPlain: "GET-Virtual Machine / NEW-Virtual Machine",
+        desc: "Windows PowerShell Hyper-V module cmdlets for inspecting, starting, checkpointing, and live-migrating virtual machines.",
+        flags: ["Get-VM", "Checkpoint-VM -Name Web01", "Move-VM -Name Web01 -DestinationHost HV02"],
+        twin: "KVM (Linux): virsh list --all / virsh start",
+        trap: "Exam Tip: Checkpoint-VM creates a VM snapshot before patching; Move-VM performs a Live Migration."
+      },
+      {
+        cmd: "virsh",
+        os: "Storage & Hypervisors",
+        symptom: "Hypervisor & UEFI",
+        giveawayHtml: '<span class="hl">VIR</span>tualization <span class="hl">SH</span>ell (Linux KVM)',
+        giveawayPlain: "VIRtualization SHell",
+        desc: "Command-line management shell for Linux KVM/libvirt hypervisors to start, stop, snapshot, and inspect guest VMs.",
+        flags: ["virsh list --all", "virsh start vm01", "virsh shutdown vm01"],
+        twin: "Windows Hyper-V: Get-VM / Start-VM",
+        trap: "Mnemonic: 'vir' (virtual) + 'sh' (shell) = Linux KVM's control center."
+      },
+      {
+        cmd: "mdadm",
+        os: "Storage & Hypervisors",
+        symptom: "Disk & RAID",
+        giveawayHtml: '<span class="hl">M</span>ultiple <span class="hl">D</span>evice <span class="hl">ADM</span>inistrator (Linux Software RAID)',
+        giveawayPlain: "Multiple Device ADMinistrator",
+        desc: "Creates, monitors, and rebuilds Linux software RAID arrays (/dev/md0) and inspects degraded array status.",
+        flags: ["mdadm --detail /dev/md0", "cat /proc/mdstat", "mdadm --manage /dev/md0 --add /dev/sdc1"],
+        twin: "Windows: Storage Spaces (New-StoragePool / Get-VirtualDisk)",
+        trap: "Exam Clue: When a drive fails in a Linux software RAID, replace the disk and add it back into the array with mdadm --add."
+      },
+      {
+        cmd: "iscsiadm / iscsicli",
+        os: "Storage & Hypervisors",
+        symptom: "Disk & RAID",
+        giveawayHtml: '<span class="hl">iSCSI</span> <span class="hl">ADM</span>inistrator (Linux) / <span class="hl">CLI</span> (Windows)',
+        giveawayPlain: "iSCSI ADMinistrator / CLI",
+        desc: "Discovers and logs into remote block-level SAN storage targets over standard TCP/IP Ethernet (port 3260).",
+        flags: ["iscsiadm -m discovery -t st -p 10.0.50.10", "iscsicli QAddTargetPortal (Windows)"],
+        twin: "Windows PowerShell: New-IscsiTargetPortal / Connect-IscsiTarget",
+        trap: "Storage Rule: iSCSI runs over standard Ethernet switches on TCP port 3260 (initiator = server, target = SAN)."
+      },
+      {
+        cmd: "UEFI Shell (map / bcfg)",
+        os: "Storage & Hypervisors",
+        symptom: "Boot Failure",
+        giveawayHtml: '<span class="hl">MAP</span> drives &amp; <span class="hl">B</span>oot <span class="hl">C</span>on<span class="hl">F</span>i<span class="hl">G</span>',
+        giveawayPlain: "MAP drives & Boot ConFiG",
+        desc: "Pre-OS UEFI firmware shell commands used to list detected storage partitions (fs0:, blk0:) and repair missing UEFI boot entries.",
+        flags: ["map -r (refresh mapped filesystems)", "fs0: (switch to EFI partition)", "bcfg boot dump"],
+        twin: "Windows: bcdedit • Linux: efibootmgr",
+        trap: "Exam Scenario: Server boots straight to 'Shell>' prompt instead of the OS -> type map to see if fs0: (your EFI system partition) is even detected by the controller!"
+      },
+      {
+        cmd: "efibootmgr",
+        os: "Storage & Hypervisors",
+        symptom: "Boot Failure",
+        giveawayHtml: '<span class="hl">EFI</span> <span class="hl">BOOT</span> <span class="hl">M</span>ana<span class="hl">G</span>e<span class="hl">R</span>',
+        giveawayPlain: "EFI BOOT ManaGeR",
+        desc: "Linux CLI tool that reads and edits UEFI NVRAM boot order entries directly from inside the OS.",
+        flags: ["efibootmgr -v (view NVRAM boot order)", "efibootmgr -o 0001,0002 (set boot priority)"],
+        twin: "Windows: bcdedit /enum firmware",
+        trap: "Firmware Link: UEFI boot order entries live in motherboard NVRAM—efibootmgr lets you change BIOS/UEFI boot order without rebooting to hit F2/F12!"
+      },
+      {
+        cmd: "ipmitool",
+        os: "Storage & Hypervisors",
+        symptom: "Hypervisor & UEFI",
+        giveawayHtml: '<span class="hl">IPMI</span> (Out-of-Band Management) <span class="hl">TOOL</span>',
+        giveawayPlain: "IPMI TOOL",
+        desc: "Communicates over the network with a server's BMC / iDRAC / iLO chip to check chassis temperatures, fan speeds, or hard-power-cycle a frozen server.",
+        flags: ["ipmitool -H 10.0.99.5 -U admin power status", "power reset", "sdr list (sensor readings)"],
+        twin: "Vendor Web/CLI: Dell iDRAC (racadm) / HPE iLO",
+        trap: "Server+ Gold: Out-of-band management (IPMI/BMC) works even when the server OS is completely crashed or powered off, as long as standby power and the management NIC are plugged in!"
+      }
+    ];
+
+    /* ==========================================================================
+       LINUX TWINS SIDE-BY-SIDE MATRIX DATA
+       ========================================================================== */
+    const LINUX_TWINS_PAIRS = [
+      {
+        task: "Repair Corrupted Filesystem",
+        hook: "Windows CHecKs DiSK; Linux runs FileSystem ChecK ('F' for Fix)",
+        win: "chkdsk C: /f /r",
+        lin: "fsck /dev/sda1"
+      },
+      {
+        task: "Repair OS Core System Files",
+        hook: "Windows System File Checker vs. Linux package verification",
+        win: "sfc /scannow  (+ DISM)",
+        lin: "rpm -Va  /  debsums -c"
+      },
+      {
+        task: "Partition & Format Disks",
+        hook: "Windows DISK PARTition vs. Linux Format DISK + MaKe FileSystem",
+        win: "diskpart  (clean / convert gpt)",
+        lin: "fdisk /dev/sdb  +  mkfs.ext4"
+      },
+      {
+        task: "View Listening Ports & Owning PID",
+        hook: "Windows NETwork STATistics (-ano) vs. Linux Socket Statistics (-tulnp)",
+        win: "netstat -ano",
+        lin: "ss -tulnp  (or netstat -tulnp)"
+      },
+      {
+        task: "Check IP Address & Routing Table",
+        hook: "Windows IP CONFIG vs. Linux IP Address / IP Route",
+        win: "ipconfig /all  &  route print",
+        lin: "ip a  &  ip r"
+      },
+      {
+        task: "Trace Network Router Hops",
+        hook: "7-letter Windows abbreviation vs. full Linux word",
+        win: "tracert -d <target>",
+        lin: "traceroute -n <target>"
+      },
+      {
+        task: "Manage Background Services",
+        hook: "Windows Service Control vs. Linux SYSTEM ConTroL",
+        win: "sc query / start  (or Get-Service)",
+        lin: "systemctl status / start / enable"
+      },
+      {
+        task: "View & Kill Hung Processes",
+        hook: "Windows TASK LIST/KILL vs. Linux Process Status & KILL",
+        win: "tasklist  &  taskkill /F /PID <id>",
+        lin: "ps aux  (or top)  &  kill -9 <id>"
+      },
+      {
+        task: "Mirror Folders & Keep Permissions",
+        hook: "Windows ROBOst COPY vs. Linux Remote SYNC",
+        win: "robocopy C:\\Src D:\\Dst /MIR /SEC",
+        lin: "rsync -avz /src/ /dst/"
+      },
+      {
+        task: "Edit Bootloader / UEFI Entries",
+        hook: "Windows Boot Configuration Data EDIT vs. Linux GRUB / EFI Boot Mgr",
+        win: "bcdedit /enum",
+        lin: "grub2-mkconfig  &  efibootmgr -v"
+      },
+      {
+        task: "Prepare VM Template (Strip Unique IDs)",
+        hook: "Windows SYStem PREParation vs. Linux cloud-init / virt-sysprep",
+        win: "sysprep /generalize /oobe /shutdown",
+        lin: "cloud-init clean  /  virt-sysprep"
+      },
+      {
+        task: "Host-Based Firewall CLI",
+        hook: "Windows NETwork SHell advfirewall vs. Linux IP packet TABLES",
+        win: "netsh advfirewall  /  New-NetFirewallRule",
+        lin: "iptables -L -n  /  ufw status"
+      }
+    ];
+
+    /* ==========================================================================
+       APP STATE & DOM REFERENCES
+       ========================================================================== */
+    let activeOsTab = "All Systems";
+    let activeSymptom = "All";
+    let searchQuery = "";
+    let drillBlurEnabled = false;
+
+    // Endless Spaced-Repetition Deck State
+    let deckPool = [];
+    let repeatQueue = [];
+    let masteredSet = new Set();
+    let currentDeckCard = null;
+    let isCurrentFromRepeat = false;
+    let isDeckFlipped = false;
+
+    const cardsGrid = document.getElementById("cardsGrid");
+    const twinsView = document.getElementById("twinsView");
+    const twinsList = document.getElementById("twinsList");
+    const emptyState = document.getElementById("emptyState");
+    const filterBar = document.getElementById("filterBar");
+    const resultsMeta = document.getElementById("resultsMeta");
+    const countLabel = document.getElementById("countLabel");
+    const searchInput = document.getElementById("searchInput");
+    const clearSearchBtn = document.getElementById("clearSearchBtn");
+    const toast = document.getElementById("toast");
+    let toastTimeout = null;
+
+    /* ==========================================================================
+       CLIPBOARD HELPER (IFRAME-SAFE document.execCommand)
+       ========================================================================== */
+    function copyTextSafe(text, btnEl) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+
+      try {
+        document.execCommand("copy");
+        showToast(`Copied "${text}"`);
+        if (btnEl) {
+          const orig = btnEl.textContent;
+          btnEl.classList.add("copied");
+          btnEl.textContent = "✓ Copied";
+          setTimeout(() => {
+            btnEl.classList.remove("copied");
+            btnEl.textContent = orig;
+          }, 1300);
+        }
+      } catch (e) {
+        showToast("Copy unavailable");
+      }
+      document.body.removeChild(ta);
+    }
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => toast.classList.remove("show"), 1700);
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    /* ==========================================================================
+       MNEMONIC & GIVEAWAY MODE TOGGLE
+       ========================================================================== */
+    const mnemonicToggleBtn = document.getElementById("mnemonicToggleBtn");
+    const mnemonicIcon = document.getElementById("mnemonicIcon");
+    const mnemonicLabel = document.getElementById("mnemonicLabel");
+
+    mnemonicToggleBtn.addEventListener("click", () => {
+      drillBlurEnabled = !drillBlurEnabled;
+      document.body.classList.toggle("drill-blur", drillBlurEnabled);
+
+      if (drillBlurEnabled) {
+        mnemonicToggleBtn.classList.remove("visible-mode");
+        mnemonicToggleBtn.classList.add("drill-mode");
+        mnemonicIcon.textContent = "🧠";
+        mnemonicLabel.textContent = "Giveaways: Drill Blur";
+      } else {
+        mnemonicToggleBtn.classList.remove("drill-mode");
+        mnemonicToggleBtn.classList.add("visible-mode");
+        mnemonicIcon.textContent = "👁️";
+        mnemonicLabel.textContent = "Giveaways: Visible";
+      }
+
+      document.querySelectorAll(".giveaway-box.revealed").forEach((box) => {
+        box.classList.remove("revealed");
+      });
+    });
+
+    /* ==========================================================================
+       ENDLESS PRACTICE DECK (INFINITE SPACED-REPETITION ENGINE)
+       ========================================================================== */
+    const deckFilterSelect = document.getElementById("deckFilterSelect");
+    const shuffleDeckBtn = document.getElementById("shuffleDeckBtn");
+    const deckStats = document.getElementById("deckStats");
+    const flashcardStage = document.getElementById("flashcardStage");
+    const fcSysPill = document.getElementById("fcSysPill");
+    const fcRepeatTag = document.getElementById("fcRepeatTag");
+    const fcQuestion = document.getElementById("fcQuestion");
+    const fcBack = document.getElementById("fcBack");
+    const fcAnswerCmd = document.getElementById("fcAnswerCmd");
+    const fcAnswerGiveaway = document.getElementById("fcAnswerGiveaway");
+    const fcAnswerTwin = document.getElementById("fcAnswerTwin");
+    const btnRepeat = document.getElementById("btnRepeat");
+    const btnReveal = document.getElementById("btnReveal");
+    const btnGotIt = document.getElementById("btnGotIt");
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function buildDeckPool(resetStats = false) {
+      const filterVal = deckFilterSelect.value;
+      const matching = COMMAND_DB.filter((item) =>
+        filterVal === "All" ? true : item.os === filterVal
+      );
+
+      if (resetStats) {
+        masteredSet.clear();
+        repeatQueue = [];
+      }
+
+      deckPool = shuffleArray(matching);
+      drawNextCard();
+    }
+
+    function updateDeckStats() {
+      deckStats.textContent = `Mastered: ${masteredSet.size} • Repeat Queue: ${repeatQueue.length}`;
+    }
+
+    function drawNextCard() {
+      isDeckFlipped = false;
+      isCurrentFromRepeat = false;
+
+      // 40% chance to pull from Repeat Queue if items exist, or always pull if main pool is empty
+      if (repeatQueue.length > 0 && (deckPool.length === 0 || Math.random() < 0.45)) {
+        currentDeckCard = repeatQueue.shift();
+        isCurrentFromRepeat = true;
+      } else {
+        if (deckPool.length === 0) {
+          // Infinite loop: refill and reshuffle automatically!
+          const filterVal = deckFilterSelect.value;
+          const matching = COMMAND_DB.filter((item) =>
+            filterVal === "All" ? true : item.os === filterVal
+          );
+          deckPool = shuffleArray(matching);
+        }
+        currentDeckCard = deckPool.pop();
+      }
+
+      renderDeckCard();
+      updateDeckStats();
+    }
+
+    function renderDeckCard() {
+      if (!currentDeckCard) return;
+
+      fcSysPill.textContent = `${currentDeckCard.os} • ${currentDeckCard.symptom}`;
+      fcRepeatTag.classList.toggle("show", isCurrentFromRepeat);
+
+      // Build scenario-style prompt from description + trap hint
+      fcQuestion.textContent = `Scenario: ${currentDeckCard.desc}`;
+      fcAnswerCmd.textContent = currentDeckCard.cmd;
+      fcAnswerGiveaway.textContent = `💡 Invisible Giveaway: ${currentDeckCard.giveawayPlain}`;
+      fcAnswerTwin.textContent = `🔁 Counterpart Twin: ${currentDeckCard.twin}`;
+
+      fcBack.classList.toggle("open", isDeckFlipped);
+      btnReveal.textContent = isDeckFlipped ? "🙈 Hide Answer" : "👁️ Reveal Answer";
+    }
+
+    function toggleDeckFlip() {
+      isDeckFlipped = !isDeckFlipped;
+      renderDeckCard();
+    }
+
+    flashcardStage.addEventListener("click", toggleDeckFlip);
+    btnReveal.addEventListener("click", toggleDeckFlip);
+    flashcardStage.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleDeckFlip();
+      }
+    });
+
+    btnRepeat.addEventListener("click", () => {
+      if (!currentDeckCard) return;
+      // Avoid duplicate consecutive entries in repeatQueue
+      if (!repeatQueue.some((c) => c.cmd === currentDeckCard.cmd)) {
+        repeatQueue.push(currentDeckCard);
+      }
+      masteredSet.delete(currentDeckCard.cmd);
+      showToast("Added to Repeat Queue 🔁");
+      drawNextCard();
+    });
+
+    btnGotIt.addEventListener("click", () => {
+      if (!currentDeckCard) return;
+      masteredSet.add(currentDeckCard.cmd);
+      repeatQueue = repeatQueue.filter((c) => c.cmd !== currentDeckCard.cmd);
+      drawNextCard();
+    });
+
+    deckFilterSelect.addEventListener("change", () => {
+      buildDeckPool(true);
+    });
+
+    shuffleDeckBtn.addEventListener("click", () => {
+      buildDeckPool(false);
+      showToast("Deck shuffled! 🔀");
+    });
+
+    /* ==========================================================================
+       RENDER COMMAND CARDS & LINUX TWINS VIEW
+       ========================================================================== */
+    function renderMainView() {
+      if (activeOsTab === "Linux Twins") {
+        cardsGrid.style.display = "none";
+        filterBar.style.display = "none";
+        resultsMeta.style.display = "none";
+        emptyState.style.display = "none";
+        twinsView.classList.add("active");
+        renderTwinsList();
+        return;
+      }
+
+      twinsView.classList.remove("active");
+      cardsGrid.style.display = "grid";
+      filterBar.style.display = "block";
+      resultsMeta.style.display = "flex";
+
+      const q = searchQuery.trim().toLowerCase();
+
+      const filtered = COMMAND_DB.filter((item) => {
+        const osOk = activeOsTab === "All Systems" || item.os === activeOsTab;
+        if (!osOk) return false;
+
+        const symOk = activeSymptom === "All" || item.symptom === activeSymptom;
+        if (!symOk) return false;
+
+        if (!q) return true;
+
+        const blob = [
+          item.cmd,
+          item.os,
+          item.symptom,
+          item.giveawayPlain,
+          item.desc,
+          item.twin,
+          item.trap,
+          ...item.flags
+        ]
+          .join(" ")
+          .toLowerCase();
+
+        return blob.includes(q);
+      });
+
+      cardsGrid.innerHTML = "";
+
+      if (filtered.length === 0) {
+        emptyState.style.display = "block";
+        countLabel.textContent = "0 matching commands";
+        return;
+      }
+
+      emptyState.style.display = "none";
+      countLabel.textContent =
+        filtered.length === COMMAND_DB.length
+          ? `Showing all ${COMMAND_DB.length} multi-OS commands`
+          : `Showing ${filtered.length} of ${COMMAND_DB.length} commands`;
+
+      filtered.forEach((item) => {
+        const card = document.createElement("article");
+        card.className = "cmd-card";
+
+        const flagsMarkup = item.flags
+          .map((f) => `<span class="flag-chip">${escapeHtml(f)}</span>`)
+          .join("");
+
+        card.innerHTML = `
+          <div class="card-header">
+            <div class="card-badges">
+              <div class="tag-line">
+                <span class="os-tag">${escapeHtml(item.os)}</span>
+                <span class="sym-tag">• ${escapeHtml(item.symptom)}</span>
+              </div>
+              <code class="cmd-title">${escapeHtml(item.cmd)}</code>
+            </div>
+            <button type="button" class="copy-btn" aria-label="Copy ${escapeHtml(item.cmd)}">📋 Copy</button>
+          </div>
+
+          <div class="giveaway-box" role="button" tabindex="0" title="Tap to reveal or mask mnemonic">
+            <div class="giveaway-top">
+              <span>💡 Invisible English Giveaway</span>
+              <span style="opacity:0.75; font-size:0.63rem;">tap to toggle</span>
+            </div>
+            <div class="giveaway-content">${item.giveawayHtml}</div>
+          </div>
+
+          <p class="plain-desc">${escapeHtml(item.desc)}</p>
+
+          <div class="flags-wrap">${flagsMarkup}</div>
+
+          <div class="twin-row">
+            <span class="twin-label">🔁 Counterpart Twin</span>
+            <span class="twin-val">${escapeHtml(item.twin)}</span>
+          </div>
+
+          <div class="trap-box">
+            <strong>🪿 Server+ Exam Trap:</strong> ${escapeHtml(item.trap.replace(/^(Exam Trap:|Troubleshooting Order:|Exam Favorite:|Classic Server\+ Question:|Mnemonic:|Boot Failure Clue:|Pro Tip:|PowerShell Equivalent:|Exam Clue:|Troubleshooting Rule:|Exam Scenario:|Server\+ Gold:|Flag Alert:|Exam Tip:|Storage Rule:|Firmware Link:|Server\+ Rule:)\s*/i, ""))}
+          </div>
+        `;
+
+        const copyBtn = card.querySelector(".copy-btn");
+        copyBtn.addEventListener("click", () => copyTextSafe(item.cmd, copyBtn));
+
+        const gBox = card.querySelector(".giveaway-box");
+        gBox.addEventListener("click", () => gBox.classList.toggle("revealed"));
+        gBox.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            gBox.classList.toggle("revealed");
+          }
+        });
+
+        cardsGrid.appendChild(card);
+      });
+    }
+
+    function renderTwinsList() {
+      if (twinsList.children.length > 0) return;
+
+      LINUX_TWINS_PAIRS.forEach((pair) => {
+        const row = document.createElement("div");
+        row.className = "twin-compare-card";
+        row.innerHTML = `
+          <div>
+            <div class="tc-task">${escapeHtml(pair.task)}</div>
+            <div class="tc-sub">💡 ${escapeHtml(pair.hook)}</div>
+          </div>
+          <div class="tc-box">
+            <div class="tc-os win">🪟 Windows Server</div>
+            <div class="tc-code">${escapeHtml(pair.win)}</div>
+          </div>
+          <div class="tc-box">
+            <div class="tc-os lin">🐧 Linux / Unix</div>
+            <div class="tc-code">${escapeHtml(pair.lin)}</div>
+          </div>
+        `;
+        twinsList.appendChild(row);
+      });
+    }
+
+    /* ==========================================================================
+       OS TABS, SYMPTOM PILLS & SEARCH EVENTS
+       ========================================================================== */
+    document.getElementById("osTabsBar").addEventListener("click", (e) => {
+      const tab = e.target.closest(".os-tab");
+      if (!tab) return;
+
+      document.querySelectorAll(".os-tab").forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+      activeOsTab = tab.dataset.os;
+      renderMainView();
+    });
+
+    document.getElementById("symptomPills").addEventListener("click", (e) => {
+      const pill = e.target.closest(".sym-pill");
+      if (!pill) return;
+
+      document.querySelectorAll(".sym-pill").forEach((p) => p.classList.remove("active"));
+      pill.classList.add("active");
+      activeSymptom = pill.dataset.sym;
+      renderMainView();
+    });
+
+    searchInput.addEventListener("input", (e) => {
+      searchQuery = e.target.value;
+      clearSearchBtn.style.display = searchQuery ? "block" : "none";
+      renderMainView();
+    });
+
+    clearSearchBtn.addEventListener("click", () => {
+      searchQuery = "";
+      searchInput.value = "";
+      clearSearchBtn.style.display = "none";
+      searchInput.focus();
+      renderMainView();
+    });
+
+    /* ==========================================================================
+       BOOT APP
+       ========================================================================== */
+    window.addEventListener("DOMContentLoaded", () => {
+      buildDeckPool(true);
+      renderMainView();
+    });
+  </script>
+</body>
+</html>

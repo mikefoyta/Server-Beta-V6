@@ -156,6 +156,12 @@
       border-color: rgba(245, 158, 11, 0.3);
     }
 
+    .pill.rose {
+      background: rgba(244, 63, 94, 0.14);
+      color: var(--accent-rose);
+      border-color: rgba(244, 63, 94, 0.3);
+    }
+
     .hero-banner h1 {
       font-size: clamp(1.35rem, 3.5vw, 1.85rem);
       font-weight: 800;
@@ -257,6 +263,11 @@
     a.port-card.lab-card { border-left: 3px solid var(--accent-emerald); }
     a.port-card.chapter-card { border-left: 3px solid var(--accent-cyan); }
     a.port-card.vlan-card { border-left: 3px solid var(--accent-sky); }
+    a.port-card.drill-card {
+      border: 1px solid rgba(244, 63, 94, 0.45);
+      border-left: 4px solid var(--accent-rose);
+      background: linear-gradient(145deg, #1e1329, var(--bg-card));
+    }
     a.port-card.admin-card {
       border: 1px solid rgba(168, 85, 247, 0.5);
       border-left: 4px solid var(--accent-purple);
@@ -284,6 +295,7 @@
     .port-tag.amber { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
     .port-tag.emerald { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
     .port-tag.cyan { background: rgba(34, 211, 238, 0.15); color: var(--accent-cyan); }
+    .port-tag.rose { background: rgba(244, 63, 94, 0.18); color: #fda4af; }
     .port-tag.purple { background: rgba(168, 85, 247, 0.2); color: #e9d5ff; }
 
     .link-state {
@@ -328,7 +340,7 @@
         <span>ALL-IN-ONE SERVER+ VLAN SWITCHBOARD</span>
       </div>
       <div class="search-wrap">
-        <input type="search" id="globalSearch" placeholder="Filter all 29 modules (e.g. RAID, SAN, iDRAC, AI, LED)..." aria-label="Filter study modules" />
+        <input type="search" id="globalSearch" placeholder="Filter all 31 modules (e.g. CLI, RAID, Linux, Windows, iDRAC)..." aria-label="Filter study modules" />
       </div>
     </div>
   </header>
@@ -337,17 +349,43 @@
     <section class="hero-banner">
       <div class="hero-tags">
         <span class="pill">UNIFIED TRUNK PORTAL</span>
-        <span class="pill emerald">28 INTERACTIVE MODULES + MASTER ADMIN</span>
+        <span class="pill emerald">30 INTERACTIVE MODULES + MASTER ADMIN</span>
+        <span class="pill rose">INFINITE CLI FLASHCARD DECKS</span>
         <span class="pill amber">400 SCENARIO DRILLS</span>
       </div>
       <h1>CompTIA Server+ V6 Command Switchboard</h1>
-      <p>Consolidated offline-ready study architecture uniting all 400 scenario drills, 5 interactive engineering labs, Sybex chapter portals, and the 15-VLAN isolated domain switchboard.</p>
+      <p>Consolidated offline-ready study architecture uniting infinite CLI mnemonic flashcard decks, 400 scenario drills, 5 interactive engineering labs, Sybex chapter portals, and the 15-VLAN isolated domain switchboard.</p>
 
       <div class="stats-strip">
         <div class="stat-box"><span class="num">400</span><span class="lbl">Exam Scenarios</span></div>
+        <div class="stat-box"><span class="num">2</span><span class="lbl">CLI Flashcard Decks</span></div>
         <div class="stat-box"><span class="num">5</span><span class="lbl">Interactive Labs</span></div>
         <div class="stat-box"><span class="num">3</span><span class="lbl">Sybex Chapter Hubs</span></div>
         <div class="stat-box"><span class="num">15 + 1</span><span class="lbl">VLAN Domain Trunks</span></div>
+      </div>
+    </section>
+
+    <!-- TRUNK 05: INTERACTIVE CLI & MNEMONIC FLASHCARD DECKS -->
+    <section class="section-block" data-section>
+      <div class="section-header">
+        <h2>Trunk 05 // Infinite CLI &amp; Mnemonic Flashcard Decks</h2>
+        <span>Tap-to-Reveal Commute Drills &bull; Invisible Giveaway Decoders</span>
+      </div>
+      <div class="grid-cards">
+        <a class="port-card drill-card" href="server_plus_linux_switchboard.html" data-keywords="linux cli commands vowel drop fsck fdisk df inodes lsof ss tail grep mnemonic flashcards">
+          <div>
+            <div class="card-top"><span class="port-tag rose">CLI DECK 01 // LINUX</span><span class="link-state">FLASHCARDS + BLUR</span></div>
+            <h3>Linux Command &amp; Vowel-Drop Switchboard</h3>
+            <p>Interactive mnemonic decoder for Server+ Linux commands (fsck, df -i, lsof, ss, mkfs, chmod) with blur-drill toggle and commute flashcard deck.</p>
+          </div>
+        </a>
+        <a class="port-card drill-card" href="server_plus_multi_os_switchboard.html" data-keywords="windows powershell cmd esxi hyper-v uefi shell ipmitool sfc dism sysprep robocopy linux twins infinite deck">
+          <div>
+            <div class="card-top"><span class="port-tag rose">CLI DECK 02 // MULTI-OS</span><span class="link-state">INFINITE DECK</span></div>
+            <h3>Multi-OS, Hypervisor &amp; UEFI CLI Switchboard</h3>
+            <p>Infinite spaced-repetition flashcard deck covering Windows Server (SFC, DISM, Sysprep, Robocopy), Networking CLI, ESXi/Hyper-V, UEFI Shell, and Linux Twins.</p>
+          </div>
+        </a>
       </div>
     </section>
 
@@ -487,4 +525,64 @@
         <a class="port-card vlan-card" href="vlan-05.html" data-keywords="vlan 05 hardware buses sas sata nvme pcie lanes ecc rdimm lrdimm numa blade">
           <div><div class="card-top"><span class="port-tag">VLAN 05</span><span class="link-state">ACTIVE</span></div><h3>Hardware, Buses &amp; Storage Interfaces</h3><p>SAS vs. SATA vs. NVMe, PCIe lanes and generations, ECC/RDIMM/LRDIMM/NUMA memory, and Rack/Blade chassis.</p></div>
         </a>
-        <a class="port-card vlan-card" href="v
+        <a class="port-card vlan-card" href="vlan-06.html" data-keywords="vlan 06 power thermal ups pdu ats 2n n+1 hot aisle cold aisle ashrae">
+          <div><div class="card-top"><span class="port-tag">VLAN 06</span><span class="link-state">ACTIVE</span></div><h3>Power Redundancy &amp; Thermal Management</h3><p>UPS topologies, PDU/ATS dual feeds, N+1 vs. 2N redundancy, hot/cold aisle containment, and ASHRAE thresholds.</p></div>
+        </a>
+        <a class="port-card vlan-card" href="vlan-07.html" data-keywords="vlan 07 out of band oob management bmc ipmi idrac ilo kvm crash cart pxe">
+          <div><div class="card-top"><span class="port-tag">VLAN 07</span><span class="link-state">ACTIVE</span></div><h3>Out-of-Band Management &amp; Provisioning</h3><p>BMC, IPMI, iDRAC, iLO, KVM-over-IP, crash carts, PXE network boot, and unattended server provisioning.</p></div>
+        </a>
+        <a class="port-card vlan-card" href="vlan-08.html" data-keywords="vlan 08 virtualization hypervisor type 1 type 2 live migration vmotion evc snapshots">
+          <div><div class="card-top"><span class="port-tag">VLAN 08</span><span class="link-state">ACTIVE</span></div><h3>Virtualization &amp; Hypervisor Architecture</h3><p>Type 1 vs. Type 2 hypervisors, live migration, CPU EVC masking, thin/thick provisioning, and VM snapshots.</p></div>
+        </a>
+        <a class="port-card vlan-card" href="vlan-09.html" data-keywords="vlan 09 containers orchestration docker kubernetes pods namespaces cgroups">
+          <div><div class="card-top"><span class="port-tag">VLAN 09</span><span class="link-state">ACTIVE</span></div><h3>Containers &amp; Orchestration</h3><p>Container runtimes vs. VMs, Linux namespaces and cgroups, container registries, and Kubernetes cluster basics.</p></div>
+        </a>
+        <a class="port-card vlan-card" href="vlan-10.html" data-keywords="vlan 10 networking vlans lacp nic teaming bonding trunking 802.1q jumbo frames">
+          <div><div class="card-top"><span class="port-tag">VLAN 10</span><span class="link-state">ACTIVE</span></div><h3>Server Networking, NIC Teaming &amp; VLANs</h3><p>802.1Q VLAN tagging, LACP link aggregation, NIC teaming modes, jumbo frames (MTU 9000), and DNS/DHCP.</p></div>
+        </a>
+        <a class="port-card vlan-card" href="vlan-11.html" data-keywords="vlan 11 security hardening selinux apparmor rbac paw uefi secure boot tpm">
+          <div><div class="card-top"><span class="port-tag">VLAN 11</span><span class="link-state">ACTIVE</span></div><h3>Server Hardening &amp; Access Control</h3><p>OS baseline hardening, SELinux/AppArmor MAC, RBAC/least privilege, PAWs, UEFI Secure Boot, and TPM 2.0.</p></div>
+        </a>
+        <a class="port-card vlan-card" href="vlan-12.html" data-keywords="vlan 12 physical security datacenter mantrap biometric cctv environmental sensors">
+          <div><div class="card-top"><span class="port-tag">VLAN 12</span><span class="link-state">ACTIVE</span></div><h3>Physical &amp; Datacenter Security</h3><p>Access control vestibules/mantraps, biometric/badge MFA, rack locks, CCTV, and environmental fire/water sensors.</p></div>
+        </a>
+        <a class="port-card vlan-card" href="vlan-13.html" data-keywords="vlan 13 backup disaster recovery dr rpo rto 3-2-1 incremental differential">
+          <div><div class="card-top"><span class="port-tag">VLAN 13</span><span class="link-state">ACTIVE</span></div><h3>Backup Strategies &amp; Disaster Recovery</h3><p>Full, incremental, and differential backups, 3-2-1 rule, RPO vs. RTO targets, and hot/warm/cold DR sites.</p></div>
+        </a>
+        <a class="port-card vlan-card" href="vlan-14.html" data-keywords="vlan 14 troubleshooting methodology post beep codes logs syslog event viewer">
+          <div><div class="card-top"><span class="port-tag">VLAN 14</span><span class="link-state">ACTIVE</span></div><h3>Troubleshooting Methodology &amp; Forensics</h3><p>CompTIA 7-step troubleshooting flow, POST beep/LED codes, hardware isolation, and OS/BMC log correlation.</p></div>
+        </a>
+        <a class="port-card vlan-card" href="vlan-15.html" data-keywords="vlan 15 ai infrastructure gpu tensor nvlink infiniband roce liquid cooling">
+          <div><div class="card-top"><span class="port-tag">VLAN 15</span><span class="link-state">ACTIVE</span></div><h3>AI Infrastructure &amp; High-Density Compute</h3><p>GPU acceleration, NVLink/NVSwitch, InfiniBand &amp; RoCEv2 fabrics, high-wattage racks, and liquid cooling.</p></div>
+        </a>
+        <a class="port-card admin-card" href="vlan-admin.html" data-keywords="vlan admin master control exam readiness tracker objectives checklist">
+          <div><div class="card-top"><span class="port-tag purple">VLAN ADMIN</span><span class="link-state">MASTER CONTROL</span></div><h3>Master Admin &amp; Exam Readiness Hub</h3><p>Cross-domain exam objective tracker, weak-spot diagnostics, and final pre-exam check-in console.</p></div>
+        </a>
+      </div>
+    </section>
+
+    <footer class="footer-note">
+      <span>SER-V6-VLAN // OFFLINE STATIC REPOSITORY</span>
+      <span>30 MODULES + MASTER ADMIN // READY FOR GITHUB PAGES</span>
+    </footer>
+  </main>
+
+  <script>
+    const searchInput = document.getElementById('globalSearch');
+    const cards = Array.from(document.querySelectorAll('.port-card'));
+    const sections = Array.from(document.querySelectorAll('[data-section]'));
+
+    searchInput.addEventListener('input', (e) => {
+      const term = e.target.value.trim().toLowerCase();
+      cards.forEach((card) => {
+        const text = (card.textContent + ' ' + (card.dataset.keywords || '')).toLowerCase();
+        card.style.display = !term || text.includes(term) ? 'flex' : 'none';
+      });
+      sections.forEach((sec) => {
+        const visible = sec.querySelectorAll('.port-card[style*="display: flex"], .port-card:not([style*="display: none"])');
+        sec.style.display = visible.length ? 'block' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

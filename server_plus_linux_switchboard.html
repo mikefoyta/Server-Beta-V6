@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Server+ Linux Command Switchboard</title>
+  <style>
+    /* ==========================================================================
+       DESIGN TOKENS & DEEP NAVY THEME
+       ========================================================================== */
+    :root {
+      --bg-deep: #070d1f;
+      --bg-navy: #0a1128;
+      --bg-card: #111d4a;
+      --bg-card-hover: #16255e;
+      --bg-elevated: #0d1638;
+      --border-subtle: rgba(100, 210, 255, 0.16);
+      --border-active: rgba(56, 189, 248, 0.55);
+
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+
+      --accent-cyan: #38bdf8;
+      --accent-cyan-glow: rgba(56, 189, 248, 0.18);
+      --accent-amber: #fbbf24;
+      --accent-amber-soft: rgba(251, 191, 36, 0.14);
+      --accent-emerald: #34d399;
+      --accent-rose: #fb7185;
+
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow-card: 0 10px 25px -5px rgba(2, 6, 23, 0.55);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-deep);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 0%, rgba(56, 189, 248, 0.09) 0%, transparent 42%),
+        radial-gradient(circle at 88% 12%, rgba(251, 191, 36, 0.06) 0%, transparent 38%),
+        linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-navy) 100%);
+      padding-bottom: 5rem;
+    }
+
+    /* ==========================================================================
+       LAYOUT & HEADER
+       ========================================================================== */
+    .container {
+      width: 100%;
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    header.app-header {
+      background: linear-gradient(145deg, rgba(17, 29, 74, 0.92), rgba(10, 17, 40, 0.96));
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .goose-badge {
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(251, 191, 36, 0.22));
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.14);
+    }
+
+    .title-block h1 {
+      font-size: clamp(1.18rem, 3.8vw, 1.55rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .title-block p {
+      font-size: 0.82rem;
+      color: var(--accent-cyan);
+      font-weight: 500;
+      margin-top: 0.2rem;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.55rem 0.85rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      min-height: 40px;
+    }
+
+    .toggle-btn:hover {
+      border-color: var(--accent-cyan);
+    }
+
+    .toggle-btn.active {
+      background: rgba(251, 191, 36, 0.16);
+      border-color: var(--accent-amber);
+      color: var(--accent-amber);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+
+    .toggle-btn.active .status-dot {
+      background: var(--accent-amber);
+      box-shadow: 0 0 8px var(--accent-amber);
+    }
+
+    /* ==========================================================================
+       COMMUTE FLASHCARD DECK (COLLAPSIBLE / COMPACT BAR)
+       ========================================================================== */
+    .flashcard-panel {
+      background: linear-gradient(160deg, #132156 0%, #0d1638 100%);
+      border: 1px solid rgba(56, 189, 248, 0.32);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.15rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .flashcard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .flashcard-label {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-amber);
+    }
+
+    .flashcard-progress {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      background: rgba(7, 13, 31, 0.6);
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .flashcard-body {
+      background: rgba(7, 13, 31, 0.62);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      cursor: pointer;
+      transition: border-color 0.2s ease, transform 0.15s ease;
+    }
+
+    .flashcard-body:hover {
+      border-color: var(--accent-cyan);
+    }
+
+    .fc-prompt {
+      font-size: 0.96rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .fc-answer {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px dashed rgba(148, 163, 184, 0.25);
+      display: none;
+    }
+
+    .fc-answer.revealed {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .fc-cmd {
+      font-family: var(--font-mono);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      margin-bottom: 0.25rem;
+    }
+
+    .fc-hook {
+      font-size: 0.85rem;
+      color: var(--accent-amber);
+    }
+
+    .flashcard-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .fc-btn {
+      padding: 0.48rem 0.85rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 38px;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .fc-btn:hover {
+      border-color: var(--accent-cyan);
+      background: var(--bg-card-hover);
+    }
+
+    .fc-btn.primary {
+      background: rgba(56, 189, 248, 0.16);
+      border-color: rgba(56, 189, 248, 0.45);
+      color: var(--accent-cyan);
+    }
+
+    /* ==========================================================================
+       SEARCH & FILTER CONTROLS
+       ========================================================================== */
+    .controls-bar {
+      position: sticky;
+      top: 0.5rem;
+      z-index: 20;
+      background: rgba(10, 17, 40, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 0.85rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 12px 30px rgba(2, 6, 23, 0.65);
+    }
+
+    .search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.7rem;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      color: var(--accent-cyan);
+      font-size: 0.95rem;
+      pointer-events: none;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 0.68rem 2.4rem 0.68rem 2.35rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      font-family: var(--font-sans);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    #searchInput::placeholder {
+      color: var(--text-muted);
+    }
+
+    #searchInput:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 3px var(--accent-cyan-glow);
+    }
+
+    #clearSearchBtn {
+      position: absolute;
+      right: 0.55rem;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      padding: 0.35rem 0.5rem;
+      cursor: pointer;
+      display: none;
+    }
+
+    .pills-row {
+      display: flex;
+      gap: 0.45rem;
+      overflow-x: auto;
+      padding-bottom: 0.2rem;
+      scrollbar-width: none;
+    }
+
+    .pills-row::-webkit-scrollbar {
+      display: none;
+    }
+
+    .pill {
+      white-space: nowrap;
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      font-size: 0.79rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.16s ease;
+      min-height: 36px;
+    }
+
+    .pill:hover {
+      color: var(--text-primary);
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .pill.active {
+      background: var(--accent-cyan);
+      color: #04091a;
+      border-color: var(--accent-cyan);
+      font-weight: 700;
+    }
+
+    .results-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+      padding: 0 0.2rem;
+    }
+
+    /* ==========================================================================
+       COMMAND CARDS GRID
+       ========================================================================== */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.9rem;
+    }
+
+    @media (min-width: 720px) {
+      .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .cmd-card {
+      background: linear-gradient(165deg, var(--bg-card) 0%, #0d173d 100%);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.05rem;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: 0.68rem;
+      transition: border-color 0.2s ease, transform 0.15s ease;
+    }
+
+    .cmd-card:hover {
+      border-color: var(--border-active);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.6rem;
+    }
+
+    .cmd-badge-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .cmd-name {
+      font-family: var(--font-mono);
+      font-size: 1.18rem;
+      font-weight: 800;
+      color: var(--accent-cyan);
+      background: rgba(7, 13, 31, 0.72);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 0.28rem 0.65rem;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      width: fit-content;
+      letter-spacing: -0.01em;
+    }
+
+    .cat-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .copy-btn {
+      padding: 0.42rem 0.68rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: rgba(7, 13, 31, 0.65);
+      color: var(--text-secondary);
+      font-size: 0.76rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .copy-btn:hover {
+      border-color: var(--accent-cyan);
+      color: var(--text-primary);
+    }
+
+    .copy-btn.copied {
+      border-color: var(--accent-emerald);
+      color: var(--accent-emerald);
+      background: rgba(52, 211, 153, 0.12);
+    }
+
+    /* Invisible Giveaway Box */
+    .giveaway-box {
+      background: rgba(7, 13, 31, 0.58);
+      border-left: 3px solid var(--accent-amber);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 0.55rem 0.75rem;
+      cursor: pointer;
+      transition: background 0.18s ease;
+    }
+
+    .giveaway-box:hover {
+      background: rgba(7, 13, 31, 0.82);
+    }
+
+    .giveaway-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-amber);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.18rem;
+    }
+
+    .giveaway-text {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      transition: filter 0.2s ease, opacity 0.2s ease;
+    }
+
+    /* Masked state when Quiz/Drill mode hides giveaways */
+    body.quiz-hide-giveaways .giveaway-box:not(.unmasked) .giveaway-text {
+      filter: blur(5px);
+      opacity: 0.45;
+      user-select: none;
+    }
+
+    .giveaway-text .hl {
+      color: var(--accent-amber);
+      font-weight: 800;
+      text-decoration: underline;
+      text-decoration-color: rgba(251, 191, 36, 0.45);
+      text-underline-offset: 3px;
+    }
+
+    .use-case {
+      font-size: 0.88rem;
+      color: var(--text-primary);
+      line-height: 1.48;
+    }
+
+    .flags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .flag-chip {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.24);
+      color: #bae6fd;
+      padding: 0.22rem 0.52rem;
+      border-radius: 6px;
+    }
+
+    .trap-note {
+      margin-top: auto;
+      padding: 0.58rem 0.72rem;
+      border-radius: var(--radius-sm);
+      background: var(--accent-amber-soft);
+      border: 1px solid rgba(251, 191, 36, 0.24);
+      font-size: 0.81rem;
+      color: #fde68a;
+      line-height: 1.42;
+    }
+
+    .trap-note strong {
+      color: var(--accent-amber);
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      color: var(--text-secondary);
+      display: none;
+    }
+
+    /* Toast notification */
+    #toast {
+      position: fixed;
+      bottom: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #0f172a;
+      color: var(--accent-emerald);
+      border: 1px solid var(--accent-emerald);
+      padding: 0.55rem 1rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 50;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- ======================================================================
+         HEADER & MNEMONIC MODE TOGGLE
+         ====================================================================== -->
+    <header class="app-header">
+      <div class="header-top">
+        <div class="brand-group">
+          <div class="goose-badge" aria-label="Emergency Goose Mascot">🪿</div>
+          <div class="title-block">
+            <h1>Server+ Linux Command Switchboard</h1>
+            <p>CompTIA Server+ (SK0-005 / V6) — Vowel-Drop &amp; Mnemonic Reference</p>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button type="button" id="mnemonicModeBtn" class="toggle-btn active" title="Toggle between highlighted Vowel-Drop answers and tap-to-reveal memory drill">
+            <span class="status-dot"></span>
+            <span id="mnemonicModeText">Mnemonic Mode: Visible</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ======================================================================
+         COMMUTE SELF-TEST FLASHCARD BAR (10 QUESTIONS)
+         ====================================================================== -->
+    <section class="flashcard-panel" aria-label="Commute Self-Test Flashcard Deck">
+      <div class="flashcard-header">
+        <div class="flashcard-label">
+          <span>⚡ Commute Self-Test</span>
+        </div>
+        <div class="flashcard-progress" id="fcProgress">Card 1 of 10</div>
+      </div>
+
+      <div class="flashcard-body" id="fcCardBox" role="button" tabindex="0" aria-label="Tap to reveal command answer">
+        <div class="fc-prompt" id="fcPrompt">Loading prompt...</div>
+        <div class="fc-answer" id="fcAnswer">
+          <div class="fc-cmd" id="fcCmd"></div>
+          <div class="fc-hook" id="fcHook"></div>
+        </div>
+      </div>
+
+      <div class="flashcard-controls">
+        <button type="button" class="fc-btn" id="fcPrevBtn">← Prev</button>
+        <button type="button" class="fc-btn primary" id="fcRevealBtn">Tap to Reveal</button>
+        <button type="button" class="fc-btn" id="fcNextBtn">Next →</button>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         STICKY SEARCH & CATEGORY FILTER PILLS
+         ====================================================================== -->
+    <section class="controls-bar" aria-label="Search and Category Filters">
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input
+          type="search"
+          id="searchInput"
+          placeholder="Search command, flag, vowel-drop, or exam trap (e.g. inode, fsck, port)..."
+          autocomplete="off"
+        />
+        <button type="button" id="clearSearchBtn" aria-label="Clear search">✕</button>
+      </div>
+
+      <div class="pills-row" id="categoryPills" role="tablist">
+        <button type="button" class="pill active" data-cat="All">All</button>
+        <button type="button" class="pill" data-cat="Disk & Storage">Disk &amp; Storage</button>
+        <button type="button" class="pill" data-cat="Logs & Text">Logs &amp; Text</button>
+        <button type="button" class="pill" data-cat="Processes & Health">Processes &amp; Health</button>
+        <button type="button" class="pill" data-cat="Hardware & Boot">Hardware &amp; Boot</button>
+        <button type="button" class="pill" data-cat="Network & Security">Network &amp; Security</button>
+        <button type="button" class="pill" data-cat="Services & Users">Services &amp; Users</button>
+      </div>
+    </section>
+
+    <div class="results-meta">
+      <span id="countLabel">Showing all commands</span>
+      <span>Tip: Tap any yellow box to toggle reveal</span>
+    </div>
+
+    <!-- ======================================================================
+         COMMAND CARDS CONTAINER
+         ====================================================================== -->
+    <main class="cards-grid" id="cardsGrid"></main>
+
+    <div class="empty-state" id="emptyState">
+      <p style="font-size: 1.5rem; margin-bottom: 0.4rem;">🪿</p>
+      <p style="font-weight: 700; color: var(--text-primary);">No matching Linux commands found</p>
+      <p style="font-size: 0.85rem; margin-top: 0.25rem;">Try clearing your search or switching back to the "All" category.</p>
+    </div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite">Copied to clipboard!</div>
+
+  <script>
+    /* ==========================================================================
+       SERVER+ LINUX COMMAND DATASET (VOWEL-DROP & MNEMONIC VERIFIED)
+       ========================================================================== */
+    const COMMANDS = [
+      // --- DISK & STORAGE ---
+      {
+        cmd: "fsck",
+        category: "Disk & Storage",
+        giveawayHtml: '<span class="hl">F</span>ile<span class="hl">S</span>ystem <span class="hl">C</span>hec<span class="hl">K</span> — "F" for Fix &amp; Check',
+        giveawayPlain: "FileSystem ChecK — F for Fix & Check",
+        useCase: "Scans and repairs corrupted Linux filesystems and bad superblocks (e.g., fsck /dev/sda1).",
+        flags: ["fsck /dev/sda1", "-y (auto-yes)", "-f (force check)"],
+        trap: "Exam Trap: fsck = FIX filesystem; fdisk = FORMAT/partition disk. Always unmount the partition BEFORE running fsck or you risk severe data corruption!"
+      },
+      {
+        cmd: "fdisk",
+        category: "Disk & Storage",
+        giveawayHtml: '<span class="hl">F</span>ormat / Partition <span class="hl">DISK</span>',
+        giveawayPlain: "Format / Partition DISK",
+        useCase: "Interactive utility to create, delete, and view partition tables on block storage drives.",
+        flags: ["fdisk -l (list all partitions)", "fdisk /dev/sdb"],
+        trap: "Exam Trap: Classic fdisk handles MBR partitions (up to 2 TB). For drives larger than 2 TB using GPT, Server+ also tests parted or gdisk."
+      },
+      {
+        cmd: "mkfs",
+        category: "Disk & Storage",
+        giveawayHtml: '<span class="hl">M</span>a<span class="hl">K</span>e <span class="hl">F</span>ile<span class="hl">S</span>ystem',
+        giveawayPlain: "MaKe FileSystem",
+        useCase: "Formats a raw partition with a specific Linux filesystem such as EXT4 or XFS.",
+        flags: ["mkfs.ext4 /dev/sdb1", "mkfs.xfs /dev/sdb1", "mkfs -t ext4"],
+        trap: "Mnemonic: Partition first with fdisk, then MaKe the FileSystem with mkfs, then attach it with mount."
+      },
+      {
+        cmd: "df",
+        category: "Disk & Storage",
+        giveawayHtml: '<span class="hl">D</span>isk <span class="hl">F</span>ree',
+        giveawayPlain: "Disk Free",
+        useCase: "Displays available and used disk space across all mounted filesystems.",
+        flags: ["df -h (human-readable GB/MB)", "df -i (check inodes)", "df -T (filesystem type)"],
+        trap: "Classic Server+ Scenario: Disk has gigabytes of free space, yet users get 'No space left on device' -> run df -i because 100% of inodes are exhausted!"
+      },
+      {
+        cmd: "du",
+        category: "Disk & Storage",
+        giveawayHtml: '<span class="hl">D</span>isk <span class="hl">U</span>sage',
+        giveawayPlain: "Disk Usage",
+        useCase: "Calculates how much disk space specific directories and files are consuming.",
+        flags: ["du -sh * (summary human-readable)", "du -h --max-depth=1 /var"],
+        trap: "Mnemonic: df = Free space across whole drives; du = Usage by specific folders (great for hunting down bloated /var/log folders)."
+      },
+      {
+        cmd: "mount / umount",
+        category: "Disk & Storage",
+        giveawayHtml: '<span class="hl">MOUNT</span> / <span class="hl">U</span>n-<span class="hl">MOUNT</span> (no "n" in umount!)',
+        giveawayPlain: "MOUNT / Un-MOUNT",
+        useCase: "Attaches or detaches storage partitions, ISO images, or network shares (NFS/SMB) to a directory tree.",
+        flags: ["mount /dev/sdb1 /mnt/data", "mount -a (mount all in /etc/fstab)", "umount /mnt/data"],
+        trap: "Exam Trap: Permanent mounts across reboots must be saved in /etc/fstab. Also note the spelling: umount, NOT unmount!"
+      },
+      {
+        cmd: "NFS vs. SMB",
+        category: "Disk & Storage",
+        giveawayHtml: '<span class="hl">N</span>ot <span class="hl">F</span>or <span class="hl">S</span>oft (Linux) vs. <span class="hl">S</span>ome <span class="hl">M</span>icrosoft <span class="hl">B</span>locks (Windows)',
+        giveawayPlain: "Not For Soft (Linux) vs Some Microsoft Blocks (Windows)",
+        useCase: "Network file-sharing protocols: NFS is native to Linux/Unix; SMB/CIFS is native to Windows (supported on Linux via Samba).",
+        flags: ["showmount -e <server>", "mount -t nfs server:/share /mnt", "smbclient"],
+        trap: "Mnemonic: If a Server+ question asks how two Linux servers share folders natively, pick NFS. If Windows clients need access, pick SMB/Samba."
+      },
+
+      // --- LOGS & TEXT ---
+      {
+        cmd: "tail -f",
+        category: "Logs & Text",
+        giveawayHtml: '<span class="hl">TAIL</span> end of file + <span class="hl">F</span>ollow live',
+        giveawayPlain: "TAIL end of file + Follow live",
+        useCase: "Displays the last 10 lines of a log file and streams new entries in real time as errors occur.",
+        flags: ["tail -f /var/log/syslog", "tail -n 50 /var/log/messages"],
+        trap: "Exam Trap: Best tool for watching live authentication failures or service crashes while reproducing an issue."
+      },
+      {
+        cmd: "head",
+        category: "Logs & Text",
+        giveawayHtml: '<span class="hl">HEAD</span> (top) of file',
+        giveawayPlain: "HEAD (top) of file",
+        useCase: "Outputs the first 10 lines of a configuration file or log without opening an editor.",
+        flags: ["head -n 20 config.conf"],
+        trap: "Mnemonic: head = top of the body; tail = bottom end."
+      },
+      {
+        cmd: "grep",
+        category: "Logs & Text",
+        giveawayHtml: '<span class="hl">G</span>rab <span class="hl">R</span>egular <span class="hl">E</span>xpression <span class="hl">P</span>attern',
+        giveawayPlain: "Grab Regular Expression Pattern",
+        useCase: "Filters text files or command output for matching keywords, IP addresses, or error strings.",
+        flags: ['grep -i "error" syslog (ignore case)', 'grep -r "10.0.0.1" /etc/ (recursive)'],
+        trap: "Exam Tip: Frequently piped with other commands (e.g., ps aux | grep apache or dmesg | grep -i usb)."
+      },
+      {
+        cmd: "cat",
+        category: "Logs & Text",
+        giveawayHtml: 'Con<span class="hl">CAT</span>enate',
+        giveawayPlain: "ConCATenate",
+        useCase: "Dumps the entire contents of short files (like /etc/hosts or /etc/resolv.conf) directly to the terminal.",
+        flags: ["cat /etc/fstab", "cat file1 file2 > combined"],
+        trap: "Tip: Use less instead of cat for massive multi-megabyte log files so you don't flood your terminal screen."
+      },
+      {
+        cmd: "journalctl",
+        category: "Logs & Text",
+        giveawayHtml: '<span class="hl">JOURNAL</span> <span class="hl">C</span>on<span class="hl">T</span>ro<span class="hl">L</span>',
+        giveawayPlain: "JOURNAL ConTroL",
+        useCase: "Queries and displays structured logs collected by systemd's journal daemon.",
+        flags: ["journalctl -u sshd (specific service)", "journalctl -xe (jump to end w/ errors)", "journalctl -b (current boot)"],
+        trap: "Exam Link: Whenever a systemd service fails to start, Server+ expects journalctl -xe or systemctl status."
+      },
+
+      // --- PROCESSES & HEALTH ---
+      {
+        cmd: "top",
+        category: "Processes & Health",
+        giveawayHtml: '<span class="hl">T</span>able <span class="hl">O</span>f <span class="hl">P</span>rocesses',
+        giveawayPlain: "Table Of Processes",
+        useCase: "Real-time interactive monitor showing CPU load, RAM/swap usage, I/O wait, and top resource-hogging processes.",
+        flags: ["top", "htop (enhanced interactive version)", "Press 'k' inside top to kill PID"],
+        trap: "Exam Trap: Slow disk access isn't always a bad drive—high CPU or low RAM in top often manifests as sluggish I/O."
+      },
+      {
+        cmd: "ps",
+        category: "Processes & Health",
+        giveawayHtml: '<span class="hl">P</span>rocess <span class="hl">S</span>tatus',
+        giveawayPlain: "Process Status",
+        useCase: "Captures a static snapshot of currently running processes and their Process IDs (PIDs).",
+        flags: ["ps aux (all users & background daemons)", "ps -ef (full format)"],
+        trap: "Mnemonic: top is a live video feed of processes; ps is a still photograph."
+      },
+      {
+        cmd: "kill / killall",
+        category: "Processes & Health",
+        giveawayHtml: '<span class="hl">KILL</span> process by PID (or <span class="hl">ALL</span> by name)',
+        giveawayPlain: "KILL process by PID (or ALL by name)",
+        useCase: "Sends termination signals to hung or runaway processes.",
+        flags: ["kill -15 <PID> (SIGTERM graceful)", "kill -9 <PID> (SIGKILL force)", "killall httpd"],
+        trap: "Exam Trap: Always try graceful SIGTERM (-15) first before forceful SIGKILL (-9) so applications can close files cleanly."
+      },
+      {
+        cmd: "lsof",
+        category: "Processes & Health",
+        giveawayHtml: '<span class="hl">L</span>i<span class="hl">S</span>t <span class="hl">O</span>pen <span class="hl">F</span>iles',
+        giveawayPlain: "LiSt Open Files",
+        useCase: "Identifies which process is locking a file/mount point or listening on a specific TCP/UDP port.",
+        flags: ["lsof -i :80 (who is using port 80?)", "lsof /mnt/usb (why won't USB unmount?)"],
+        trap: "In Linux, everything is a file—including network sockets. If umount says 'target is busy', run lsof to find the culprit."
+      },
+      {
+        cmd: "vmstat",
+        category: "Processes & Health",
+        giveawayHtml: '<span class="hl">V</span>irtual <span class="hl">M</span>emory <span class="hl">STAT</span>istics',
+        giveawayPlain: "Virtual Memory STATistics",
+        useCase: "Reports memory, paging/swap activity, disk I/O blocks, and CPU scheduling bottlenecks.",
+        flags: ["vmstat 2 5 (every 2 sec, 5 times)", "free -h (quick RAM/swap check)"],
+        trap: "Exam Clue: High 'si/so' (swap in / swap out) numbers mean the server is thrashing swap due to insufficient RAM."
+      },
+
+      // --- HARDWARE & BOOT ---
+      {
+        cmd: "lsblk",
+        category: "Hardware & Boot",
+        giveawayHtml: '<span class="hl">L</span>i<span class="hl">S</span>t <span class="hl">BL</span>oc<span class="hl">K</span> devices',
+        giveawayPlain: "LiSt BLocK devices",
+        useCase: "Lists all physical disks, partitions, RAID volumes, and mount points in a clean tree layout.",
+        flags: ["lsblk", "lsblk -f (show UUIDs & filesystems)"],
+        trap: "Mnemonic: Hard drives transfer data in blocks -> LiSt BLocK devices."
+      },
+      {
+        cmd: "lspci",
+        category: "Hardware & Boot",
+        giveawayHtml: '<span class="hl">L</span>i<span class="hl">S</span>t <span class="hl">PCI</span> devices',
+        giveawayPlain: "LiSt PCI devices",
+        useCase: "Displays internal motherboard expansion cards (NICs, hardware RAID controllers, HBAs, GPUs).",
+        flags: ["lspci", "lspci -v (verbose driver info)", "lspci | grep -i eth"],
+        trap: "Use this when a newly installed NIC or RAID HBA isn't showing up in the OS to verify hardware detection."
+      },
+      {
+        cmd: "lsusb",
+        category: "Hardware & Boot",
+        giveawayHtml: '<span class="hl">L</span>i<span class="hl">S</span>t <span class="hl">USB</span> devices',
+        giveawayPlain: "LiSt USB devices",
+        useCase: "Lists all USB buses and connected external peripherals (crash cart keyboards, USB drives, dongles).",
+        flags: ["lsusb", "lsusb -t (tree view)"],
+        trap: "Easy giveaway: literally 'ls' + 'usb'."
+      },
+      {
+        cmd: "dmesg",
+        category: "Hardware & Boot",
+        giveawayHtml: '<span class="hl">D</span>iagnostic <span class="hl">MES</span>sa<span class="hl">G</span>es (kernel ring buffer)',
+        giveawayPlain: "Diagnostic MESsaGes (kernel ring buffer)",
+        useCase: "Prints hardware detection and driver initialization messages from the Linux kernel during boot.",
+        flags: ["dmesg | grep -i error", "dmesg -T (human timestamps)"],
+        trap: "Exam Clue: When a drive clicks, a NIC drops link, or a driver fails at boot, dmesg holds the kernel's raw hardware alerts."
+      },
+      {
+        cmd: "grub",
+        category: "Hardware & Boot",
+        giveawayHtml: '<span class="hl">GR</span>and <span class="hl">U</span>nified <span class="hl">B</span>ootloader',
+        giveawayPlain: "GRand Unified Bootloader",
+        useCase: "Default modern Linux bootloader that loads the kernel and initramfs into memory at startup.",
+        flags: ["/boot/grub2/grub.cfg", "grub2-mkconfig -o /boot/grub2/grub.cfg"],
+        trap: "Exam Trap: GRUB is the modern Linux bootloader; LILO (LInux LOader) is the legacy/obsolete one often used as a distractor."
+      },
+
+      // --- NETWORK & SECURITY ---
+      {
+        cmd: "ss",
+        category: "Network & Security",
+        giveawayHtml: '<span class="hl">S</span>ocket <span class="hl">S</span>tatistics',
+        giveawayPlain: "Socket Statistics",
+        useCase: "Modern replacement for netstat; inspects active TCP/UDP connections and listening server ports.",
+        flags: ["ss -tulnp (TCP, UDP, Listening, Numeric, Process)", "ss -s (summary)"],
+        trap: "Mnemonic: 'tulnp' = TCP, UDP, Listening, Numeric ports, Process name. Essential for checking if a daemon is actually listening!"
+      },
+      {
+        cmd: "ip",
+        category: "Network & Security",
+        giveawayHtml: '<span class="hl">IP</span>route2 utility (replaces ifconfig)',
+        giveawayPlain: "IProute2 utility (replaces ifconfig)",
+        useCase: "Configures and inspects network interfaces, IP addresses, default gateways, and routing tables.",
+        flags: ["ip a (show IP addresses)", "ip r (show routing table)", "ip link set eth0 up"],
+        trap: "Exam Trap: ifconfig and route are legacy tools; modern Linux distros use ip addr and ip route."
+      },
+      {
+        cmd: "iptables",
+        category: "Network & Security",
+        giveawayHtml: '<span class="hl">IP</span> packet filter <span class="hl">TABLES</span>',
+        giveawayPlain: "IP packet filter TABLES",
+        useCase: "Classic Linux host-based firewall utility (and backend for ufw/firewalld) controlling INPUT, OUTPUT, and FORWARD chains.",
+        flags: ["iptables -L -n -v (list rules)", "ufw status", "firewall-cmd --list-all"],
+        trap: "Exam Trap: iptables = host firewall; Tripwire = File Integrity Monitoring (FIM) tool that detects unauthorized file changes."
+      },
+      {
+        cmd: "chmod",
+        category: "Network & Security",
+        giveawayHtml: '<span class="hl">CH</span>ange <span class="hl">MOD</span>e (permissions)',
+        giveawayPlain: "CHange MODe (permissions)",
+        useCase: "Modifies Read (4), Write (2), and Execute (1) permissions for Owner, Group, and Others.",
+        flags: ["chmod 640 secret.conf", "chmod +x backup.sh", "chmod -R 755 /var/www"],
+        trap: "Quick Math: Read=4, Write=2, Execute=1. So 7 = rwx (4+2+1), 6 = rw- (4+2), 5 = r-x (4+1)."
+      },
+      {
+        cmd: "chown",
+        category: "Network & Security",
+        giveawayHtml: '<span class="hl">CH</span>ange <span class="hl">OWN</span>er',
+        giveawayPlain: "CHange OWNer",
+        useCase: "Changes the user owner and/or group owner of files and directories.",
+        flags: ["chown apache:apache /var/www/html", "chown -R root:root /etc/app"],
+        trap: "Mnemonic: chmod changes what you can DO (mode); chown changes WHO owns it (owner)."
+      },
+
+      // --- SERVICES & USERS ---
+      {
+        cmd: "systemctl",
+        category: "Services & Users",
+        giveawayHtml: '<span class="hl">SYSTEM</span> <span class="hl">C</span>on<span class="hl">T</span>ro<span class="hl">L</span>',
+        giveawayPlain: "SYSTEM ConTroL",
+        useCase: "Starts, stops, restarts, enables, and checks the status of background Linux services (daemons).",
+        flags: ["systemctl status sshd", "systemctl restart nginx", "systemctl enable httpd (start on boot)"],
+        trap: "Exam Trap: 'start' runs a service right now; 'enable' makes it start automatically after a reboot!"
+      },
+      {
+        cmd: "chronyc",
+        category: "Services & Users",
+        giveawayHtml: '<span class="hl">CHRONY</span> (time) <span class="hl">C</span>lient',
+        giveawayPlain: "CHRONY (time) Client",
+        useCase: "Monitors and manages NTP time synchronization on modern Linux servers (chronyd).",
+        flags: ["chronyc sources -v", "chronyc tracking", "timedatectl status"],
+        trap: "Server+ Rule: Kerberos authentication, TLS certificates, and log correlation ALL break if server clocks drift—always verify NTP!"
+      },
+      {
+        cmd: "pwd",
+        category: "Services & Users",
+        giveawayHtml: '<span class="hl">P</span>rint <span class="hl">W</span>orking <span class="hl">D</span>irectory',
+        giveawayPlain: "Print Working Directory",
+        useCase: "Displays the full absolute path of your current location in the filesystem.",
+        flags: ["pwd"],
+        trap: "Simple sanity check before running destructive commands like rm -rf or mkfs!"
+      },
+      {
+        cmd: "su / sudo",
+        category: "Services & Users",
+        giveawayHtml: '<span class="hl">S</span>ubstitute <span class="hl">U</span>ser / <span class="hl">S</span>ubstitute <span class="hl">U</span>ser <span class="hl">DO</span>',
+        giveawayPlain: "Substitute User / Substitute User DO",
+        useCase: "Executes administrative commands with elevated root privileges without logging directly in as root.",
+        flags: ["sudo systemctl restart sshd", "su - (switch user with full environment)"],
+        trap: "Security Best Practice: Disable direct root SSH login and audit privileged commands via /etc/sudoers."
+      }
+    ];
+
+    /* ==========================================================================
+       10 COMMUTE SELF-TEST FLASHCARDS
+       ========================================================================== */
+    const FLASHCARDS = [
+      {
+        prompt: "1. A Linux drive won't mount due to filesystem corruption. Which command repairs it (and what must you do first)?",
+        cmd: "fsck /dev/sda1 (after unmounting!)",
+        hook: "Invisible Giveaway: FileSystem ChecK — 'F' for Fix & Check (unlike fdisk, which Formats/partitions disks)."
+      },
+      {
+        prompt: "2. A server says 'No space left on device' even though df -h shows 40 GB free. Which command & flag proves why?",
+        cmd: "df -i",
+        hook: "Invisible Giveaway: Disk Free -inodes — every tiny file eats 1 inode; 100% inode usage blocks new files."
+      },
+      {
+        prompt: "3. You need to watch new authentication errors appear in /var/log/secure in real time while testing a login.",
+        cmd: "tail -f /var/log/secure",
+        hook: "Invisible Giveaway: TAIL end of file + Follow live."
+      },
+      {
+        prompt: "4. Which command shows all listening TCP/UDP ports and the exact Linux process holding each socket open?",
+        cmd: "ss -tulnp",
+        hook: "Invisible Giveaway: Socket Statistics (TCP, UDP, Listening, Numeric, Process)."
+      },
+      {
+        prompt: "5. You just configured Apache (httpd) and started it. How do you ensure it survives a server reboot?",
+        cmd: "systemctl enable httpd",
+        hook: "Invisible Giveaway: SYSTEM ConTroL — 'start' is for now; 'enable' is for every boot."
+      },
+      {
+        prompt: "6. Two Linux servers need to share a directory natively. Which protocol is 'Not For Soft' (Linux native)?",
+        cmd: "NFS (Network File System)",
+        hook: "Mnemonic: NFS = Not For Soft (Linux); SMB = Some Microsoft Blocks (Windows)."
+      },
+      {
+        prompt: "7. Which Linux utility acts as a host-based packet-filtering firewall (not a file integrity monitor)?",
+        cmd: "iptables (or ufw / firewalld)",
+        hook: "Exam Trap: iptables blocks network packets; Tripwire is a File Integrity Monitoring (FIM) tool."
+      },
+      {
+        prompt: "8. You try to umount /mnt/backup and get 'target is busy'. Which command shows which process has a file locked there?",
+        cmd: "lsof /mnt/backup",
+        hook: "Invisible Giveaway: LiSt Open Files."
+      },
+      {
+        prompt: "9. A newly installed PCIe RAID controller isn't showing drives. Which command checks if the motherboard sees the card?",
+        cmd: "lspci",
+        hook: "Invisible Giveaway: LiSt PCI devices (paired with lsblk for block drives and dmesg for kernel boot logs)."
+      },
+      {
+        prompt: "10. Users report Kerberos login failures on a Linux app server due to clock drift. Which command checks NTP sync?",
+        cmd: "chronyc sources -v (or timedatectl)",
+        hook: "Invisible Giveaway: CHRONY Client — keeps server clocks synchronized."
+      }
+    ];
+
+    /* ==========================================================================
+       DOM REFERENCES & STATE
+       ========================================================================== */
+    const cardsGrid = document.getElementById("cardsGrid");
+    const emptyState = document.getElementById("emptyState");
+    const searchInput = document.getElementById("searchInput");
+    const clearSearchBtn = document.getElementById("clearSearchBtn");
+    const categoryPills = document.getElementById("categoryPills");
+    const countLabel = document.getElementById("countLabel");
+    const mnemonicModeBtn = document.getElementById("mnemonicModeBtn");
+    const mnemonicModeText = document.getElementById("mnemonicModeText");
+    const toast = document.getElementById("toast");
+
+    let activeCategory = "All";
+    let searchQuery = "";
+    let mnemonicVisible = true;
+    let currentCardIdx = 0;
+    let cardRevealed = false;
+    let toastTimer = null;
+
+    /* ==========================================================================
+       CLIPBOARD HELPER (IFRAME-SAFE FALLBACK)
+       ========================================================================== */
+    function copyCommandText(text, btnEl) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-9999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        document.execCommand("copy");
+        showToast(`Copied "${text}"`);
+        if (btnEl) {
+          const original = btnEl.innerHTML;
+          btnEl.classList.add("copied");
+          btnEl.innerHTML = "✓ Copied";
+          setTimeout(() => {
+            btnEl.classList.remove("copied");
+            btnEl.innerHTML = original;
+          }, 1400);
+        }
+      } catch (err) {
+        showToast("Could not copy text");
+      }
+      document.body.removeChild(textArea);
+    }
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 1800);
+    }
+
+    /* ==========================================================================
+       RENDER COMMAND CARDS
+       ========================================================================== */
+    function renderCards() {
+      const q = searchQuery.trim().toLowerCase();
+
+      const filtered = COMMANDS.filter((item) => {
+        const matchesCat = activeCategory === "All" || item.category === activeCategory;
+        if (!matchesCat) return false;
+        if (!q) return true;
+
+        const haystack = [
+          item.cmd,
+          item.category,
+          item.giveawayPlain,
+          item.useCase,
+          item.trap,
+          ...item.flags
+        ]
+          .join(" ")
+          .toLowerCase();
+
+        return haystack.includes(q);
+      });
+
+      cardsGrid.innerHTML = "";
+
+      if (filtered.length === 0) {
+        emptyState.style.display = "block";
+        countLabel.textContent = "0 commands matched";
+        return;
+      }
+
+      emptyState.style.display = "none";
+      countLabel.textContent =
+        filtered.length === COMMANDS.length
+          ? `Showing all ${COMMANDS.length} Server+ Linux items`
+          : `Showing ${filtered.length} of ${COMMANDS.length} items`;
+
+      filtered.forEach((item) => {
+        const card = document.createElement("article");
+        card.className = "cmd-card";
+
+        const flagsHtml = item.flags
+          .map((flag) => `<span class="flag-chip">${escapeHtml(flag)}</span>`)
+          .join("");
+
+        card.innerHTML = `
+          <div class="card-top">
+            <div class="cmd-badge-group">
+              <span class="cat-tag">${escapeHtml(item.category)}</span>
+              <code class="cmd-name">${escapeHtml(item.cmd)}</code>
+            </div>
+            <button type="button" class="copy-btn" aria-label="Copy ${escapeHtml(item.cmd)}">
+              📋 Copy
+            </button>
+          </div>
+
+          <div class="giveaway-box" role="button" tabindex="0" title="Tap to reveal or mask mnemonic">
+            <div class="giveaway-label">
+              <span>👁️ Invisible Giveaway</span>
+              <span style="font-size:0.65rem; opacity:0.8;">tap to toggle</span>
+            </div>
+            <div class="giveaway-text">${item.giveawayHtml}</div>
+          </div>
+
+          <p class="use-case">${escapeHtml(item.useCase)}</p>
+
+          <div class="flags-row">${flagsHtml}</div>
+
+          <div class="trap-note">
+            <strong>🪿 Goose Note:</strong> ${escapeHtml(item.trap.replace(/^(Exam Trap:|Mnemonic:|Classic Server\+ Scenario:|Exam Tip:|Exam Link:|Exam Clue:|Tip:|Exam Rule:|Server\+ Rule:|Simple sanity check|Security Best Practice:|Easy giveaway:|Quick Math:)\s*/i, ""))}
+          </div>
+        `;
+
+        // Copy button handler
+        const copyBtn = card.querySelector(".copy-btn");
+        copyBtn.addEventListener("click", () => copyCommandText(item.cmd, copyBtn));
+
+        // Individual giveaway box unmask toggle (for quiz mode)
+        const giveawayBox = card.querySelector(".giveaway-box");
+        giveawayBox.addEventListener("click", () => {
+          giveawayBox.classList.toggle("unmasked");
+        });
+        giveawayBox.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            giveawayBox.classList.toggle("unmasked");
+          }
+        });
+
+        cardsGrid.appendChild(card);
+      });
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    /* ==========================================================================
+       MNEMONIC MODE (VISIBLE VS. BLURRED DRILL)
+       ========================================================================== */
+    mnemonicModeBtn.addEventListener("click", () => {
+      mnemonicVisible = !mnemonicVisible;
+      document.body.classList.toggle("quiz-hide-giveaways", !mnemonicVisible);
+      mnemonicModeBtn.classList.toggle("active", mnemonicVisible);
+      mnemonicModeText.textContent = mnemonicVisible
+        ? "Mnemonic Mode: Visible"
+        : "Mnemonic Mode: Drill (Blurred)";
+
+      // Reset individual overrides when switching global mode
+      document.querySelectorAll(".giveaway-box.unmasked").forEach((el) => {
+        el.classList.remove("unmasked");
+      });
+    });
+
+    /* ==========================================================================
+       SEARCH & CATEGORY PILLS EVENTS
+       ========================================================================== */
+    searchInput.addEventListener("input", (e) => {
+      searchQuery = e.target.value;
+      clearSearchBtn.style.display = searchQuery ? "block" : "none";
+      renderCards();
+    });
+
+    clearSearchBtn.addEventListener("click", () => {
+      searchQuery = "";
+      searchInput.value = "";
+      clearSearchBtn.style.display = "none";
+      searchInput.focus();
+      renderCards();
+    });
+
+    categoryPills.addEventListener("click", (e) => {
+      const btn = e.target.closest(".pill");
+      if (!btn) return;
+
+      document.querySelectorAll(".pill").forEach((p) => p.classList.remove("active"));
+      btn.classList.add("active");
+      activeCategory = btn.dataset.cat;
+      renderCards();
+    });
+
+    /* ==========================================================================
+       COMMUTE FLASHCARD DECK LOGIC
+       ========================================================================== */
+    const fcProgress = document.getElementById("fcProgress");
+    const fcCardBox = document.getElementById("fcCardBox");
+    const fcPrompt = document.getElementById("fcPrompt");
+    const fcAnswer = document.getElementById("fcAnswer");
+    const fcCmd = document.getElementById("fcCmd");
+    const fcHook = document.getElementById("fcHook");
+    const fcPrevBtn = document.getElementById("fcPrevBtn");
+    const fcNextBtn = document.getElementById("fcNextBtn");
+    const fcRevealBtn = document.getElementById("fcRevealBtn");
+
+    function renderFlashcard() {
+      const card = FLASHCARDS[currentCardIdx];
+      fcProgress.textContent = `Card ${currentCardIdx + 1} of ${FLASHCARDS.length}`;
+      fcPrompt.textContent = card.prompt;
+      fcCmd.textContent = card.cmd;
+      fcHook.textContent = card.hook;
+
+      if (cardRevealed) {
+        fcAnswer.classList.add("revealed");
+        fcRevealBtn.textContent = "Hide Answer";
+      } else {
+        fcAnswer.classList.remove("revealed");
+        fcRevealBtn.textContent = "Tap to Reveal";
+      }
+    }
+
+    function toggleFlashcardReveal() {
+      cardRevealed = !cardRevealed;
+      renderFlashcard();
+    }
+
+    fcCardBox.addEventListener("click", toggleFlashcardReveal);
+    fcRevealBtn.addEventListener("click", toggleFlashcardReveal);
+    fcCardBox.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleFlashcardReveal();
+      }
+    });
+
+    fcPrevBtn.addEventListener("click", () => {
+      currentCardIdx = (currentCardIdx - 1 + FLASHCARDS.length) % FLASHCARDS.length;
+      cardRevealed = false;
+      renderFlashcard();
+    });
+
+    fcNextBtn.addEventListener("click", () => {
+      currentCardIdx = (currentCardIdx + 1) % FLASHCARDS.length;
+      cardRevealed = false;
+      renderFlashcard();
+    });
+
+    /* ==========================================================================
+       INITIALIZE ON LOAD
+       ========================================================================== */
+    window.addEventListener("DOMContentLoaded", () => {
+      renderFlashcard();
+      renderCards();
+    });
+  </script>
+</body>
+</html>
